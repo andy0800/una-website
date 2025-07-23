@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+ <script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('about.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'about.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+</head>
+
+<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
+      <a class="logo" href="index.html"><img src="images/logo.png" alt="شعار المركز" /></a>
+
+      <nav class="main-nav" style="margin-right: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدورات</a></li>
+          <li><a href="news.html">الأخبار</a></li>
+          <li><a href="contact.html">تواصل معنا</a></li>
+        </ul>
+      </nav>
+
+     <div class="lang-toggle" style="margin-left:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <a href="../en/about.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
+  <span style="color:#ffcc00;">ع</span>
+</div>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    من نحن
+  </section>
+
+  <section class="about-content container animate-on-scroll">
+    <h2>رؤيتنا</h2>
+    <p>
+      نهدف إلى أن نكون المرجع الأول للتدريب المهني في مجالات التحكيم وتسوية النزاعات داخل الوطن العربي.
+    </p>
+
+    <h2>مهمتنا</h2>
+    <p>
+      توفير برامج تدريبية عالية الجودة بأسلوب أكاديمي وتطبيقي، يربط بين الجانب النظري والواقع العملي.
+    </p>
+
+    <h2>قيمنا</h2>
+    <ul>
+      <li>الاحترافية</li>
+      <li>الشفافية</li>
+      <li>المسؤولية</li>
+      <li>الابتكار في التعليم</li>
+    </ul>
+  </section>
+
+  <section class="team container animate-on-scroll">
+    <h2>فريقنا</h2>
+    <div class="team-grid">
+      <div class="team-member">
+        <img src="images/team1.jpg" alt="محاضر" />
+        <h3>د. أحمد فؤاد</h3>
+        <p>خبير في التحكيم التجاري الدولي</p>
+      </div>
+      <div class="team-member">
+        <img src="images/team2.jpg" alt="محاضر" />
+        <h3>م. سامي النجار</h3>
+        <p>استشاري عقود وتحكيم هندسي</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>جميع الحقوق محفوظة © 2025 مركز التحكيم المصري</p>
+    </div>
+  </footer>
+
+  <script src="js/animations.js"></script>
+</body>
+</html>

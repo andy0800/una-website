@@ -1,0 +1,99 @@
+/* Reset & base */
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.site-header {
+  background-color: #003366; /* replicate original blue */
+  color: white;
+  padding: 15px 0;
+}
+
+.site-header .logo img {
+  height: 50px;
+}
+
+.main-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.main-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.main-nav a.active,
+.main-nav a:hover {
+  border-bottom: 2px solid #ffcc00;
+}
+
+/* Hero */
+.hero {
+  background: url('../images/hero-bg.jpg') center center/cover no-repeat;
+  color: white;
+  padding: 100px 0;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+}
+
+.btn {
+  padding: 10px 25px;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.btn-primary {
+  background-color: #ffcc00;
+  color: #003366;
+}
+
+.btn-secondary {
+  background-color: #003366;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-nav ul {
+    flex-direction: column;
+    display: none;
+  }
+  .main-nav.open ul {
+    display: flex;
+  }
+  .mobile-menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+  }
+}
