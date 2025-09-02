@@ -23,8 +23,10 @@ const os = require('os');
 // Redis imports for load balancing
 let createAdapter, createClient;
 try {
-  const { createAdapter } = require('@socket.io/redis-adapter');
-  const { createClient } = require('redis');
+  const redisAdapter = require('@socket.io/redis-adapter');
+  const redis = require('redis');
+  createAdapter = redisAdapter.createAdapter;
+  createClient = redis.createClient;
 } catch (error) {
   console.warn('Redis packages not installed. Load balancing will work without Redis adapter.');
   createAdapter = null;
