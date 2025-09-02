@@ -1,0 +1,123 @@
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="index.html" class="logo">
+        <img src="../images/logo.svg" alt="شعار معهد الاتحاد المميز" />
+        <span class="logo-text">معهد الاتحاد</span>
+      </a>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدورات</a></li>
+          <li><a href="news.html">الأخبار</a></li>
+          <li><a href="contact.html">اتصل بنا</a></li>
+          <li id="profileNavItem" style="display: none;">
+            <a href="profile.html">ملفي الشخصي</a>
+          </li>
+          <li id="lecturesNavItem" style="display: none;">
+            <a href="recorded-lectures.html">المحاضرات المسجلة</a>
+          </li>
+          <li id="liveNavItem" style="display: none;">
+            <a href="livestream.html">البث المباشر</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Hamburger Menu Button -->
+      <button class="hamburger-menu" id="hamburgerMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="lang-toggle">
+        <a href="#" class="lang-link" id="enLink" lang="en" hreflang="en" title="English">EN</a> /
+        <span style="color:var(--accent-gold);">ع</span>
+      </div>
+      
+      <div class="auth-buttons" id="authButtons">
+        <a href="register.html" id="registerBtn">تسجيل</a>
+        <a href="login.html" id="loginBtn">دخول</a>
+        <button id="logoutBtn" style="display: none;">تسجيل خروج</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Navigation Overlay -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileNavClose">
+    <i class="fas fa-times"></i>
+  </button>
+  <div class="mobile-nav-content">
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="about.html">من نحن</a></li>
+      <li><a href="courses.html">الدورات</a></li>
+      <li><a href="news.html">الأخبار</a></li>
+      <li><a href="contact.html">اتصل بنا</a></li>
+      <li id="mobileProfileNavItem" style="display: none;">
+        <a href="profile.html">ملفي الشخصي</a>
+      </li>
+      <li id="mobileLecturesNavItem" style="display: none;">
+        <a href="recorded-lectures.html">المحاضرات المسجلة</a>
+      </li>
+      <li id="mobileLiveNavItem" style="display: none;">
+        <a href="livestream.html">البث المباشر</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// Dynamic language switching logic
+(function() {
+  const enLink = document.getElementById('enLink');
+  if (enLink) {
+    // Get current page path more reliably
+    let currentPage = 'index.html';
+    
+    // Try multiple methods to get current page
+    if (window.location.pathname) {
+      const pathParts = window.location.pathname.split('/');
+      currentPage = pathParts[pathParts.length - 1] || 'index.html';
+    } else if (window.location.href) {
+      const urlParts = window.location.href.split('/');
+      currentPage = urlParts[urlParts.length - 1] || 'index.html';
+    }
+    
+    // Handle cases where currentPage might be empty
+    if (!currentPage || currentPage === '') {
+      currentPage = 'index.html';
+    }
+    
+    // Map Arabic pages to English equivalents
+    const pageMap = {
+      'index.html': '../en/index.html',
+      'about.html': '../en/about.html',
+      'courses.html': '../en/courses.html',
+      'news.html': '../en/news.html',
+      'contact.html': '../en/contact.html',
+      'profile.html': '../en/profile.html',
+      'livestream.html': '../en/livestream.html',
+      'login.html': '../en/login.html',
+      'register.html': '../en/register.html',
+      'course-details.html': '../en/course-details.html',
+      'enroll.html': '../en/enroll.html',
+      'recorded-lectures.html': '../en/recorded-lectures.html'
+    };
+    
+    // Set the correct English page link
+    if (pageMap[currentPage]) {
+      enLink.href = pageMap[currentPage];
+      console.log(`Language switcher: ${currentPage} -> ${pageMap[currentPage]}`);
+    } else {
+      enLink.href = '../en/index.html'; // Default fallback
+      console.log(`Language switcher: ${currentPage} -> default (../en/index.html)`);
+    }
+  }
+})();
+</script>

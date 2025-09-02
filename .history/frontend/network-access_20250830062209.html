@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Access - UNA Institute</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .network-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .network-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .network-info p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .access-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        .access-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .url-display {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+        .copy-btn:hover {
+            background: #5a6fd8;
+        }
+        .device-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .device-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .device-item:hover {
+            transform: translateY(-5px);
+        }
+        .device-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .instructions h4 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <img src="images/logo.png" alt="Distinguished Union Institute Logo" />
+                    <span class="logo-text">UNA Institute</span>
+                </a>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="courses.html">Courses</a></li>
+                        <li><a href="news.html">News</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="register.html">Register</a>
+                    <a href="login.html">Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Network Access Information -->
+    <div class="network-info">
+        <h1><i class="fas fa-network-wired"></i> Network Access</h1>
+        <p>Access your UNA Institute website from any device on your local network</p>
+    </div>
+
+    <div class="container">
+        <!-- Access URLs -->
+        <div class="access-card">
+            <h3><i class="fas fa-link"></i> Access URLs</h3>
+            <p>Use these URLs to access your website from different devices:</p>
+            
+            <div class="url-display">
+                <strong>Local Access:</strong> http://localhost:3000
+                <button class="copy-btn" onclick="copyToClipboard('http://localhost:3000')">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+            
+            <div class="url-display">
+                <strong>Network Access:</strong> http://192.168.187.16:3000
+                <button class="copy-btn" onclick="copyToClipboard('http://192.168.187.16:3000')">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+
+        <!-- Device Access Instructions -->
+        <div class="access-card">
+            <h3><i class="fas fa-mobile-alt"></i> Device Access Instructions</h3>
+            
+            <div class="instructions">
+                <h4><i class="fas fa-info-circle"></i> How to Access from Other Devices:</h4>
+                <ol>
+                    <li><strong>Ensure all devices are on the same WiFi network</strong></li>
+                    <li><strong>On the other device, open a web browser</strong></li>
+                    <li><strong>Enter the Network Access URL:</strong> <code>http://192.168.187.16:3000</code></li>
+                    <li><strong>Press Enter to access your website</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Device Compatibility -->
+        <div class="access-card">
+            <h3><i class="fas fa-tablet-alt"></i> Compatible Devices</h3>
+            <div class="device-list">
+                <div class="device-item">
+                    <div class="device-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h4>Smartphones</h4>
+                    <p>iOS & Android devices</p>
+                    <span class="status-indicator status-online"></span>
+                    <span>Compatible</span>
+                </div>
+                <div class="device-item">
+                    <div class="device-icon"><i class="fas fa-tablet-alt"></i></div>
+                    <h4>Tablets</h4>
+                    <p>iPad, Android tablets</p>
+                    <span class="status-indicator status-online"></span>
+                    <span>Compatible</span>
+                </div>
+                <div class="device-item">
+                    <div class="device-icon"><i class="fas fa-laptop"></i></div>
+                    <h4>Laptops</h4>
+                    <p>Windows, Mac, Linux</p>
+                    <span class="status-indicator status-online"></span>
+                    <span>Compatible</span>
+                </div>
+                <div class="device-item">
+                    <div class="device-icon"><i class="fas fa-desktop"></i></div>
+                    <h4>Desktop PCs</h4>
+                    <p>Windows, Mac, Linux</p>
+                    <span class="status-indicator status-online"></span>
+                    <span>Compatible</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Status -->
+        <div class="access-card">
+            <h3><i class="fas fa-wifi"></i> Network Status</h3>
+            <div id="networkStatus">
+                <p><strong>Your Network IP:</strong> 192.168.187.16</p>
+                <p><strong>Port:</strong> 3000</p>
+                <p><strong>Network Range:</strong> 192.168.187.0/24</p>
+                <p><strong>Gateway:</strong> 192.168.187.201</p>
+                <p><strong>Status:</strong> <span class="status-indicator status-online"></span> Online</p>
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="access-card">
+            <h3><i class="fas fa-tools"></i> Troubleshooting</h3>
+            <div class="instructions">
+                <h4>Common Issues & Solutions:</h4>
+                <ol>
+                    <li><strong>Can't access from other devices?</strong>
+                        <ul>
+                            <li>Check if devices are on the same WiFi network</li>
+                            <li>Verify the server is running</li>
+                            <li>Check Windows Firewall settings</li>
+                        </ul>
+                    </li>
+                    <li><strong>Connection refused?</strong>
+                        <ul>
+                            <li>Ensure server is listening on 0.0.0.0</li>
+                            <li>Check if port 3000 is not blocked</li>
+                        </ul>
+                    </li>
+                    <li><strong>Slow loading?</strong>
+                        <ul>
+                            <li>Check network speed</li>
+                            <li>Reduce image sizes if needed</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Copy URL to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show success message
+                const btn = event.target.closest('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '#667eea';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy URL. Please copy manually: ' + text);
+            });
+        }
+
+        // Check network connectivity
+        function checkNetworkStatus() {
+            fetch('/health')
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ Server is accessible');
+                    }
+                })
+                .catch(error => {
+                    console.log('❌ Server not accessible:', error);
+                });
+        }
+
+        // Auto-check network status
+        window.addEventListener('load', () => {
+            console.log('🌐 Network access page loaded');
+            console.log('📱 Other devices can access: http://192.168.187.16:3000');
+            
+            // Check network status every 30 seconds
+            setInterval(checkNetworkStatus, 30000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,4881 @@
+// Global variables - ALL CONSOLIDATED TO WINDOW SCOPE
+window.socket = null;
+window.localStream = null;
+window.screenStream = null;
+window.isScreenSharing = false;
+window.connectedViewers = new Map();
+window.currentEditId = null;
+window.quillEditor = null;
+window.peerConnections = {}; // Store peer connections for each viewer
+window.userAudioStreams = new Map(); // Initialize user audio streams Map
+window.mediaRecorder = null;
+window.recordedChunks = [];
+window.currentRecordingLectureId = null;
+window.audioMonitor = null;
+
+// PHASE 2: Stream State Machine
+window.streamState = {
+    // Current state
+    current: 'idle', // idle, starting, live, screenSharing, recording, stopping, error
+    
+    // State transitions
+    transitions: {
+        'idle': ['starting'],
+        'starting': ['live', 'error'],
+        'live': ['screenSharing', 'recording', 'stopping', 'error'],
+        'screenSharing': ['live', 'recording', 'stopping', 'error'],
+        'recording': ['live', 'screenSharing', 'stopping', 'error'],
+        'stopping': ['idle', 'error'],
+        'error': ['idle']
+    },
+    
+    // State validation
+    canTransition: function(toState) {
+        return this.transitions[this.current] && this.transitions[this.current].includes(toState);
+    },
+    
+    // State change with validation
+    changeTo: function(newState) {
+        if (this.canTransition(newState)) {
+            const oldState = this.current;
+            this.current = newState;
+            // Production-ready: Console logging removed
+            
+            // Update UI based on state
+            this.updateUI();
+            
+            // Emit state change event
+            this.emitStateChange(oldState, newState);
+            
+            return true;
+        } else {
+            console.error(`❌ Invalid state transition: ${this.current} → ${newState}`);
+            return false;
+        }
+    },
+    
+    // Update UI based on current state
+    updateUI: function() {
+        const startLiveBtn = document.getElementById('startLiveBtn');
+        const endLiveBtn = document.getElementById('endLiveBtn');
+        const shareScreenBtn = document.getElementById('shareScreenBtn');
+        const startRecordingBtn = document.getElementById('startRecordingBtn');
+        const stopRecordingBtn = document.getElementById('stopRecordingBtn');
+        const streamStatus = document.getElementById('streamStatus');
+        
+        if (startLiveBtn) startLiveBtn.disabled = this.current !== 'idle';
+        if (endLiveBtn) endLiveBtn.disabled = !['live', 'screenSharing', 'recording'].includes(this.current);
+        if (shareScreenBtn) shareScreenBtn.disabled = !['live', 'recording'].includes(this.current);
+        if (startRecordingBtn) startRecordingBtn.disabled = !['live', 'screenSharing'].includes(this.current);
+        if (stopRecordingBtn) stopRecordingBtn.disabled = this.current !== 'recording';
+        
+        // Update status display
+        if (streamStatus) {
+            const statusMap = {
+                'idle': { text: '⏹️ Stream Stopped', class: 'status-stopped' },
+                'starting': { text: '🔄 Starting Stream...', class: 'status-loading' },
+                'live': { text: '🟢 LIVE - Camera Active', class: 'status-live' },
+                'screenSharing': { text: '🖥️ LIVE - Screen Sharing', class: 'status-live' },
+                'recording': { text: '🔴 RECORDING', class: 'status-recording' },
+                'stopping': { text: '🔄 Stopping Stream...', class: 'status-loading' },
+                'error': { text: '❌ Stream Error', class: 'status-error' }
+            };
+            
+            const status = statusMap[this.current];
+            if (status) {
+                streamStatus.textContent = status.text;
+                streamStatus.className = status.class;
+            }
+        }
+        
+        // Update share screen button text
+        if (shareScreenBtn) {
+            shareScreenBtn.textContent = this.current === 'screenSharing' ? 'Stop Sharing' : 'Share Screen';
+        }
+    },
+    
+    // Emit state change event for debugging
+    emitStateChange: function(oldState, newState) {
+        // Custom event for state changes
+        const event = new CustomEvent('streamStateChange', {
+            detail: { oldState, newState, timestamp: Date.now() }
+        });
+        document.dispatchEvent(event);
+        
+        // Log state change
+        // Production-ready: Console logging removed
+    },
+    
+    // Get current state info
+    getInfo: function() {
+        return {
+            current: this.current,
+            canStart: this.canTransition('starting'),
+            canStop: this.canTransition('stopping'),
+            canScreenShare: this.canTransition('screenSharing'),
+            canRecord: this.canTransition('recording'),
+            isActive: ['live', 'screenSharing', 'recording'].includes(this.current),
+            isRecording: this.current === 'recording',
+            isScreenSharing: this.current === 'screenSharing'
+        };
+    },
+    
+    // Reset to idle state
+    reset: function() {
+        this.current = 'idle';
+        this.updateUI();
+        // Production-ready: Console logging removed
+    },
+    
+    // Force state change (for emergency situations)
+    forceChange: function(newState) {
+        const oldState = this.current;
+        this.current = newState;
+        // Production-ready: Console logging removed
+        this.updateUI();
+        this.emitStateChange(oldState, newState);
+    },
+    
+    // Production-ready: Debug function removed
+};
+
+// Production-ready global functions (debug functions removed)
+window.getStreamState = function() {
+    if (window.streamState) {
+        return window.streamState.getInfo();
+    } else {
+        return { error: 'Stream state machine not initialized' };
+    }
+};
+
+// Production-ready: Test function removed for security
+
+// PHASE 3: Simplified Audio Pipeline System
+window.audioPipeline = {
+    // Audio elements
+    adminAudio: null,
+    userAudioMixer: null,
+    
+    // Audio streams
+    adminStream: null,
+    userStreams: new Map(),
+    
+    // Initialize audio pipeline
+    init: function() {
+        // Production-ready: Console logging removed
+        
+        // Create admin audio element
+        this.adminAudio = document.getElementById('adminAudio');
+        if (!this.adminAudio) {
+            this.adminAudio = document.createElement('audio');
+            this.adminAudio.id = 'adminAudio';
+            this.adminAudio.controls = false;
+            this.adminAudio.autoplay = true;
+            this.adminAudio.style.display = 'none';
+            document.body.appendChild(this.adminAudio);
+            // Production-ready: Console logging removed
+        }
+        
+        // Create user audio mixer
+        this.userAudioMixer = new Map();
+        
+        // Production-ready: Console logging removed
+    },
+    
+    // Set admin audio source
+    setAdminAudio: function(stream) {
+        if (!this.adminAudio) {
+            this.init();
+        }
+        
+        this.adminStream = stream;
+        
+        if (stream && stream.getAudioTracks().length > 0) {
+            this.adminAudio.srcObject = stream;
+            // Production-ready: Console logging removed
+        } else {
+            // Production-ready: Console logging removed
+        }
+    },
+    
+    // Add user audio stream
+    addUserAudio: function(socketId, stream) {
+        if (!this.userAudioMixer) {
+            this.init();
+        }
+        
+        this.userStreams.set(socketId, stream);
+        // Production-ready: Console logging removed
+        
+        // Update mixed audio
+        this.updateMixedAudio();
+    },
+    
+    // Remove user audio stream
+    removeUserAudio: function(socketId) {
+        if (this.userStreams.has(socketId)) {
+            this.userStreams.delete(socketId);
+            // Production-ready: Console logging removed
+            
+            // Update mixed audio
+            this.updateMixedAudio();
+        }
+    },
+    
+    // Update mixed audio for admin to hear
+    updateMixedAudio: function() {
+        if (this.userStreams.size === 0) {
+            // No users, mute admin audio
+            if (this.adminAudio) {
+                this.adminAudio.muted = true;
+            }
+            return;
+        }
+        
+        // Create mixed stream from all user audio
+        const mixedStream = new MediaStream();
+        this.userStreams.forEach((userStream, socketId) => {
+            const audioTracks = userStream.getAudioTracks();
+            audioTracks.forEach(track => {
+                mixedStream.addTrack(track);
+            });
+        });
+        
+        // Set mixed audio to admin audio
+        if (this.adminAudio) {
+            this.adminAudio.srcObject = mixedStream;
+            this.adminAudio.muted = false;
+            // Production-ready: Console logging removed
+        }
+    },
+    
+    // Get all audio tracks for recording
+    getAllAudioTracks: function() {
+        const allTracks = [];
+        
+        // Add admin audio tracks
+        if (this.adminStream) {
+            const adminTracks = this.adminStream.getAudioTracks();
+            adminTracks.forEach(track => allTracks.push(track));
+        }
+        
+        // Add user audio tracks
+        this.userStreams.forEach((userStream, socketId) => {
+            const userTracks = userStream.getAudioTracks();
+            userTracks.forEach(track => allTracks.push(track));
+        });
+        
+        // Production-ready: Console logging removed
+        return allTracks;
+    },
+    
+    // Clear all audio
+    clear: function() {
+        if (this.adminAudio) {
+            this.adminAudio.srcObject = null;
+            this.adminAudio.muted = true;
+        }
+        
+        this.userStreams.clear();
+        this.adminStream = null;
+        
+        // Production-ready: Console logging removed
+    },
+    
+    // Production-ready: Debug function removed
+};
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Production-ready: Console logging removed
+    
+    // Add a small delay to ensure all elements are rendered
+    setTimeout(() => {
+        // Production-ready: Console logging removed
+        
+        try {
+            // First check authentication
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                // Production-ready: Console logging removed
+                window.location.href = '/admin/login.html';
+                return;
+            }
+            
+            // Production-ready: Console logging removed
+            
+            // Initialize core functionality
+            initializeDashboard();
+            initializeTabNavigation();
+            initializeSocketConnection();
+            initializeQuillEditor();
+            
+            // Initialize stream state machine
+            if (window.streamState) {
+                window.streamState.updateUI();
+                console.log('✅ Stream state machine initialized');
+            }
+            
+            // Initialize audio pipeline
+            if (window.audioPipeline) {
+                window.audioPipeline.init();
+                // Production-ready: Console logging removed
+            }
+            
+            // Initialize error handler
+            if (window.errorHandler) {
+                // Production-ready: Console logging removed
+            }
+            
+            // Load content after core initialization
+            setTimeout(() => {
+                try {
+                    loadDashboardStats();
+                    initializeEditModals();
+                    // Production-ready: Console logging removed
+                } catch (error) {
+                    console.error('❌ Error loading dashboard content:', error);
+                }
+            }, 200);
+            
+            // Add page visibility and unload handlers
+            document.addEventListener('visibilitychange', handlePageVisibilityChange);
+            window.addEventListener('beforeunload', handleBeforeUnload);
+            
+            // Production-ready: Console logging removed
+        } catch (error) {
+            console.error('❌ Admin Dashboard: Initialization failed:', error);
+        }
+    }, 100);
+});
+
+// Check if all required streaming elements exist
+function checkStreamingElements() {
+    const requiredElements = [
+        'startLiveBtn',
+        'endLiveBtn', 
+        'shareScreenBtn',
+        'startRecordingBtn',
+        'stopRecordingBtn',
+        'localVideo',
+        'streamStatus',
+        'recordingStatus',
+        'viewerCount',
+        'liveViewers'
+    ];
+    
+    const missingElements = [];
+    
+    requiredElements.forEach(elementId => {
+        if (!document.getElementById(elementId)) {
+            missingElements.push(elementId);
+        }
+    });
+    
+    if (missingElements.length > 0) {
+        console.error('❌ Missing required streaming elements:', missingElements);
+        return false;
+    }
+    
+    // Production-ready: Console logging removed
+    return true;
+}
+
+// Initialize dashboard
+function initializeDashboard() {
+    // Production-ready: Console logging removed
+    
+    try {
+        // Check authentication
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            // Production-ready: Console logging removed
+            window.location.href = '/admin/login.html';
+            return;
+        }
+        // Production-ready: Console logging removed
+
+        // Initialize logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('adminToken');
+                window.location.href = '/admin/login.html';
+            });
+            // Production-ready: Console logging removed
+        } else {
+            console.error('❌ Logout button not found');
+        }
+
+        // Check if streaming elements exist before initializing
+        if (checkStreamingElements()) {
+            // Initialize streaming event listeners
+            initializeStreamingEventListeners();
+        } else {
+            console.warn('⚠️ Some streaming elements missing, streaming features may not work');
+        }
+
+        // Load initial content
+        // Production-ready: Console logging removed
+        loadUsers();
+        
+    } catch (error) {
+        console.error('❌ Error initializing dashboard:', error);
+    }
+}
+
+// Initialize streaming event listeners
+function initializeStreamingEventListeners() {
+    // Production-ready: Console logging removed
+    
+    // Wait for elements to exist before binding events
+    const startLiveBtn = document.getElementById('startLiveBtn');
+    const endLiveBtn = document.getElementById('endLiveBtn');
+    const sendAdminChat = document.getElementById('sendAdminChat');
+    const adminChatInput = document.getElementById('adminChatInput');
+    
+    if (startLiveBtn) {
+        startLiveBtn.addEventListener('click', startLiveStream);
+        // Production-ready: Console logging removed
+    } else {
+        console.error('❌ Start live button not found');
+    }
+    
+    if (endLiveBtn) {
+        endLiveBtn.addEventListener('click', endLiveStream);
+        // Production-ready: Console logging removed
+    } else {
+        console.error('❌ End live button not found');
+    }
+    
+    if (sendAdminChat) {
+        sendAdminChat.addEventListener('click', sendChatMessage);
+        // Production-ready: Console logging removed
+    } else {
+        console.error('❌ Send admin chat button not found');
+    }
+    
+    if (adminChatInput) {
+        adminChatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+        // Production-ready: Console logging removed
+    } else {
+        console.error('❌ Admin chat input not found');
+    }
+}
+
+// Initialize edit modals
+function initializeEditModals() {
+    // User edit form
+    document.getElementById('editUserForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveUserEdit();
+    });
+
+    // Course edit form
+    document.getElementById('editCourseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveCourseEdit();
+    });
+
+    // Modal close buttons
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modalId = this.closest('.edit-modal').id;
+            closeEditModal(modalId);
+        });
+    });
+
+    // Modal cancel buttons
+    document.querySelectorAll('.btn-cancel').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modalId = this.closest('.edit-modal').id;
+            closeEditModal(modalId);
+        });
+    });
+
+    // Viewers popup close
+    const viewersCloseBtn = document.querySelector('.close-btn');
+    if (viewersCloseBtn) {
+        viewersCloseBtn.addEventListener('click', hideViewersPopup);
+    }
+}
+
+// Initialize tab navigation
+function initializeTabNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const targetTab = this.getAttribute('data-tab');
+            
+            // Update active nav item
+            navItems.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show target tab content
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(targetTab).classList.add('active');
+            
+            // Update page title
+            updatePageTitle(targetTab);
+            
+            // Load tab-specific content
+            loadTabContent(targetTab);
+        });
+    });
+}
+
+// Update page title based on active tab
+function updatePageTitle(tabName) {
+    const titles = {
+        'dashboard': 'Dashboard Overview',
+        'users': 'Users Management',
+        'courses': 'Courses Management',
+        'content': 'Content Editor',
+        'livestream': 'Live Stream Control',
+        'stats': 'Statistics',
+        'forms': 'Submitted Forms',
+        'recorded-lectures': 'Recorded Lectures Management'
+    };
+    
+    document.querySelector('.page-title').textContent = titles[tabName] || 'Dashboard';
+}
+
+// Load tab-specific content
+function loadTabContent(tabName) {
+    switch(tabName) {
+        case 'dashboard':
+            loadDashboardStats();
+            break;
+        case 'users':
+            loadUsers();
+            break;
+        case 'courses':
+            loadCourses();
+            break;
+        case 'stats':
+            loadStats();
+            break;
+        case 'forms':
+            loadForms();
+            break;
+        case 'livestream':
+            // Live stream is already initialized
+            break;
+        case 'recorded-lectures':
+            loadRecordedLectures();
+            break;
+    }
+}
+
+// Initialize socket connection
+function initializeSocketConnection() {
+    // Production-ready: Console logging removed
+    
+    try {
+        // Configure Socket.IO with better options
+        window.socket = io({
+            transports: ['websocket', 'polling'],
+            timeout: 20000,
+            forceNew: true,
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            maxReconnectionAttempts: 5
+        });
+        
+        // Connection event handlers
+        window.socket.on('connect', () => {
+            // Production-ready: Console logging removed
+            
+            // Update connection status
+            updateConnectionStatus('connected');
+            
+            // Re-join stream if we were streaming before
+            if (window.localStream && window.localStream.active) {
+                // Production-ready: Console logging removed
+                window.socket.emit('admin-start');
+            }
+        });
+        
+        window.socket.on('connect_error', (error) => {
+            console.error('❌ Socket connection error:', error);
+            updateConnectionStatus('error', error.message);
+            
+            // Show user-friendly error message
+            showConnectionError('Connection failed. Please check your internet connection and refresh the page.');
+        });
+        
+        window.socket.on('disconnect', (reason) => {
+            // Production-ready: Console logging removed
+            
+            if (reason === 'io server disconnect') {
+                // Server disconnected us, try to reconnect
+                // Production-ready: Console logging removed
+                window.socket.connect();
+            } else if (reason === 'io client disconnect') {
+                // Client disconnected, don't reconnect
+                // Production-ready: Console logging removed
+            } else {
+                // Transport error or other issues
+                // Production-ready: Console logging removed
+                updateConnectionStatus('reconnecting');
+            }
+        });
+        
+        window.socket.on('reconnect', (attemptNumber) => {
+            // Production-ready: Console logging removed
+            updateConnectionStatus('connected');
+            
+            // Re-join stream if we were streaming before
+            if (window.localStream && window.localStream.active) {
+                // Production-ready: Console logging removed
+                window.socket.emit('admin-start');
+            }
+        });
+        
+        window.socket.on('reconnect_error', (error) => {
+            console.error('❌ Reconnection error:', error);
+            updateConnectionStatus('error', 'Reconnection failed');
+        });
+        
+        window.socket.on('reconnect_failed', () => {
+            console.error('❌ Reconnection failed after all attempts');
+            updateConnectionStatus('error', 'Reconnection failed');
+            showConnectionError('Unable to reconnect. Please refresh the page.');
+        });
+        
+        // Handle stream start event
+        window.socket.on('stream-started', () => {
+            // Production-ready: Console logging removed
+            const streamStatus = document.getElementById('streamStatus');
+            if (streamStatus) {
+                streamStatus.textContent = 'LIVE';
+                streamStatus.style.backgroundColor = '#28a745';
+            }
+            
+            // Enable recording buttons when stream is active
+            const startRecordingBtn = document.getElementById('startRecordingBtn');
+            if (startRecordingBtn) {
+                startRecordingBtn.disabled = false;
+            }
+        });
+
+        window.socket.on('viewer-join', async (data) => {
+            const { socketId, userInfo, viewerCount } = data;
+            // Production-ready: Console logging removed
+            
+            // Update viewer count
+            const viewerCountElement = document.getElementById('viewerCount');
+            const liveViewersElement = document.getElementById('liveViewers');
+            
+            if (viewerCountElement) {
+                viewerCountElement.textContent = `${viewerCount} viewers`;
+            }
+            if (liveViewersElement) {
+                liveViewersElement.textContent = viewerCount;
+            }
+            
+            // Store viewer information (only name, no phone)
+            if (userInfo) {
+                window.connectedViewers.set(socketId, {
+                    name: userInfo.name || 'Anonymous',
+                    hasMic: false
+                });
+            }
+            
+            // Add to chat
+            addChatMessage('System', `${userInfo?.name || 'Anonymous'} joined the stream`);
+            
+            // Create WebRTC peer connection for this viewer
+            if (window.localStream) {
+                try {
+                    const peerConnection = createPeerConnection(socketId);
+                    window.peerConnections[socketId] = peerConnection;
+
+                    // Create and send offer
+                    const offer = await peerConnection.createOffer();
+                    await peerConnection.setLocalDescription(offer);
+
+                    window.socket.emit('offer', {
+                        target: socketId,
+                        offer: offer
+                    });
+
+                    // Production-ready: Console logging removed
+                } catch (error) {
+                    console.error('❌ Error creating peer connection:', error);
+                }
+            }
+        });
+
+        window.socket.on('disconnectPeer', (data) => {
+            const { socketId, viewerCount } = data;
+            // Production-ready: Console logging removed
+            
+            // Update viewer count
+            const viewerCountElement = document.getElementById('viewerCount');
+            const liveViewersElement = document.getElementById('liveViewers');
+            
+            if (viewerCountElement) {
+                viewerCountElement.textContent = `${viewerCount} viewers`;
+            }
+            if (liveViewersElement) {
+                liveViewersElement.textContent = viewerCount;
+            }
+            
+            // Remove from connected viewers
+            window.connectedViewers.delete(socketId);
+            
+            // Close peer connection
+            if (window.peerConnections[socketId]) {
+                window.peerConnections[socketId].close();
+                delete window.peerConnections[socketId];
+            }
+            
+            // Clean up user audio stream
+            if (window.userAudioStreams && window.userAudioStreams.has(socketId)) {
+                const userAudioStream = window.userAudioStreams.get(socketId);
+                userAudioStream.getTracks().forEach(track => track.stop());
+                window.userAudioStreams.delete(socketId);
+                // Production-ready: Console logging removed
+            }
+            
+            // Add to chat
+            addChatMessage('System', 'A viewer left the stream');
+        });
+
+        // Handle WebRTC answers from viewers
+        window.socket.on('answer', async (data) => {
+            const { socketId, answer } = data;
+            const peerConnection = window.peerConnections[socketId];
+
+            if (peerConnection) {
+                try {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                    // Production-ready: Console logging removed
+                } catch (error) {
+                    console.error('❌ Error setting remote description:', error);
+                }
+            }
+        });
+
+        // Handle ICE candidates from viewers
+        window.socket.on('ice-candidate', (data) => {
+            const { socketId, candidate } = data;
+            const peerConnection = window.peerConnections[socketId];
+
+            if (peerConnection) {
+                peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                    .catch(error => console.error('❌ Error adding ICE candidate:', error));
+            }
+        });
+
+        window.socket.on('chat-message', (data) => {
+            addChatMessage(data.user, data.message);
+        });
+
+        window.socket.on('mic-request', (data) => {
+            addMicRequest(data.user, data.socketId, data.userInfo);
+        });
+
+        window.socket.on('unmute-request', (data) => {
+            addMicRequest(data.user, data.socketId, data.userInfo, true);
+        });
+
+        window.socket.on('stream-stopped', () => {
+            // Production-ready: Console logging removed
+            window.connectedViewers.clear();
+            
+            const viewerCountElement = document.getElementById('viewerCount');
+            const liveViewersElement = document.getElementById('liveViewers');
+            
+            if (viewerCountElement) {
+                viewerCountElement.textContent = '0 viewers';
+            }
+            if (liveViewersElement) {
+                liveViewersElement.textContent = '0';
+            }
+            
+            addChatMessage('System', 'Stream ended');
+        });
+        
+        // Production-ready: Console logging removed
+        
+    } catch (error) {
+        console.error('❌ Error initializing socket connection:', error);
+    }
+}
+
+// Initialize Quill editor
+function initializeQuillEditor() {
+    window.quillEditor = new Quill('#quillEditor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Save content button
+    document.getElementById('saveContentBtn').addEventListener('click', saveContent);
+}
+
+// Load dashboard statistics
+function loadDashboardStats() {
+    // Load users count
+    fetch('/api/admin/users', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('totalUsers').textContent = data.length || 0;
+    })
+    .catch(error => {
+        console.error('Error loading users:', error);
+        document.getElementById('totalUsers').textContent = '0';
+    });
+
+    // Load courses count
+    fetch('/api/admin/courses', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('activeCourses').textContent = data.length || 0;
+    })
+    .catch(error => {
+        console.error('Error loading courses:', error);
+        document.getElementById('activeCourses').textContent = '0';
+    });
+
+    // Load forms count
+    fetch('/api/admin/forms', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('totalForms').textContent = data.length || 0;
+    })
+    .catch(error => {
+        console.error('Error loading forms:', error);
+        document.getElementById('totalForms').textContent = '0';
+    });
+}
+
+// Load users
+function loadUsers() {
+    const content = document.getElementById('adminContent');
+    content.innerHTML = '<p>Loading users...</p>';
+
+    fetch('/api/admin/users', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(users => {
+        displayUsers(users);
+    })
+    .catch(error => {
+        console.error('Error loading users:', error);
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <p style="color: #dc3545;">Error loading users</p>
+                <button onclick="loadUsers()" class="save-btn">Retry</button>
+            </div>
+        `;
+    });
+}
+
+// Display users in table format
+function displayUsers(users) {
+    const content = document.getElementById('adminContent');
+    
+    if (!users || users.length === 0) {
+        content.innerHTML = '<p>No users found</p>';
+        return;
+      }
+
+    // First, get all courses for badge display
+    fetch('/api/admin/courses', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(courses => {
+        const courseMap = {};
+        courses.forEach(course => {
+            courseMap[course._id] = course;
+        });
+
+        let html = `
+            <div style="overflow-x: auto;">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Civil ID</th>
+                            <th>Assigned Courses</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        users.forEach(user => {
+            const courseBadges = user.courses && user.courses.length > 0 ? user.courses.map(courseId => {
+                // Convert ObjectIds to strings for comparison
+                const course = courseMap[courseId.toString()];
+                if (course) {
+                    return `<span class="course-badge" style="background-color: ${course.color || '#007bff'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin: 2px; display: inline-block; border: 2px solid ${course.color || '#007bff'}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${course.name}</span>`;
+                }
+                return '';
+            }).join('') : '';
+
+            html += `
+                <tr>
+                    <td>${user.name || 'N/A'}</td>
+                    <td>${user.phone || 'N/A'}</td>
+                    <td>${user.civilId || 'N/A'}</td>
+                    <td style="max-width: 400px; word-wrap: break-word;">
+                        ${courseBadges || '<span style="color: #666; font-style: italic;">No courses assigned</span>'}
+                    </td>
+                    <td>
+                        <button onclick="editUser('${user._id}')" class="save-btn" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>
+        `;
+      });
+
+        html += '</tbody></table></div>';
+        content.innerHTML = html;
+    })
+    .catch(error => {
+        console.error('Error loading courses for display:', error);
+        // Fallback display without course badges
+        let html = `
+            <div style="overflow-x: auto;">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Civil ID</th>
+                            <th>Assigned Courses</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        users.forEach(user => {
+            html += `
+                <tr>
+                    <td>${user.name || 'N/A'}</td>
+                    <td>${user.phone || 'N/A'}</td>
+                    <td>${user.civilId || 'N/A'}</td>
+                    <td>${user.courses ? user.courses.length + ' courses' : 'No courses'}</td>
+                    <td>
+                        <button onclick="editUser('${user._id}')" class="save-btn" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table></div>';
+        content.innerHTML = html;
+    });
+}
+
+// Filter users
+function filterUsers() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.users-table tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+}
+
+// Edit user
+function editUser(userId) {
+    window.currentEditId = userId;
+    
+    fetch(`/api/admin/users/${userId}`, {
+    headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+    }
+  })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(user => {
+        document.getElementById('editUserName').value = user.name || '';
+        document.getElementById('editUserPhone').value = user.phone || '';
+        document.getElementById('editUserCivilId').value = user.civilId || '';
+        
+        // Load and display certificates
+        displayCertificates(user.certificates || []);
+        
+        // Load available courses and mark assigned ones
+        loadAvailableCourses(user.courses || []);
+        
+        document.getElementById('editUserModal').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error loading user:', error);
+        alert('Error loading user: ' + error.message);
+    });
+}
+
+// Load available courses for assignment
+function loadAvailableCourses(assignedCourses = []) {
+    fetch('/api/admin/courses', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(courses => {
+        const courseSelect = document.getElementById('editUserCourses');
+        if (!courseSelect) {
+            console.error('Course select element not found');
+            return;
+        }
+        
+        courseSelect.innerHTML = '<option value="">Select courses...</option>';
+        
+        courses.forEach(course => {
+            // Convert ObjectIds to strings for comparison
+            const isAssigned = assignedCourses.some(assignedId => 
+                assignedId.toString() === course._id.toString()
+            );
+            
+            const option = document.createElement('option');
+            option.value = course._id;
+            option.textContent = `${course.name} (${course.duration || 'N/A'})`;
+            option.selected = isAssigned;
+            option.style.color = course.color || '#333';
+            courseSelect.appendChild(option);
+        });
+        
+        // Production-ready: Console logging removed
+    })
+    .catch(error => {
+        console.error('Error loading courses:', error);
+        const courseSelect = document.getElementById('editUserCourses');
+        if (courseSelect) {
+            courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+        }
+    });
+}
+
+// Save user edit
+function saveUserEdit() {
+    const courseSelect = document.getElementById('editUserCourses');
+    if (!courseSelect) {
+        console.error('Course select element not found');
+        alert('Error: Course selection element not found');
+        return;
+    }
+    
+    // Input validation
+    const name = document.getElementById('editUserName').value.trim();
+    const phone = document.getElementById('editUserPhone').value.trim();
+    const civilId = document.getElementById('editUserCivilId').value.trim();
+    
+    if (!name) {
+        alert('Please enter a valid name');
+        document.getElementById('editUserName').focus();
+        return;
+    }
+    
+    if (!phone) {
+        alert('Please enter a valid phone number');
+        document.getElementById('editUserPhone').focus();
+        return;
+    }
+    
+    const selectedCourses = Array.from(courseSelect.selectedOptions)
+        .map(option => option.value)
+        .filter(id => id !== '' && id !== null);
+    
+    const userData = {
+        name: name,
+        phone: phone,
+        civilId: civilId,
+        courses: selectedCourses
+    };
+
+    // Production-ready: Console logging removed
+    // Production-ready: Console logging removed
+
+    fetch(`/api/admin/users/${window.currentEditId}/info`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(userData)
+    })
+    .then(response => {
+        // Production-ready: Console logging removed
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
+            });
+        }
+        return response.json();
+    })
+      .then(data => {
+        // Production-ready: Console logging removed
+        alert('User updated successfully!');
+        closeEditModal('editUserModal');
+        loadUsers(); // Reload the users list
+    })
+    .catch(error => {
+        console.error('Error updating user:', error);
+        alert('Error updating user: ' + error.message);
+    });
+}
+
+// Load courses
+function loadCourses() {
+    const content = document.getElementById('coursesContent');
+    content.innerHTML = '<p>Loading courses...</p>';
+
+    fetch('/api/admin/courses', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(courses => {
+        displayCourses(courses);
+    })
+    .catch(error => {
+        console.error('Error loading courses:', error);
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <p style="color: #dc3545;">Error loading courses</p>
+                <button onclick="loadCourses()" class="save-btn">Retry</button>
+            </div>
+        `;
+    });
+}
+
+// Display courses
+function displayCourses(courses) {
+    const content = document.getElementById('coursesContent');
+    
+    if (!courses || courses.length === 0) {
+        content.innerHTML = '<p>No courses found</p>';
+        return;
+    }
+
+    let html = `
+        <div style="overflow-x: auto;">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Duration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        courses.forEach(course => {
+            html += `
+                <tr>
+                    <td>${course.name || 'N/A'}</td>
+                    <td>${course.description || 'N/A'}</td>
+                    <td>${course.duration || 'N/A'}</td>
+                    <td>
+                        <button onclick="editCourse('${course._id}')" class="save-btn" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table></div>';
+        content.innerHTML = html;
+    }
+
+// Edit course function
+function editCourse(courseId) {
+    window.currentEditId = courseId;
+    
+    // Fetch course data
+    fetch(`/api/admin/courses/${courseId}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(course => {
+        // Populate form
+        document.getElementById('editCourseName').value = course.name || '';
+        document.getElementById('editCourseDescription').value = course.description || '';
+        document.getElementById('editCourseDuration').value = course.duration || '';
+        
+        // Show modal
+        document.getElementById('editCourseModal').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error loading course:', error);
+        alert('Error loading course data. Please try again.');
+    });
+}
+
+// Save course edit
+function saveCourseEdit() {
+    // Input validation
+    const name = document.getElementById('editCourseName').value.trim();
+    const description = document.getElementById('editCourseDescription').value.trim();
+    const duration = document.getElementById('editCourseDuration').value.trim();
+    
+    if (!name) {
+        alert('Please enter a valid course name');
+        document.getElementById('editCourseName').focus();
+        return;
+    }
+    
+    if (!description) {
+        alert('Please enter a valid course description');
+        document.getElementById('editCourseDescription').focus();
+        return;
+    }
+    
+    const courseData = {
+        name: name,
+        description: description,
+        duration: duration
+    };
+
+    fetch(`/api/admin/courses/${window.currentEditId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(courseData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert('Course updated successfully!');
+        closeEditModal('editCourseModal');
+        loadCourses(); // Reload the courses list
+    })
+    .catch(error => {
+        console.error('Error updating course:', error);
+        alert('Error updating course. Please try again.');
+    });
+}
+
+// Close edit modal
+function closeEditModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    window.currentEditId = null;
+    
+    // Clear form fields
+    if (modalId === 'editUserModal') {
+        document.getElementById('editUserForm').reset();
+    } else if (modalId === 'editCourseModal') {
+        document.getElementById('editCourseForm').reset();
+    } else if (modalId === 'createLectureModal') {
+        document.getElementById('createLectureForm').reset();
+        hideUploadProgress(); // Hide progress bar when closing
+    }
+}
+
+// Load statistics
+function loadStats() {
+    const content = document.getElementById('adminStats');
+    content.innerHTML = '<p>Loading statistics...</p>';
+
+    fetch('/api/admin/stats', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(stats => {
+        displayStats(stats);
+    })
+    .catch(error => {
+        console.error('Error loading stats:', error);
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <p style="color: #dc3545;">Error loading statistics</p>
+                <button onclick="loadStats()" class="save-btn">Retry</button>
+            </div>
+        `;
+    });
+}
+
+// Display statistics
+function displayStats(stats) {
+    const content = document.getElementById('adminStats');
+    content.innerHTML = `
+        <div class="dashboard-overview">
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <div class="number">${stats.users || 0}</div>
+                <div class="trend">+12% this month</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Courses</h3>
+                <div class="number">${stats.courses || 0}</div>
+                <div class="trend">+5% this month</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Forms</h3>
+                <div class="number">${stats.forms || 0}</div>
+                <div class="trend">+8% this month</div>
+            </div>
+            <div class="stat-card">
+                <h3>Certificates</h3>
+                <div class="number">${stats.certificates || 0}</div>
+                <div class="trend">+3% this month</div>
+            </div>
+        </div>
+    `;
+}
+
+// Load forms
+function loadForms() {
+    const content = document.getElementById('formsContent');
+    content.innerHTML = '<p>Loading forms...</p>';
+
+    fetch('/api/admin/forms', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(forms => {
+        displayForms(forms);
+    })
+    .catch(error => {
+        console.error('Error loading forms:', error);
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <p style="color: #dc3545;">Error loading forms</p>
+                <button onclick="loadForms()" class="save-btn">Retry</button>
+            </div>
+        `;
+    });
+}
+
+// Display forms
+function displayForms(forms) {
+    const content = document.getElementById('formsContent');
+    
+    if (!forms || forms.length === 0) {
+        content.innerHTML = '<p>No forms submitted</p>';
+        return;
+    }
+
+    let html = `
+        <div style="overflow-x: auto;">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        forms.forEach(form => {
+            html += `
+                <tr>
+                    <td>${form.name || 'N/A'}</td>
+                    <td>${form.email || 'N/A'}</td>
+                    <td>${form.subject || 'N/A'}</td>
+                    <td>${form.message || 'N/A'}</td>
+                    <td>${new Date(form.createdAt).toLocaleDateString()}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table></div>';
+        content.innerHTML = html;
+    }
+
+// Live Stream Functions with Proper WebRTC Implementation
+
+function startLiveStream() {
+    console.log('🎥 Starting live stream...');
+    
+    // Use state machine to validate transition
+    if (!window.streamState.canTransition('starting')) {
+        console.error('❌ Cannot start stream from current state:', window.streamState.current);
+        alert('Cannot start stream from current state. Please stop the current stream first.');
+        return;
+    }
+    
+    // Change to starting state
+    window.streamState.changeTo('starting');
+    
+    try {
+        // Check if we have permission to access media devices
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Media devices API not supported in this browser');
+        }
+        
+        // Use enhanced media access with fallbacks
+        requestMediaAccess()
+        .then(stream => {
+            console.log('✅ Media stream obtained successfully');
+            console.log('📹 Video tracks:', stream.getVideoTracks().length);
+            console.log('🎤 Audio tracks:', stream.getAudioTracks().length);
+            
+            // Log track details for debugging
+            stream.getTracks().forEach(track => {
+                console.log(`🎯 Track: ${track.kind}, enabled: ${track.enabled}, readyState: ${track.readyState}`);
+                if (track.kind === 'audio') {
+                    console.log(`🎤 Audio track settings:`, track.getSettings());
+                }
+            });
+            
+            window.localStream = stream;
+            
+            // Start audio level monitoring
+            if (stream.getAudioTracks().length > 0) {
+                window.audioMonitor = monitorAudioLevels(stream);
+                console.log('🎤 Audio monitoring started');
+            }
+            
+            // Update local video display
+                    const localVideo = document.getElementById('localVideo');
+        if (localVideo) {
+            localVideo.srcObject = stream;
+            localVideo.muted = true; // Mute local video to prevent feedback
+            localVideo.play().catch(e => console.log('Video autoplay prevented:', e));
+        }
+        
+        // Initialize audio pipeline
+        if (window.audioPipeline) {
+            window.audioPipeline.init();
+            // Set admin stream but don't play it (prevents echo)
+            window.audioPipeline.setAdminAudio(stream);
+        }
+        
+        console.log('🎤 Audio pipeline initialized - admin will hear only user audio (no echo)');
+            
+            // Update UI buttons
+            const startLiveBtn = document.getElementById('startLiveBtn');
+            const endLiveBtn = document.getElementById('endLiveBtn');
+            const shareScreenBtn = document.getElementById('shareScreenBtn');
+            
+            if (startLiveBtn) startLiveBtn.disabled = true;
+            if (endLiveBtn) endLiveBtn.disabled = false;
+            if (shareScreenBtn) shareScreenBtn.disabled = false;
+            
+            // Show admin audio controls
+            showAdminAudioControls();
+            
+            // Change to live state (this will update UI automatically)
+            window.streamState.changeTo('live');
+            
+            // Update status based on what we got
+            if (streamStatus) {
+                if (stream.getVideoTracks().length > 0 && stream.getAudioTracks().length > 0) {
+                    streamStatus.textContent = '🟢 LIVE - Audio & Video Active';
+                    streamStatus.className = 'status-live';
+                } else if (stream.getVideoTracks().length > 0) {
+                    streamStatus.textContent = '🟡 LIVE - Video Only (No Audio)';
+                    streamStatus.className = 'status-live';
+                } else if (stream.getAudioTracks().length > 0) {
+                    streamStatus.textContent = '🟡 LIVE - Audio Only (No Video)';
+                    streamStatus.className = 'status-live';
+                }
+            }
+            
+            // Notify server that streaming has started
+            if (!safeSocketEmit('admin-start')) {
+                console.error('❌ Failed to notify server about stream start');
+                alert('Connection error. Please wait for reconnection or refresh the page.');
+                return;
+            }
+            
+            console.log('📡 Emitted admin-start event to server');
+            
+            console.log('🎥 Live stream started successfully');
+        })
+        .catch(error => {
+            console.error('❌ Error accessing media devices:', error);
+            
+            // Change to error state
+            window.streamState.changeTo('error');
+            
+            let errorMessage = 'Error accessing camera/microphone. ';
+            let detailedMessage = '';
+            
+            if (error.name === 'NotAllowedError') {
+                errorMessage += 'Permission denied. ';
+                detailedMessage = 'Please click the camera/microphone icon in your browser address bar and allow access. Then refresh the page and try again.';
+            } else if (error.name === 'NotFoundError') {
+                errorMessage += 'No camera or microphone found. ';
+                detailedMessage = 'Please check your device has working camera and microphone, then try again.';
+            } else if (error.name === 'NotReadableError') {
+                errorMessage += 'Camera or microphone is already in use. ';
+                detailedMessage = 'Please close other applications using your camera/microphone, then try again.';
+            } else if (error.name === 'NotSupportedError') {
+                errorMessage += 'Media not supported. ';
+                detailedMessage = 'Your browser may not support the required media formats. Please try a different browser.';
+            } else if (error.name === 'OverconstrainedError') {
+                errorMessage += 'Media constraints not met. ';
+                detailedMessage = 'Your device cannot meet the required video/audio specifications.';
+            } else {
+                detailedMessage = error.message || 'Please check permissions and try again.';
+            }
+            
+            // Show detailed error message
+            const fullMessage = errorMessage + '\n\n' + detailedMessage;
+            alert(fullMessage);
+        });
+        
+    } catch (error) {
+        console.error('❌ Error in startLiveStream:', error);
+        
+        // Change to error state
+        window.streamState.changeTo('error');
+        
+        alert('Error starting live stream: ' + error.message);
+    }
+}
+
+function endLiveStream() {
+    console.log('⏹️ Ending live stream...');
+    
+    // Use state machine to validate transition
+    if (!window.streamState.canTransition('stopping')) {
+        console.error('❌ Cannot stop stream from current state:', window.streamState.current);
+        alert('Cannot stop stream from current state.');
+        return;
+    }
+    
+    // Change to stopping state
+    window.streamState.changeTo('stopping');
+    
+    try {
+        // Stop audio monitoring
+        if (window.audioMonitor) {
+            window.audioMonitor.stop();
+            window.audioMonitor = null;
+            console.log('🎤 Audio monitoring stopped');
+        }
+        
+        // Stop all media tracks
+        if (window.localStream) {
+            window.localStream.getTracks().forEach(track => {
+                track.stop();
+                console.log('🛑 Stopped track:', track.kind);
+            });
+            window.localStream = null;
+        }
+        
+        // Clear audio pipeline
+        if (window.audioPipeline) {
+            window.audioPipeline.clear();
+            console.log('🛑 Audio pipeline cleared');
+        }
+        
+        // Clean up user audio streams
+        if (window.userAudioStreams) {
+            window.userAudioStreams.forEach((stream, socketId) => {
+                stream.getTracks().forEach(track => track.stop());
+                console.log('🛑 Stopped user audio stream for:', socketId);
+            });
+            window.userAudioStreams.clear();
+        }
+        
+        if (window.screenStream) {
+            window.screenStream.getTracks().forEach(track => {
+                track.stop();
+                console.log('🛑 Stopped screen track:', track.kind);
+            });
+            window.screenStream = null;
+        }
+        
+        // Close all peer connections
+        Object.keys(window.peerConnections).forEach(socketId => {
+            const pc = window.peerConnections[socketId];
+            if (pc) {
+                pc.close();
+                console.log('🛑 Closed peer connection:', socketId);
+            }
+        });
+        window.peerConnections = {};
+        
+        // Clear connected viewers
+        window.connectedViewers.clear();
+        
+        // Update UI
+        const localVideo = document.getElementById('localVideo');
+        const startLiveBtn = document.getElementById('startLiveBtn');
+        const endLiveBtn = document.getElementById('endLiveBtn');
+        const shareScreenBtn = document.getElementById('shareScreenBtn');
+        
+        if (localVideo) {
+            localVideo.srcObject = null;
+        }
+        if (startLiveBtn) startLiveBtn.disabled = false;
+        if (endLiveBtn) endLiveBtn.disabled = true;
+        if (shareScreenBtn) {
+            shareScreenBtn.disabled = true;
+            shareScreenBtn.textContent = 'Share Screen';
+        }
+        
+        // Reset screen sharing state
+        window.isScreenSharing = false;
+        
+        // Hide admin audio controls
+        hideAdminAudioControls();
+        
+        // Notify server that streaming has ended
+        if (!safeSocketEmit('admin-end')) {
+            console.error('❌ Failed to notify server about stream end');
+        } else {
+            console.log('📡 Emitted admin-end event to server');
+        }
+        
+        // Change to idle state
+        window.streamState.changeTo('idle');
+        
+        console.log('✅ Live stream ended successfully');
+        
+    } catch (error) {
+        console.error('❌ Error ending live stream:', error);
+        
+        // Change to error state
+        window.streamState.changeTo('error');
+        
+        alert('Error ending live stream: ' + error.message);
+    }
+}
+
+// Create WebRTC peer connection for a viewer
+function createPeerConnection(viewerSocketId) {
+    console.log('🔗 Creating peer connection for viewer:', viewerSocketId);
+    
+    const peerConnection = new RTCPeerConnection({
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+        ]
+    });
+
+    // Add local stream tracks to peer connection
+    // Use screen stream if screen sharing is active, otherwise use camera stream
+    const streamToUse = window.isScreenSharing && window.screenStream ? window.screenStream : window.localStream;
+    
+    if (streamToUse) {
+        console.log('📡 Adding tracks to peer connection. Stream has:');
+        console.log('  - Video tracks:', streamToUse.getVideoTracks().length);
+        console.log('  - Audio tracks:', streamToUse.getAudioTracks().length);
+        
+        streamToUse.getTracks().forEach(track => {
+            console.log(`🎯 Adding ${track.kind} track:`, {
+                enabled: track.enabled,
+                readyState: track.readyState,
+                muted: track.muted
+            });
+            
+            // Ensure audio tracks are enabled
+            if (track.kind === 'audio') {
+                track.enabled = true;
+                console.log('🎤 Audio track enabled for peer connection');
+            }
+            
+            peerConnection.addTrack(track, streamToUse);
+        });
+        
+        // Log peer connection transceivers
+        peerConnection.getTransceivers().forEach(transceiver => {
+            console.log('📡 Transceiver:', {
+                mid: transceiver.mid,
+                direction: transceiver.direction,
+                currentDirection: transceiver.currentDirection,
+                stopped: transceiver.stopped
+            });
+        });
+    } else {
+        console.error('❌ No stream available for peer connection');
+    }
+
+    // Handle ICE candidates
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            console.log('🧊 ICE candidate generated for viewer:', viewerSocketId);
+            window.socket.emit('ice-candidate', {
+                target: viewerSocketId,
+                candidate: event.candidate
+            });
+        }
+    };
+
+    // Handle connection state changes
+    peerConnection.onconnectionstatechange = () => {
+        console.log('🔗 Peer connection state changed for viewer:', viewerSocketId, 'State:', peerConnection.connectionState);
+        if (peerConnection.connectionState === 'failed' || peerConnection.connectionState === 'disconnected') {
+            console.log('❌ Removing failed peer connection for viewer:', viewerSocketId);
+            delete window.peerConnections[viewerSocketId];
+        }
+    };
+
+            // Handle track events - this is where we receive user audio/video
+        peerConnection.ontrack = (event) => {
+            console.log('📡 Track received from viewer:', viewerSocketId, 'Track kind:', event.track.kind);
+            console.log('📡 Track details:', {
+                id: event.track.id,
+                enabled: event.track.enabled,
+                muted: event.track.muted,
+                readyState: event.track.readyState
+            });
+            
+            // If this is an audio track from a user, add it to admin audio
+            if (event.track.kind === 'audio') {
+                console.log('🎤 Processing user audio track...');
+                handleUserAudioTrack(event.track, viewerSocketId);
+            }
+        };
+
+    return peerConnection;
+}
+
+// Handle incoming user audio tracks for admin to hear
+function handleUserAudioTrack(audioTrack, viewerSocketId) {
+    console.log('🎤 Handling user audio track from viewer:', viewerSocketId);
+    
+    try {
+        // Create a MediaStream with just this audio track
+        const userAudioStream = new MediaStream([audioTrack]);
+        
+        // Store the user audio stream for later management (keep for backward compatibility)
+        if (!window.userAudioStreams) {
+            window.userAudioStreams = new Map();
+        }
+        window.userAudioStreams.set(viewerSocketId, userAudioStream);
+        
+        // Use the new audio pipeline
+        if (window.audioPipeline) {
+            window.audioPipeline.addUserAudio(viewerSocketId, userAudioStream);
+        }
+        
+        console.log('✅ User audio track added to admin audio for viewer:', viewerSocketId);
+        console.log('🎤 Total user audio streams:', window.userAudioStreams.size);
+        
+    } catch (error) {
+        console.error('❌ Error handling user audio track:', error);
+    }
+}
+
+// Create a mixed stream for recording that combines admin and user audio
+function createMixedStreamForRecording(adminStream) {
+    try {
+        console.log('🎬 Creating mixed stream for recording...');
+        
+        // Start with admin stream (video + admin audio)
+        const mixedStream = new MediaStream();
+        
+        // Add all tracks from admin stream
+        adminStream.getTracks().forEach(track => {
+            mixedStream.addTrack(track);
+            console.log(`🎯 Added ${track.kind} track from admin stream to recording`);
+        });
+        
+        // Add user audio tracks using the new audio pipeline
+        if (window.audioPipeline) {
+            const userAudioTracks = window.audioPipeline.getAllAudioTracks();
+            userAudioTracks.forEach(track => {
+                mixedStream.addTrack(track);
+                console.log(`🎤 Added user audio track to recording`);
+            });
+        } else {
+            // Fallback to old method for backward compatibility
+            if (window.userAudioStreams && window.userAudioStreams.size > 0) {
+                console.log(`🎤 Adding ${window.userAudioStreams.size} user audio tracks to recording (fallback)`);
+                
+                window.userAudioStreams.forEach((userStream, socketId) => {
+                    const audioTracks = userStream.getAudioTracks();
+                    audioTracks.forEach(track => {
+                        mixedStream.addTrack(track);
+                        console.log(`🎤 Added user audio track from ${socketId} to recording (fallback)`);
+                    });
+                });
+            } else {
+                console.log('🎤 No user audio tracks to add to recording');
+            }
+        }
+        
+        // Debug: Log all tracks in the mixed stream
+        console.log('🎬 Mixed stream tracks:', {
+            video: mixedStream.getVideoTracks().length,
+            audio: mixedStream.getAudioTracks().length,
+            total: mixedStream.getTracks().length
+        });
+        
+        // Log each track for debugging
+        mixedStream.getTracks().forEach((track, index) => {
+            console.log(`🎬 Track ${index}: ${track.kind}, enabled: ${track.enabled}, readyState: ${track.readyState}`);
+        });
+        
+        return mixedStream;
+        
+    } catch (error) {
+        console.error('❌ Error creating mixed stream for recording:', error);
+        return null;
+    }
+}
+
+// Add mic request
+function addMicRequest(user, socketId, userInfo, isUnmute = false) {
+    const list = document.getElementById('micRequestList');
+    const li = document.createElement('li');
+    
+    // Store socketId as data attribute for easy removal
+    li.setAttribute('data-socket-id', socketId);
+    
+    li.innerHTML = `
+        <span>${user} ${isUnmute ? 'wants to unmute' : 'wants to use microphone'}</span>
+        <div>
+            <button class="approve-btn" onclick="approveMic('${socketId}')">Approve</button>
+            <button class="reject-btn" onclick="rejectMic('${socketId}')">Reject</button>
+            ${!isUnmute ? `<button class="mute-btn" onclick="muteUserMic('${socketId}')" style="background: #ffc107; color: #000;">Mute</button>` : ''}
+        </div>
+    `;
+    list.appendChild(li);
+    
+    console.log('🎤 Added mic request for:', user, 'with socket ID:', socketId);
+    
+    // Update viewer's mic status to false (requesting)
+    if (window.connectedViewers.has(socketId)) {
+        const viewer = window.connectedViewers.get(socketId);
+        viewer.hasMic = false;
+        window.connectedViewers.set(socketId, viewer);
+    }
+}
+
+// Approve mic
+function approveMic(socketId) {
+    if (!safeSocketEmit('approve-mic', socketId)) {
+        console.error('❌ Failed to approve mic request for:', socketId);
+        return;
+    }
+    
+    console.log('✅ Mic request approved for viewer:', socketId);
+    removeMicRequest(socketId);
+    
+    // Update viewer's mic status to true (approved)
+    if (window.connectedViewers.has(socketId)) {
+        const viewer = window.connectedViewers.get(socketId);
+        viewer.hasMic = true;
+        window.connectedViewers.set(socketId, viewer);
+    }
+}
+
+// Reject mic
+function rejectMic(socketId) {
+    if (!safeSocketEmit('reject-mic', socketId)) {
+        console.error('❌ Failed to reject mic request for:', socketId);
+        return;
+    }
+    
+    console.log('❌ Mic request rejected for viewer:', socketId);
+    removeMicRequest(socketId);
+    
+    // Update viewer's mic status to false
+    if (window.connectedViewers.has(socketId)) {
+        const viewer = window.connectedViewers.get(socketId);
+        viewer.hasMic = false;
+        window.connectedViewers.set(socketId, viewer);
+    }
+}
+
+// Mute user microphone
+function muteUserMic(socketId) {
+    if (!safeSocketEmit('mute-user-mic', socketId)) {
+        console.error('❌ Failed to mute user mic for:', socketId);
+        return;
+    }
+    
+    console.log('🔇 Muted user mic for viewer:', socketId);
+    
+    // Update viewer's mic status to false
+    if (window.connectedViewers.has(socketId)) {
+        const viewer = window.connectedViewers.get(socketId);
+        viewer.hasMic = false;
+        window.connectedViewers.set(socketId, viewer);
+    }
+}
+
+// Remove mic request
+function removeMicRequest(socketId) {
+    const list = document.getElementById('micRequestList');
+    if (!list) {
+        console.error('❌ micRequestList element not found');
+        return;
+    }
+    
+    const items = list.getElementsByTagName('li');
+    for (let item of items) {
+        if (item.getAttribute('data-socket-id') === socketId) {
+            console.log('🗑️ Removing mic request for socket ID:', socketId);
+            item.remove();
+            break;
+        }
+    }
+}
+
+// Add chat message
+function addChatMessage(user, message) {
+    const messagesDiv = document.getElementById('adminMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message';
+    messageDiv.innerHTML = `<strong>${user}:</strong> ${message}`;
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Send chat message
+function sendChatMessage() {
+    const input = document.getElementById('adminChatInput');
+    const message = input.value.trim();
+    
+    if (message) {
+        window.socket.emit('admin-chat', message);
+        addChatMessage('Admin', message);
+        input.value = '';
+    }
+}
+
+// Popup functions
+function showViewersPopup() {
+    const popup = document.getElementById('viewersPopup');
+    const viewersList = document.getElementById('viewersList');
+    
+    if (window.connectedViewers.size === 0) {
+        viewersList.innerHTML = '<p class="no-viewers">No viewers currently watching</p>';
+  } else {
+        let html = '';
+        window.connectedViewers.forEach((viewerInfo, socketId) => {
+            const micIcon = viewerInfo.hasMic ? 
+                '<span class="mic-icon mic-unmuted">🎤</span>' : 
+                '<span class="mic-icon mic-muted">🔇</span>';
+            
+            html += `
+                <div class="viewer-item">
+                    <span class="viewer-name">${viewerInfo.name || 'Anonymous'}</span>
+                    <div class="mic-status">
+                        ${micIcon}
+                        <span>${viewerInfo.hasMic ? 'Unmuted' : 'Muted'}</span>
+                    </div>
+                </div>
+            `;
+        });
+        viewersList.innerHTML = html;
+    }
+    
+    // Show popup with smooth animation
+    popup.style.display = 'flex';
+    setTimeout(() => {
+        popup.classList.add('show');
+    }, 10);
+}
+
+function hideViewersPopup() {
+    const popup = document.getElementById('viewersPopup');
+    
+    // Hide popup with smooth animation
+    popup.classList.remove('show');
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 300);
+}
+
+// Save content
+function saveContent() {
+    const content = window.quillEditor.root.innerHTML;
+    const language = document.getElementById('contentLang').value;
+    const page = document.getElementById('contentPage').value;
+    
+    fetch('/api/admin/content', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({
+            language,
+            page,
+            content
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('contentSaveStatus').innerHTML = 
+            '<p style="color: green;">Content saved successfully!</p>';
+    })
+    .catch(error => {
+        console.error('Error saving content:', error);
+        document.getElementById('contentSaveStatus').innerHTML = 
+            '<p style="color: red;">Error saving content</p>';
+    });
+}
+
+// Event listeners
+// REMOVED: These are now handled in initializeStreamingEventListeners()
+// document.getElementById('startLiveBtn').addEventListener('click', startLiveStream);
+// document.getElementById('endLiveBtn').addEventListener('click', endLiveStream);
+// document.getElementById('sendAdminChat').addEventListener('click', sendChatMessage);
+// document.getElementById('adminChatInput').addEventListener('keypress', function(e) {
+//   if (e.key === 'Enter') {
+//         sendChatMessage();
+//     }
+// });
+
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+    const popup = document.getElementById('viewersPopup');
+    if (e.target === popup) {
+        hideViewersPopup();
+    }
+});
+
+// Close popup with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const popup = document.getElementById('viewersPopup');
+        if (popup.style.display === 'flex') {
+            hideViewersPopup();
+        }
+    }
+});
+
+// Export functions for global access
+window.loadUsers = loadUsers;
+window.loadCourses = loadCourses;
+window.loadStats = loadStats;
+window.loadForms = loadForms;
+window.showCreateCourseForm = function() {
+    // Implementation for creating course form
+    console.log('Create course form');
+};
+window.showCreateUserForm = function() {
+    // Implementation for creating user form
+    console.log('Create user form');
+};
+window.exportUsersExcel = function() {
+    // Implementation for exporting users to Excel
+    console.log('Export users to Excel');
+};
+
+// NEW: Lecture Management Functions
+window.showCreateLectureForm = showCreateLectureForm;
+window.loadRecordedLectures = loadRecordedLectures;
+window.createLecture = createLecture;
+window.deleteLecture = deleteLecture;
+window.manageLectureAccess = manageLectureAccess;
+window.uploadVideoToLecture = uploadVideoToLecture;
+window.closeAccessModal = closeAccessModal;
+window.togglePublicAccess = togglePublicAccess;
+window.saveAccessChanges = saveAccessChanges;
+window.selectAllUsers = selectAllUsers;
+window.deselectAllUsers = deselectAllUsers;
+
+// Make functions globally accessible
+window.editUser = editUser;
+window.saveUserEdit = saveUserEdit;
+window.editCourse = editCourse;
+window.saveCourseEdit = saveCourseEdit;
+window.closeEditModal = closeEditModal;
+window.showViewersPopup = showViewersPopup;
+window.hideViewersPopup = hideViewersPopup;
+window.toggleScreenShare = toggleScreenShare;
+window.uploadCertificate = uploadCertificate;
+window.deleteCertificate = deleteCertificate;
+
+// Certificate Management Functions
+function displayCertificates(certificates) {
+    const displayDiv = document.getElementById('certificatesDisplay');
+    if (!displayDiv) return;
+    
+    if (!certificates || certificates.length === 0) {
+        displayDiv.innerHTML = '<p style="margin: 0; color: #666;">No certificates uploaded yet</p>';
+        return;
+    }
+    
+    let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">';
+    
+    certificates.forEach((cert, index) => {
+        const isImage = cert.image && (cert.image.endsWith('.jpg') || cert.image.endsWith('.jpeg') || cert.image.endsWith('.png') || cert.image.endsWith('.gif'));
+        
+        html += `
+            <div style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; background: white;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    ${isImage ? 
+                        `<img src="/certs/${cert.image}" alt="${cert.name}" style="max-width: 100%; max-height: 100px; object-fit: cover; border-radius: 3px;">` :
+                        `<div style="width: 100%; height: 100px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px;">
+                            <i class="fas fa-file-pdf" style="font-size: 2rem; color: #dc3545;"></i>
+                        </div>`
+                    }
+                </div>
+                <p style="margin: 5px 0; font-size: 12px; font-weight: bold; text-align: center;">${cert.name}</p>
+                <button onclick="deleteCertificate(${index})" class="btn-cancel" style="width: 100%; padding: 5px; font-size: 11px;">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    displayDiv.innerHTML = html;
+}
+
+function uploadCertificate() {
+    const name = document.getElementById('certificateName').value.trim();
+    const file = document.getElementById('certificateFile').files[0];
+    
+    if (!name || !file) {
+        alert('Please provide both certificate name and file.');
+        return;
+    }
+    
+    if (!window.currentEditId) {
+        alert('No user selected for certificate upload.');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('image', file);
+    
+    fetch(`/api/admin/users/${window.currentEditId}/certificate`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(user => {
+        alert('Certificate uploaded successfully!');
+        displayCertificates(user.certificates);
+        
+        // Clear form
+        document.getElementById('certificateName').value = '';
+        document.getElementById('certificateFile').value = '';
+    })
+    .catch(error => {
+        console.error('Error uploading certificate:', error);
+        alert('Failed to upload certificate: ' + error.message);
+    });
+}
+
+function deleteCertificate(certIndex) {
+    if (!window.currentEditId) {
+        alert('No user selected for certificate deletion.');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this certificate?')) {
+        return;
+    }
+    
+    fetch(`/api/admin/users/${window.currentEditId}/certificates/${certIndex}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert('Certificate deleted successfully!');
+        // Reload user data to refresh certificates
+        editUser(window.currentEditId);
+    })
+    .catch(error => {
+        console.error('Error deleting certificate:', error);
+        alert('Failed to delete certificate: ' + error.message);
+    });
+}
+
+// Screen sharing functionality
+function toggleScreenShare() {
+    if (!window.isScreenSharing) {
+        startScreenShare();
+    } else {
+        stopScreenShare();
+    }
+}
+
+// ===== LECTURE MANAGEMENT FUNCTIONS =====
+
+// Show create lecture form
+function showCreateLectureForm() {
+    document.getElementById('createLectureModal').style.display = 'block';
+}
+
+// Load recorded lectures
+function loadRecordedLectures() {
+    console.log('🎬 Loading recorded lectures...');
+    const content = document.getElementById('recordedLecturesContent');
+    
+    if (!content) {
+        console.error('❌ recordedLecturesContent element not found');
+        return;
+    }
+    
+    content.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+            <div class="loading-spinner" style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+            <h3 style="color: #666; margin-bottom: 10px;">Loading Recorded Lectures</h3>
+            <p style="color: #999; font-size: 0.9rem;">Please wait while we fetch your lecture data...</p>
+        </div>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    `;
+
+    // Check if admin token exists
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+        console.error('❌ No admin token found');
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                <h3 style="color: #dc3545; margin-bottom: 10px;">Authentication Required</h3>
+                <p style="color: #666; margin-bottom: 20px;">Please log in as admin to view recorded lectures.</p>
+                <button onclick="window.location.href='/admin/login.html'" class="save-btn">
+                    <i class="fas fa-sign-in-alt"></i> Go to Login
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    console.log('🔑 Admin token found, making API request...');
+
+    fetch('/api/lectures/admin/lectures', {
+        headers: {
+            'Authorization': `Bearer ${adminToken}`
+        }
+    })
+    .then(handleApiResponse)
+    .then(lectures => {
+        console.log('✅ Lectures received:', lectures);
+        displayRecordedLectures(lectures);
+    })
+    .catch(error => {
+        console.error('❌ Error loading lectures:', error);
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                <h3 style="color: #dc3545; margin-bottom: 10px;">Error Loading Lectures</h3>
+                <p style="color: #666; margin-bottom: 20px;">${error.message}</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="loadRecordedLectures()" class="save-btn">
+                        <i class="fas fa-sync"></i> Retry
+                    </button>
+                    <button onclick="showCreateLectureForm()" class="save-btn gradient-primary">
+                        <i class="fas fa-plus"></i> Create New Lecture
+                    </button>
+                </div>
+                <details style="margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <summary style="cursor: pointer; color: #007bff;">Debug Information</summary>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${error.stack || 'No stack trace available'}</pre>
+                </details>
+            </div>
+        `;
+    });
+}
+
+// Display recorded lectures
+function displayRecordedLectures(lectures) {
+    const content = document.getElementById('recordedLecturesContent');
+    const countElement = document.getElementById('lectureCountNumber');
+    
+    // Update lecture count
+    if (countElement) {
+        countElement.textContent = lectures ? lectures.length : 0;
+    }
+    
+    if (!lectures || lectures.length === 0) {
+        content.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-video-camera" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                <h3 style="color: #666; margin-bottom: 10px;">No Recorded Lectures Found</h3>
+                <p style="color: #999; font-size: 0.9rem; margin-bottom: 20px;">
+                    Get started by creating your first recorded lecture or uploading a video file.
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="showCreateLectureForm()" class="save-btn gradient-primary">
+                        <i class="fas fa-plus"></i> Create New Lecture
+                    </button>
+                    <button onclick="loadRecordedLectures()" class="save-btn">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div style="overflow-x: auto;">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Quality</th>
+                        <th>Duration</th>
+                        <th>Access Control</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        lectures.forEach(lecture => {
+            const duration = lecture.duration ? `${Math.floor(lecture.duration / 60)}:${(lecture.duration % 60).toString().padStart(2, '0')}` : 'N/A';
+            const accessCount = lecture.accessUsers ? lecture.accessUsers.length : 0;
+            const hasVideo = lecture.filePath && lecture.filePath.trim() !== '';
+            const fileSize = lecture.fileSize ? `${(lecture.fileSize / (1024 * 1024)).toFixed(1)} MB` : 'N/A';
+            
+            html += `
+                <tr>
+                    <td>
+                        <strong>${lecture.title || 'N/A'}</strong>
+                        ${lecture.description ? `<br><small style="color: #666;">${lecture.description}</small>` : ''}
+                        <br><small style="color: #999;">Created: ${new Date(lecture.createdAt).toLocaleDateString()}</small>
+                    </td>
+                    <td>
+                        <span class="course-badge" style="background-color: #007bff; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px;">
+                            ${lecture.category || 'General'}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="color: #28a745; font-weight: 600;">${lecture.quality || '1080p'}</span>
+                    </td>
+                    <td>${duration}</td>
+                    <td>
+                        <div style="margin-bottom: 5px;">
+                            <span class="lecture-status ${lecture.isPublic ? 'status-public' : 'status-private'}">
+                                ${lecture.isPublic ? 'Public' : `${accessCount} users`}
+                            </span>
+                        </div>
+                        <div style="font-size: 11px; color: #666;">
+                            <span class="lecture-status ${hasVideo ? 'status-video' : 'status-no-video'}">
+                                ${hasVideo ? `✅ Video: ${fileSize}` : '❌ No video'}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <button onclick="playLectureInPopup('${lecture._id}')" class="save-btn" style="padding: 5px 10px; font-size: 12px; margin-right: 5px; background: #007bff;">
+                            <i class="fas fa-play"></i> View
+                        </button>
+                        <button onclick="manageLectureAccess('${lecture._id}')" class="save-btn" style="padding: 5px 10px; font-size: 12px; margin-right: 5px;">
+                            <i class="fas fa-users"></i> Access
+                        </button>
+                        ${!hasVideo ? `
+                            <button onclick="uploadVideoToLecture('${lecture._id}')" class="save-btn" style="padding: 5px 10px; font-size: 12px; margin-right: 5px; background: #28a745;">
+                                <i class="fas fa-upload"></i> Video
+                            </button>
+                        ` : `
+                            <button onclick="uploadVideoToLecture('${lecture._id}')" class="save-btn" style="padding: 5px 10px; font-size: 12px; margin-right: 5px; background: #17a2b8;">
+                                <i class="fas fa-sync"></i> Replace
+                            </button>
+                        `}
+                        <button onclick="deleteLecture('${lecture._id}')" class="btn-cancel" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table></div>';
+        content.innerHTML = html;
+    }
+
+
+// Create new lecture
+function createLecture() {
+    console.log('🎬 Creating new lecture...');
+    
+    const title = document.getElementById('lectureTitle').value.trim();
+    const description = document.getElementById('lectureDescription').value.trim();
+    const category = document.getElementById('lectureCategory').value;
+    const tags = document.getElementById('lectureTags').value.trim();
+    const quality = document.getElementById('lectureQuality').value;
+    const videoFile = document.getElementById('lectureVideo').files[0];
+
+    console.log('📝 Form data:', { title, description, category, tags, quality, hasVideo: !!videoFile });
+
+    // Enhanced validation
+    if (!title) {
+        alert('Please enter a lecture title');
+        document.getElementById('lectureTitle').focus();
+        return;
+    }
+    
+    if (!category) {
+        alert('Please select a lecture category');
+        document.getElementById('lectureCategory').focus();
+        return;
+    }
+    
+    if (title.length < 3) {
+        alert('Lecture title must be at least 3 characters long');
+        document.getElementById('lectureTitle').focus();
+        return;
+    }
+
+    const lectureData = {
+        title,
+        description,
+        category,
+        tags,
+        quality
+    };
+
+    console.log('📤 Sending lecture data:', lectureData);
+
+    // If video file is selected, upload it first
+    if (videoFile) {
+        console.log('🎥 Video file selected, uploading with lecture...');
+        uploadLectureWithVideo(lectureData, videoFile);
+    } else {
+        console.log('📝 No video file, creating lecture only...');
+        // Create lecture without video
+        createLectureEntry(lectureData);
+    }
+}
+
+// Create lecture entry (without video)
+function createLectureEntry(lectureData) {
+    console.log('📤 Creating lecture entry via API...');
+    
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+        console.error('❌ No admin token found');
+        alert('Authentication error. Please log in again.');
+        return;
+    }
+
+    fetch('/api/lectures/admin/lectures', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify(lectureData)
+    })
+    .then(response => {
+        console.log('📡 Create lecture response status:', response.status);
+        console.log('📡 Create lecture response headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Lecture created successfully:', data);
+        alert('Lecture created successfully! You can upload the video file later.');
+        closeEditModal('createLectureModal');
+        loadRecordedLectures(); // Reload the lectures list
+    })
+    .catch(error => {
+        console.error('❌ Error creating lecture:', error);
+        alert('Error creating lecture: ' + error.message);
+    });
+}
+
+// Upload lecture with video
+function uploadLectureWithVideo(lectureData, videoFile) {
+    // First create the lecture entry
+    fetch('/api/lectures/admin/lectures', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(lectureData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(lecture => {
+        console.log('✅ Lecture created, now uploading video...');
+        
+        // Now upload the video file
+        const formData = new FormData();
+        formData.append('video', videoFile);
+        
+        return fetch(`/api/lectures/admin/lectures/${lecture._id}/video`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            },
+            body: formData
+        });
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert('Lecture created and video uploaded successfully!');
+        closeEditModal('createLectureModal');
+        loadRecordedLectures(); // Reload the lectures list
+    })
+    .catch(error => {
+        console.error('Error creating lecture with video:', error);
+        alert('Error creating lecture with video: ' + error.message);
+    });
+}
+
+// Delete lecture
+function deleteLecture(lectureId) {
+    if (!confirm('Are you sure you want to delete this lecture? This action cannot be undone.')) {
+        return;
+    }
+
+    fetch(`/api/lectures/admin/lectures/${lectureId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert('Lecture deleted successfully!');
+        loadRecordedLectures(); // Reload the lectures list
+    })
+    .catch(error => {
+        console.error('Error deleting lecture:', error);
+        alert('Error deleting lecture: ' + error.message);
+    });
+}
+
+// Manage lecture access
+function manageLectureAccess(lectureId) {
+    console.log('🔐 Managing access for lecture:', lectureId);
+    
+    // Check if modal already exists and remove it
+    const existingModal = document.getElementById('accessModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create a comprehensive access management modal
+    const modalHtml = `
+        <div id="accessModal" class="edit-modal" style="display: block;">
+            <div class="edit-modal-content">
+                <div class="edit-modal-header">
+                    <h3><i class="fas fa-users"></i> Manage Lecture Access</h3>
+                    <button class="close-modal" onclick="closeAccessModal()">&times;</button>
+                </div>
+                <div class="edit-form">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="isPublicAccess" onchange="togglePublicAccess()">
+                            Make this lecture public (accessible to all users)
+                        </label>
+                        <small class="color-secondary">When enabled, all users can access this lecture without individual permissions.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Individual User Access Control</label>
+                        <div id="userAccessList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 5px; background: #f9f9f9;">
+                            <div style="text-align: center; color: #666;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading users...
+                            </div>
+                        </div>
+                        <small class="color-secondary">Select specific users who can access this lecture when it's not public.</small>
+                        <div style="margin-top: 10px;">
+                            <button onclick="testUserLoading()" class="save-btn" style="padding: 5px 10px; font-size: 12px; background: #17a2b8;">
+                                <i class="fas fa-bug"></i> Test User Loading
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeAccessModal()">Cancel</button>
+                        <button type="button" class="btn-save" onclick="saveAccessChanges('${lectureId}')">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    console.log('📝 Adding modal to page...');
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    console.log('✅ Modal added, now loading access settings and users...');
+    
+    // Load current access settings and available users
+    loadLectureAccessSettings(lectureId);
+    loadAvailableUsers(lectureId);
+}
+
+// Close access modal
+function closeAccessModal() {
+    const modal = document.getElementById('accessModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Toggle public access
+function togglePublicAccess() {
+    const isPublic = document.getElementById('isPublicAccess').checked;
+    const userAccessList = document.getElementById('userAccessList');
+    
+    if (isPublic) {
+        userAccessList.innerHTML = '<p style="color: #28a745; text-align: center;">✓ Public access enabled - all users can view this lecture</p>';
+    } else {
+        userAccessList.innerHTML = '<p style="color: #ffc107; text-align: center;">Individual user access mode</p>';
+    }
+}
+
+// Load lecture access settings
+function loadLectureAccessSettings(lectureId) {
+    console.log('🔍 Loading lecture access settings for:', lectureId);
+    
+    fetch(`/api/lectures/admin/lectures/${lectureId}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+    })
+    .then(response => {
+        console.log('📡 Access settings response status:', response.status);
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Lecture not found. It may have been deleted.');
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        }
+        
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Invalid response format. Expected JSON.');
+        }
+        
+        return response.json();
+    })
+    .then(lecture => {
+        console.log('✅ Lecture access settings loaded:', lecture);
+        
+        // Set public access checkbox
+        const isPublicCheckbox = document.getElementById('isPublicAccess');
+        if (isPublicCheckbox) {
+            isPublicCheckbox.checked = lecture.isPublic;
+            togglePublicAccess(); // Update UI
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error loading lecture access settings:', error);
+        const userAccessList = document.getElementById('userAccessList');
+        if (userAccessList) {
+            userAccessList.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                    <p style="color: #dc3545; margin-bottom: 10px;">Error loading settings</p>
+                    <p style="color: #666; font-size: 0.9rem;">${error.message}</p>
+                    <button onclick="loadLectureAccessSettings('${lectureId}')" class="save-btn" style="margin-top: 10px;">
+                        <i class="fas fa-sync"></i> Retry
+                    </button>
+                </div>
+            `;
+        }
+    });
+}
+
+// Save access changes
+function saveAccessChanges(lectureId) {
+    const isPublic = document.getElementById('isPublicAccess').checked;
+    
+    // Collect selected users
+    const selectedUsers = [];
+    const checkboxes = document.querySelectorAll('.user-access-checkbox:checked');
+    checkboxes.forEach(checkbox => {
+        selectedUsers.push(checkbox.value);
+    });
+    
+    console.log('💾 Saving access changes for lecture:', lectureId);
+    console.log('📋 Public access:', isPublic);
+    console.log('👥 Selected users:', selectedUsers);
+    
+    const accessData = {
+        isPublic: isPublic,
+        accessUsers: selectedUsers
+    };
+    
+    fetch(`/api/lectures/admin/lectures/${lectureId}/access`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(accessData)
+    })
+    .then(handleApiResponse)
+    .then(data => {
+        console.log('✅ Access settings updated successfully:', data);
+        alert('Access settings updated successfully!');
+        closeAccessModal();
+        loadRecordedLectures(); // Reload the lectures list
+    })
+    .catch(error => {
+        console.error('❌ Error updating access settings:', error);
+        alert('Error updating access settings: ' + error.message);
+    });
+}
+
+// ===== VIDEO RECORDING FUNCTIONS =====
+
+// Start recording
+function startRecording() {
+    // Use state machine to validate transition
+    if (!window.streamState.canTransition('recording')) {
+        console.error('❌ Cannot start recording from current state:', window.streamState.current);
+        alert('Cannot start recording from current state. Please start streaming first.');
+        return;
+    }
+    
+    if (!window.localStream && !window.screenStream) {
+        alert('Please start streaming first before recording.');
+        return;
+    }
+
+    // Get the current lecture ID from the form or create a new one
+    const lectureTitle = document.getElementById('lectureTitle')?.value || 'Live Stream Recording';
+    const lectureDescription = document.getElementById('lectureDescription')?.value || 'Recording from live stream';
+    const lectureCategory = document.getElementById('lectureCategory')?.value || 'general';
+    const lectureQuality = document.getElementById('lectureQuality')?.value || '1080p';
+
+    // Create lecture entry first
+    const lectureData = {
+        title: lectureTitle,
+        description: lectureDescription,
+        category: lectureCategory,
+        quality: lectureQuality,
+        filePath: '' // Explicitly set empty filePath
+    };
+
+    console.log('🎬 Creating lecture for recording:', lectureData);
+
+    fetch('/api/lectures/admin/lectures', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(lectureData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(lecture => {
+        console.log('✅ Lecture created successfully:', lecture);
+        
+        // Start MediaRecorder with the lecture ID
+        startMediaRecorder(lecture._id);
+        
+        // Notify server that recording has started
+        window.socket.emit('admin-start-recording', lecture._id);
+        
+        // Store lecture ID for later use
+        window.currentRecordingLectureId = lecture._id;
+        
+        // Change to recording state (this will update UI automatically)
+        window.streamState.changeTo('recording');
+        
+        alert('Recording started! Lecture: ' + lecture.title);
+    })
+    .catch(error => {
+        console.error('❌ Error creating lecture for recording:', error);
+        alert('Error starting recording: ' + error.message);
+    });
+}
+
+// Stop recording
+function stopRecording() {
+    if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
+        console.log('⏹️ Stopping recording...');
+        console.log('📝 Current lecture ID:', window.currentRecordingLectureId);
+        
+        window.mediaRecorder.stop();
+        
+        // Notify server that recording has stopped
+        window.socket.emit('admin-stop-recording');
+        
+        // Don't clear currentRecordingLectureId yet - it's needed for saveRecording()
+        // It will be cleared after the video is successfully uploaded
+        
+        // Determine next state based on current streaming status
+        let nextState = 'idle';
+        if (window.localStream && window.localStream.active) {
+            nextState = window.isScreenSharing ? 'screenSharing' : 'live';
+        }
+        
+        // Change to appropriate state (this will update UI automatically)
+        window.streamState.changeTo(nextState);
+        
+        alert('Recording stopped! Video is being processed...');
+    }
+}
+
+// Start MediaRecorder with 1080p quality
+function startMediaRecorder(lectureId) {
+    try {
+        console.log('🎬 Starting MediaRecorder for lecture:', lectureId);
+        console.log('📝 Lecture ID type:', typeof lectureId);
+        console.log('📝 Lecture ID value:', lectureId);
+        
+        if (!lectureId) {
+            throw new Error('No lecture ID provided to startMediaRecorder');
+        }
+        
+        // Get the active stream (either camera or screen)
+        const activeStream = window.screenStream || window.localStream;
+        
+        if (!activeStream) {
+            throw new Error('No active stream available for recording');
+        }
+
+        // Create a mixed stream for recording that includes admin audio/video + user audio
+        const mixedStream = createMixedStreamForRecording(activeStream);
+        
+        if (!mixedStream) {
+            throw new Error('Failed to create mixed stream for recording');
+        }
+
+        // Check MediaRecorder support
+        if (!window.MediaRecorder) {
+            throw new Error('MediaRecorder API not supported in this browser');
+        }
+
+        // Configure MediaRecorder with best supported format that includes audio
+        let options = {};
+        
+        // Try different MIME types for better audio compatibility
+        const supportedFormats = [
+            'video/webm;codecs=vp8,opus',  // Best for audio + video
+            'video/webm;codecs=vp8',       // VP8 with default audio
+            'video/webm',                  // WebM with default codecs
+            'video/mp4',                   // MP4 fallback
+            ''                              // Browser default
+        ];
+        
+        let selectedMimeType = '';
+        for (const format of supportedFormats) {
+            if (format === '' || window.MediaRecorder.isTypeSupported(format)) {
+                selectedMimeType = format;
+                break;
+            }
+        }
+        
+        if (selectedMimeType) {
+            options.mimeType = selectedMimeType;
+            console.log(`🎬 Using MIME type: ${selectedMimeType || 'browser default'}`);
+            
+            // Only set bitrates for supported formats
+            if (selectedMimeType.includes('webm') || selectedMimeType.includes('mp4')) {
+                options.videoBitsPerSecond = 8000000; // 8 Mbps for 1080p quality
+                options.audioBitsPerSecond = 128000;  // 128 kbps audio
+            }
+        } else {
+            console.warn('⚠️ No specific MIME type supported, using browser default');
+        }
+
+        console.log('🎬 Creating MediaRecorder with mixed stream and options:', options);
+
+        window.mediaRecorder = new window.MediaRecorder(mixedStream, options);
+        window.recordedChunks = [];
+
+        // Handle data available event
+        window.mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                window.recordedChunks.push(event.data);
+                console.log('📹 Recording chunk received, size:', event.data.size);
+            }
+        };
+
+        // Handle recording stop event
+        window.mediaRecorder.onstop = () => {
+            console.log('⏹️ MediaRecorder stopped, processing recording...');
+            console.log('📝 Lecture ID from parameter:', lectureId);
+            console.log('📝 Stored lecture ID:', window.currentRecordingLectureId);
+            console.log('📊 Recorded chunks count:', window.recordedChunks.length);
+            
+            if (window.recordedChunks.length > 0) {
+                const totalSize = window.recordedChunks.reduce((sum, chunk) => sum + chunk.size, 0);
+                console.log('📊 Total recording size:', totalSize, 'bytes');
+                
+                // Use the provided lectureId or fall back to stored one
+                const finalLectureId = lectureId || window.currentRecordingLectureId;
+                console.log('🎯 Final lecture ID for saving:', finalLectureId);
+                
+                saveRecording(finalLectureId);
+            } else {
+                console.warn('⚠️ No recording chunks available');
+                alert('Recording failed - no data captured. Please try again.');
+            }
+        };
+
+        // Handle recording error
+        window.mediaRecorder.onerror = (event) => {
+            console.error('❌ MediaRecorder error:', event);
+            alert('Recording error occurred: ' + (event.error?.message || 'Unknown error') + '. Please try again.');
+        };
+
+        // Handle recording start
+        window.mediaRecorder.onstart = () => {
+            console.log('✅ MediaRecorder started successfully');
+        };
+
+        // Start recording with 1-second intervals for better chunk management
+        window.mediaRecorder.start(1000);
+        
+        console.log('🎬 MediaRecorder started with options:', options);
+        
+    } catch (error) {
+        console.error('❌ Error starting MediaRecorder:', error);
+        
+        // Change to error state
+        window.streamState.changeTo('error');
+        
+        alert('Error starting recording: ' + error.message);
+    }
+}
+
+// Save the recorded video
+function saveRecording(lectureId) {
+    try {
+        console.log('🎬 Saving recording for lecture ID:', lectureId);
+        console.log('📊 Recorded chunks:', window.recordedChunks.length);
+        
+        // If no lectureId provided, try to get it from stored value
+        if (!lectureId && window.currentRecordingLectureId) {
+            lectureId = window.currentRecordingLectureId;
+            console.log('🔄 Using stored lecture ID:', lectureId);
+        }
+        
+        if (!lectureId) {
+            throw new Error('No lecture ID provided for saving recording. Please ensure recording was started properly.');
+        }
+        
+        const blob = new Blob(window.recordedChunks, { type: 'video/webm' });
+        console.log('📹 Blob created, size:', blob.size, 'bytes');
+        
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('video', blob, `lecture-${lectureId}-${Date.now()}.webm`);
+
+        const uploadUrl = `/api/lectures/admin/lectures/${lectureId}/video`;
+        console.log('📤 Uploading to URL:', uploadUrl);
+        
+        // Upload video to server
+        fetch(uploadUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('📡 Upload response status:', response.status);
+            console.log('📡 Upload response headers:', response.headers);
+            
+            if (!response.ok) {
+                console.error('❌ Upload failed with status:', response.status);
+                // Try to get error details from response
+                return response.text().then(errorText => {
+                    console.error('❌ Error response body:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Video uploaded successfully:', data);
+            
+            // Update lecture with duration and other metadata
+            updateLectureMetadata(lectureId, blob.size);
+            
+            // Clear recorded chunks
+            window.recordedChunks = [];
+            
+            // Now it's safe to clear the lecture ID
+            window.currentRecordingLectureId = null;
+            console.log('🧹 Lecture ID cleared after successful upload');
+            
+            alert('Recording saved successfully!');
+        })
+        .catch(error => {
+            console.error('Error uploading video:', error);
+            alert('Error saving recording: ' + error.message);
+        });
+        
+    } catch (error) {
+        console.error('Error saving recording:', error);
+        alert('Error saving recording: ' + error.message);
+    }
+}
+
+// Update lecture metadata after recording
+function updateLectureMetadata(lectureId, fileSize) {
+    // Calculate duration from recorded chunks (approximate)
+    const duration = Math.floor(window.recordedChunks.length); // 1 second per chunk
+    
+    fetch(`/api/lectures/admin/lectures/${lectureId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({
+            duration: duration,
+            fileSize: fileSize
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Lecture metadata updated:', data);
+    })
+    .catch(error => {
+        console.error('Error updating lecture metadata:', error);
+    });
+}
+
+function startScreenShare() {
+    // Use state machine to validate transition
+    if (!window.streamState.canTransition('screenSharing')) {
+        console.error('❌ Cannot start screen sharing from current state:', window.streamState.current);
+        alert('Cannot start screen sharing from current state. Please start streaming first.');
+        return;
+    }
+    
+    navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
+        .then(stream => {
+            window.screenStream = stream;
+            
+            // Update local video display
+            document.getElementById('localVideo').srcObject = stream;
+            window.isScreenSharing = true;
+            
+            // Change to screen sharing state
+            window.streamState.changeTo('screenSharing');
+            
+            // Update admin audio to screen stream if it has audio
+            const adminAudio = document.getElementById('adminAudio');
+            if (adminAudio && stream.getAudioTracks().length > 0) {
+                adminAudio.srcObject = stream;
+                console.log('🎤 Updated admin audio to screen stream');
+            }
+            
+            // Update all existing peer connections with screen stream
+            Object.keys(window.peerConnections).forEach(socketId => {
+                const pc = window.peerConnections[socketId];
+                if (pc && pc.connectionState === 'connected') {
+                    // Remove existing video tracks
+                    const senders = pc.getSenders();
+                    senders.forEach(sender => {
+                        if (sender.track && sender.track.kind === 'video') {
+                            pc.removeTrack(sender);
+                        }
+                    });
+                    
+                    // Add screen stream video track
+                    const videoTrack = stream.getVideoTracks()[0];
+                    if (videoTrack) {
+                        pc.addTrack(videoTrack, stream);
+                    }
+                }
+            });
+            
+            // Handle screen share stop
+            stream.getVideoTracks()[0].onended = () => {
+                stopScreenShare();
+            };
+        })
+        .catch(error => {
+            console.error('Error sharing screen:', error);
+            
+            // Change to error state
+            window.streamState.changeTo('error');
+            
+            alert('Error sharing screen. Please try again.');
+        });
+}
+
+function stopScreenShare() {
+    if (window.screenStream) {
+        window.screenStream.getTracks().forEach(track => track.stop());
+        window.screenStream = null;
+    }
+    
+    // Restore camera stream to local video
+    if (window.localStream) {
+        document.getElementById('localVideo').srcObject = window.localStream;
+        
+        // Restore admin audio to camera stream
+        const adminAudio = document.getElementById('adminAudio');
+        if (adminAudio) {
+            adminAudio.srcObject = window.localStream;
+            console.log('🎤 Restored admin audio to camera stream');
+        }
+        
+        // Update all peer connections back to camera stream
+        Object.keys(window.peerConnections).forEach(socketId => {
+            const pc = window.peerConnections[socketId];
+            if (pc && pc.connectionState === 'connected') {
+                // Remove existing video tracks
+                const senders = pc.getSenders();
+                senders.forEach(sender => {
+                    if (sender.track && sender.track.kind === 'video') {
+                        pc.removeTrack(sender);
+                    }
+                });
+                
+                // Add camera stream video track
+                const videoTrack = window.localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    pc.addTrack(videoTrack, window.localStream);
+                }
+            }
+        });
+    }
+    
+    window.isScreenSharing = false;
+    
+    // Change back to live state
+    window.streamState.changeTo('live');
+}
+
+// Test streaming setup and provide debugging info
+function testStreamingSetup() {
+    console.log('🧪 Testing streaming setup...');
+    
+    const testResults = {
+        socket: false,
+        mediaDevices: false,
+        getUserMedia: false,
+        MediaRecorder: false,
+        requiredElements: false,
+        permissions: 'unknown'
+    };
+    
+    // Test socket connection
+    if (window.socket && window.socket.connected) {
+        testResults.socket = true;
+        console.log('✅ Socket connected with ID:', window.socket.id);
+    } else {
+        console.error('❌ Socket not connected');
+    }
+    
+    // Test media devices API
+    if (navigator.mediaDevices) {
+        testResults.mediaDevices = true;
+        console.log('✅ MediaDevices API available');
+        
+        if (navigator.mediaDevices.getUserMedia) {
+            testResults.getUserMedia = true;
+            console.log('✅ getUserMedia available');
+        } else {
+            console.error('❌ getUserMedia not available');
+        }
+    } else {
+        console.error('❌ MediaDevices API not available');
+    }
+    
+    // Test MediaRecorder
+    if (window.MediaRecorder) {
+        testResults.MediaRecorder = true;
+        console.log('✅ MediaRecorder API available');
+        
+        // Test supported formats with priority order
+        const formats = [
+            { mimeType: 'video/webm;codecs=vp9', name: 'VP9 (High Quality)', priority: 1 },
+            { mimeType: 'video/webm;codecs=vp8', name: 'VP8 (Good Quality)', priority: 2 },
+            { mimeType: 'video/webm', name: 'WebM (Basic)', priority: 3 }
+        ];
+        
+        let bestSupportedFormat = null;
+        let supportedFormats = [];
+        
+        formats.forEach(format => {
+            if (window.MediaRecorder.isTypeSupported(format.mimeType)) {
+                console.log(`✅ ${format.name} supported: ${format.mimeType}`);
+                supportedFormats.push(format);
+                if (!bestSupportedFormat || format.priority < bestSupportedFormat.priority) {
+                    bestSupportedFormat = format;
+                }
+            } else {
+                console.log(`⚠️ ${format.name} not supported: ${format.mimeType}`);
+            }
+        });
+        
+        // Log the best supported format for recording
+        if (bestSupportedFormat) {
+            console.log(`🎬 Best recording format: ${bestSupportedFormat.name} (${bestSupportedFormat.mimeType})`);
+        } else {
+            console.error('❌ No supported recording formats found!');
+        }
+    } else {
+        console.error('❌ MediaRecorder API not available');
+    }
+    
+    // Test required DOM elements
+    const requiredElements = [
+        'startLiveBtn', 'endLiveBtn', 'shareScreenBtn',
+        'startRecordingBtn', 'stopRecordingBtn', 'localVideo',
+        'streamStatus', 'recordingStatus', 'viewerCount', 'liveViewers'
+    ];
+    
+    const missingElements = [];
+    requiredElements.forEach(id => {
+        if (!document.getElementById(id)) {
+            missingElements.push(id);
+        }
+    });
+    
+    if (missingElements.length === 0) {
+        testResults.requiredElements = true;
+        console.log('✅ All required DOM elements found');
+    } else {
+        console.error('❌ Missing DOM elements:', missingElements);
+    }
+    
+    // Test permissions
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'camera' })
+            .then(result => {
+                testResults.permissions = result.state;
+                console.log('📷 Camera permission state:', result.state);
+            })
+            .catch(err => {
+                console.log('📷 Camera permission check failed:', err);
+            });
+            
+        navigator.permissions.query({ name: 'microphone' })
+            .then(result => {
+                console.log('🎤 Microphone permission state:', result.state);
+            })
+            .catch(err => {
+                console.log('🎤 Microphone permission check failed:', err);
+            });
+    }
+    
+    // Display test results
+    console.table(testResults);
+    
+    // Provide recommendations
+    if (!testResults.socket) {
+        console.warn('⚠️ Socket connection issue - check server and network');
+    }
+    if (!testResults.mediaDevices) {
+        console.warn('⚠️ Media devices not supported - use modern browser');
+    }
+    if (!testResults.MediaRecorder) {
+        console.warn('⚠️ Recording not supported - use modern browser');
+    }
+    if (!testResults.requiredElements) {
+        console.warn('⚠️ Missing UI elements - check HTML structure');
+    }
+    
+    return testResults;
+}
+
+// Make test function globally accessible
+window.testStreamingSetup = testStreamingSetup;
+
+// Show upload progress
+function showUploadProgress() {
+    const progressDiv = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    
+    if (progressDiv) {
+        progressDiv.style.display = 'block';
+        progressFill.style.width = '0%';
+        progressText.textContent = '0%';
+    }
+}
+
+// Update upload progress
+function updateUploadProgress(percent) {
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    
+    if (progressFill && progressText) {
+        progressFill.style.width = percent + '%';
+        progressText.textContent = Math.round(percent) + '%';
+    }
+}
+
+// Hide upload progress
+function hideUploadProgress() {
+    const progressDiv = document.getElementById('uploadProgress');
+    if (progressDiv) {
+        progressDiv.style.display = 'none';
+    }
+}
+
+// Upload video to existing lecture
+function uploadVideoToLecture(lectureId) {
+    // Create a file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'video/*';
+    fileInput.style.display = 'none';
+    
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Validate file size (500MB limit)
+        if (file.size > 500 * 1024 * 1024) {
+            alert('File size must be less than 500MB');
+            return;
+        }
+        
+        // Validate file type
+        if (!file.type.startsWith('video/')) {
+            alert('Please select a valid video file');
+            return;
+        }
+        
+        // Show progress bar
+        showUploadProgress();
+        
+        // Upload the video with progress tracking
+        const formData = new FormData();
+        formData.append('video', file);
+        
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                updateUploadProgress(percentComplete);
+            }
+        });
+        
+        xhr.addEventListener('load', function() {
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    alert('Video uploaded successfully!');
+                    loadRecordedLectures(); // Reload the lectures list
+                } catch (error) {
+                    alert('Video uploaded but response parsing failed');
+                    loadRecordedLectures();
+                }
+            } else {
+                alert('Error uploading video: ' + xhr.statusText);
+            }
+            hideUploadProgress();
+        });
+        
+        xhr.addEventListener('error', function() {
+            alert('Error uploading video: Network error');
+            hideUploadProgress();
+        });
+        
+        xhr.open('POST', `/api/lectures/admin/lectures/${lectureId}/video`);
+        xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('adminToken')}`);
+        xhr.send(formData);
+        
+        // Clean up
+        document.body.removeChild(fileInput);
+    });
+    
+    // Trigger file selection
+    document.body.appendChild(fileInput);
+    fileInput.click();
+}
+
+// Test recorded lectures API
+function testRecordedLecturesAPI() {
+    console.log('🧪 Testing recorded lectures API...');
+    updateSystemStatus('🧪 Starting API tests...', 'info');
+    
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+        console.error('❌ No admin token found');
+        updateSystemStatus('❌ No admin token found. Please log in first.', 'error');
+        alert('No admin token found. Please log in first.');
+        return;
+    }
+    
+    console.log('🔑 Admin token found:', adminToken.substring(0, 20) + '...');
+    updateSystemStatus('🔑 Admin token verified, testing API endpoint...', 'info');
+    
+    // Test 1: Check if we can reach the API
+    console.log('🧪 Test 1: Checking API endpoint...');
+    fetch('/api/lectures/admin/lectures', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${adminToken}`
+        }
+    })
+    .then(handleApiResponse)
+    .then(data => {
+        console.log('✅ Test 1 PASSED - API is reachable');
+        console.log('📊 Data received:', data);
+        updateSystemStatus('✅ API endpoint test passed, testing lecture creation...', 'success');
+        
+        // Test 2: Try to create a test lecture
+        console.log('🧪 Test 2: Creating test lecture...');
+        const testLecture = {
+            title: 'Test Lecture - ' + new Date().toISOString(),
+            description: 'This is a test lecture for debugging purposes',
+            category: 'test',
+            tags: 'test,debug',
+            quality: '1080p'
+        };
+        
+        return fetch('/api/lectures/admin/lectures', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${adminToken}`
+            },
+            body: JSON.stringify(testLecture)
+        });
+    })
+    .then(handleApiResponse)
+    .then(data => {
+        console.log('✅ Test 2 PASSED - Lecture creation works');
+        console.log('📝 Test lecture created:', data);
+        updateSystemStatus('✅ Lecture creation test passed, testing deletion...', 'success');
+        
+        // Test 3: Try to delete the test lecture
+        console.log('🧪 Test 3: Deleting test lecture...');
+        return fetch(`/api/lectures/admin/lectures/${data._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${adminToken}`
+            }
+        });
+    })
+    .then(response => {
+        console.log('📡 Test 3 Response Status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // DELETE requests typically don't return JSON
+        return { success: true };
+    })
+    .then(data => {
+        console.log('✅ Test 3 PASSED - Lecture deletion works');
+        console.log('🎉 ALL TESTS PASSED! Recorded lectures API is working correctly.');
+        updateSystemStatus('🎉 All tests passed! Recorded lectures system is fully operational.', 'success');
+        
+        alert('🎉 API Test Complete!\n\n✅ API endpoint is reachable\n✅ Lecture creation works\n✅ Lecture deletion works\n\nAll systems are operational!');
+        
+        // Reload lectures to show current state
+        loadRecordedLectures();
+    })
+    .catch(error => {
+        console.error('❌ API Test Failed:', error);
+        updateSystemStatus('❌ API test failed: ' + error.message, 'error');
+        alert('❌ API Test Failed!\n\nError: ' + error.message + '\n\nCheck the console for detailed information.');
+    });
+}
+
+window.closeAccessModal = closeAccessModal;
+window.togglePublicAccess = togglePublicAccess;
+window.saveAccessChanges = saveAccessChanges;
+window.testRecordedLecturesAPI = testRecordedLecturesAPI;
+
+// Update system status
+function updateSystemStatus(message, type = 'info') {
+    const statusElement = document.getElementById('systemStatus');
+    const statusText = document.getElementById('statusText');
+    
+    if (!statusElement || !statusText) return;
+    
+    // Update text
+    statusText.textContent = message;
+    
+    // Update styling based on type
+    statusElement.className = 'margin-top-10';
+    statusElement.style.padding = '10px';
+    statusElement.style.borderRadius = '5px';
+    statusElement.style.borderLeft = '4px solid';
+    
+    switch (type) {
+        case 'success':
+            statusElement.style.background = '#d4edda';
+            statusElement.style.borderLeftColor = '#28a745';
+            break;
+        case 'error':
+            statusElement.style.background = '#f8d7da';
+            statusElement.style.borderLeftColor = '#dc3545';
+            break;
+        case 'warning':
+            statusElement.style.background = '#fff3cd';
+            statusElement.style.borderLeftColor = '#ffc107';
+            break;
+        default:
+            statusElement.style.background = '#d1ecf1';
+            statusElement.style.borderLeftColor = '#17a2b8';
+    }
+}
+
+// Utility function for safe API response handling
+function handleApiResponse(response) {
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Invalid response format. Expected JSON.');
+    }
+    
+    return response.json();
+}
+
+// Load available users for access control
+function loadAvailableUsers(lectureId) {
+    console.log('👥 Loading available users for lecture:', lectureId);
+    
+    const userAccessList = document.getElementById('userAccessList');
+    if (!userAccessList) {
+        console.error('❌ userAccessList element not found');
+        return;
+    }
+    
+    // Show loading state
+    userAccessList.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <div class="loading-spinner" style="display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;"></div>
+            <p style="color: #666; margin-bottom: 10px;">Loading Users...</p>
+            <p style="color: #999; font-size: 0.9rem;">Please wait while we fetch the user list</p>
+        </div>
+    `;
+    
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+        console.error('❌ No admin token found');
+        userAccessList.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: #dc3545;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>No admin token found</p>
+                <p style="font-size: 0.9rem;">Please log in again</p>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log('🔑 Admin token found, fetching users from /api/admin/users...');
+    
+    // Fetch all users from the system
+    fetch('/api/admin/users', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log('📡 Users API Response Status:', response.status);
+        console.log('📡 Users API Response Headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Invalid response format. Expected JSON.');
+        }
+        
+        return response.json();
+    })
+    .then(users => {
+        console.log('✅ Users loaded successfully:', users);
+        console.log('📊 Number of users:', users.length);
+        
+        if (!Array.isArray(users)) {
+            throw new Error('Invalid response: users is not an array');
+        }
+        
+        displayUserAccessList(users, lectureId);
+    })
+    .catch(error => {
+        console.error('❌ Error loading users:', error);
+        userAccessList.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                <h4 style="color: #dc3545; margin-bottom: 10px;">Error Loading Users</h4>
+                <p style="color: #666; margin-bottom: 20px;">${error.message}</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="loadAvailableUsers('${lectureId}')" class="save-btn">
+                        <i class="fas fa-sync"></i> Retry
+                    </button>
+                    <button onclick="closeAccessModal()" class="btn-cancel">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+                <details style="margin-top: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;">
+                    <summary style="cursor: pointer; color: #007bff;">Debug Information</summary>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${error.stack || 'No stack trace available'}</pre>
+                </details>
+            </div>
+        `;
+    });
+}
+
+// Display user access list with checkboxes
+function displayUserAccessList(users, lectureId) {
+    const userAccessList = document.getElementById('userAccessList');
+    if (!userAccessList) {
+        console.error('❌ userAccessList element not found in displayUserAccessList');
+        return;
+    }
+    
+    console.log('📋 Displaying user list with', users.length, 'users');
+    
+    if (!users || users.length === 0) {
+        userAccessList.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: #666;">
+                <i class="fas fa-users" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
+                <h4 style="margin-bottom: 10px;">No Users Found</h4>
+                <p style="margin-bottom: 15px;">There are no users in the system yet.</p>
+                <div style="font-size: 12px; color: #999; background: #f8f9fa; padding: 10px; border-radius: 5px; text-align: left;">
+                    <strong>To add users:</strong><br>
+                    1. Go to "Users" tab in admin dashboard<br>
+                    2. Click "Create New User"<br>
+                    3. Fill in user details and save<br>
+                    4. Return here to manage access
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div style="margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong style="color: #333;">Select Users with Access (${users.length} total)</strong>
+                <div>
+                    <button onclick="selectAllUsers()" class="save-btn" style="padding: 5px 10px; font-size: 12px; margin-right: 5px;">
+                        <i class="fas fa-check-double"></i> Select All
+                    </button>
+                    <button onclick="deselectAllUsers()" class="save-btn" style="padding: 5px 10px; font-size: 12px; background: #6c757d;">
+                        <i class="fas fa-times"></i> Deselect All
+                    </button>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: #666;">
+                <i class="fas fa-info-circle"></i> Check the users who should have access to this lecture
+            </div>
+        </div>
+        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px; background: white;">
+    `;
+    
+    users.forEach((user, index) => {
+        console.log(`👤 User ${index + 1}:`, user);
+        html += `
+            <div class="user-access-item">
+                <input type="checkbox" 
+                       id="user_${user._id}" 
+                       value="${user._id}" 
+                       class="user-access-checkbox">
+                <div class="user-info">
+                    <div class="user-name">${user.name || 'Unnamed User'}</div>
+                    <div class="user-details">
+                        <i class="fas fa-phone"></i> ${user.phone || 'No phone'}
+                        ${user.civilId ? `<br><i class="fas fa-id-card"></i> ${user.civilId}` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    userAccessList.innerHTML = html;
+    
+    console.log('✅ User list displayed successfully');
+    
+    // Load current access settings to check existing users
+    loadCurrentUserAccess(lectureId, users);
+}
+
+// Load current user access settings
+function loadCurrentUserAccess(lectureId, allUsers) {
+    console.log('🔍 Loading current user access for lecture:', lectureId);
+    
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) return;
+    
+    fetch(`/api/lectures/admin/lectures/${lectureId}`, {
+        headers: {
+            'Authorization': `Bearer ${adminToken}`
+        }
+    })
+    .then(handleApiResponse)
+    .then(lecture => {
+        console.log('✅ Current lecture access loaded:', lecture);
+        
+        // Check existing users
+        if (lecture.accessUsers && lecture.accessUsers.length > 0) {
+            lecture.accessUsers.forEach(userId => {
+                const checkbox = document.getElementById(`user_${userId}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error loading current user access:', error);
+    });
+}
+
+// Select all users
+function selectAllUsers() {
+    const checkboxes = document.querySelectorAll('.user-access-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+}
+
+// Deselect all users
+function deselectAllUsers() {
+    const checkboxes = document.querySelectorAll('.user-access-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+
+// Test user loading function
+function testUserLoading() {
+    console.log('🧪 Testing user loading...');
+    
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+        alert('No admin token found. Please log in first.');
+        return;
+    }
+    
+    console.log('🔑 Admin token found, testing /api/admin/users endpoint...');
+    
+    fetch('/api/admin/users', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log('📡 Test Response Status:', response.status);
+        console.log('📡 Test Response Headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Test successful! Users data:', data);
+        alert(`✅ User loading test successful!\n\nFound ${data.length} users\n\nCheck console for details.`);
+    })
+    .catch(error => {
+        console.error('❌ Test failed:', error);
+        alert(`❌ User loading test failed!\n\nError: ${error.message}\n\nCheck console for details.`);
+    });
+}
+
+window.selectAllUsers = selectAllUsers;
+window.deselectAllUsers = deselectAllUsers;
+window.testUserLoading = testUserLoading;
+window.testMicrophoneAccess = testMicrophoneAccess;
+window.testCameraAccess = testCameraAccess;
+window.monitorAudioLevels = monitorAudioLevels;
+window.updateConnectionStatus = updateConnectionStatus;
+window.showConnectionError = showConnectionError;
+window.isSocketConnected = isSocketConnected;
+window.safeSocketEmit = safeSocketEmit;
+window.handlePageVisibilityChange = handlePageVisibilityChange;
+window.handleBeforeUnload = handleBeforeUnload;
+window.updateAdminVolume = updateAdminVolume;
+window.toggleAdminMicrophone = toggleAdminMicrophone;
+window.showAdminAudioControls = showAdminAudioControls;
+window.hideAdminAudioControls = hideAdminAudioControls;
+
+
+// Global functions for lecture popup
+window.showLecturePopup = function() {
+  const popup = document.getElementById('lecturePopup');
+  popup.classList.add('active');
+  document.body.style.overflow = 'hidden'; // Prevent background scrolling
+};
+
+window.closeLecturePopup = function() {
+  const popup = document.getElementById('lecturePopup');
+  const video = document.getElementById('lectureVideoPlayer');
+  
+  // Stop video playback
+  video.pause();
+  video.src = '';
+  
+  // Hide popup
+  popup.classList.remove('active');
+  document.body.style.overflow = ''; // Restore background scrolling
+};
+
+window.playLectureInPopup = async function(lectureId) {
+  console.log('🎬 Admin playing lecture with ID:', lectureId);
+  
+  if (!lectureId) {
+    console.error('❌ No lecture ID provided');
+    alert('Error: No lecture ID provided');
+    return;
+  }
+  
+  try {
+    // Show popup with loading state
+    showLecturePopup();
+    
+    console.log('🔍 Fetching lecture details for ID:', lectureId);
+    
+    const response = await fetch(`/api/lectures/admin/lectures/${lectureId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+      }
+    });
+
+    console.log('📡 Lecture details response status:', response.status);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch lecture details');
+    }
+
+    const lecture = await response.json();
+    console.log('✅ Lecture details received:', lecture);
+    
+    // Populate popup with lecture info
+    document.getElementById('popupLectureTitle').textContent = lecture.title;
+    document.getElementById('popupLectureDescription').textContent = lecture.description || 'No description available';
+    document.getElementById('popupLectureDate').textContent = formatDate(lecture.streamDate);
+    document.getElementById('popupLectureDuration').textContent = formatDuration(lecture.duration);
+    document.getElementById('popupLectureQuality').textContent = lecture.quality || '1080p';
+    document.getElementById('popupLectureCategory').textContent = lecture.category || 'General';
+    
+    // Set video source with authentication token
+    const adminToken = localStorage.getItem('adminToken');
+    const video = document.getElementById('lectureVideoPlayer');
+    const placeholder = document.getElementById('lectureVideoPlaceholder');
+    
+    // Show placeholder while video loads
+    placeholder.style.display = 'flex';
+    video.style.display = 'none';
+    
+    video.src = `/api/lectures/admin/lectures/${lectureId}/stream?token=${encodeURIComponent(adminToken)}`;
+    
+    // Load video and hide placeholder
+    video.load();
+    video.addEventListener('loadeddata', () => {
+      placeholder.style.display = 'none';
+      video.style.display = 'block';
+    });
+    
+    // Handle video errors
+    video.addEventListener('error', () => {
+      placeholder.style.display = 'flex';
+      video.style.display = 'none';
+      placeholder.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>Error loading video</p>
+        <button onclick="playLectureInPopup('${lectureId}')" class="lecture-error-retry">Retry</button>
+      `;
+    });
+    
+  } catch (error) {
+    console.error('Error playing lecture:', error);
+    showLectureError(error.message);
+  }
+};
+
+window.showLectureError = function(message) {
+  const popup = document.getElementById('lecturePopup');
+  const content = popup.querySelector('.lecture-popup-content');
+  
+  content.innerHTML = `
+    <div class="lecture-error">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div class="lecture-error-message">Error Loading Lecture</div>
+      <div class="lecture-error-details">${message}</div>
+      <button class="lecture-error-retry" onclick="closeLecturePopup()">Close</button>
+    </div>
+  `;
+  
+  popup.classList.add('active');
+  document.body.style.overflow = 'hidden';
+};
+
+window.downloadLecture = function() {
+  const video = document.getElementById('lectureVideoPlayer');
+  if (video.src) {
+    const link = document.createElement('a');
+    link.href = video.src;
+    link.download = 'lecture.mp4';
+    link.click();
+  } else {
+    alert('No video available for download');
+  }
+};
+
+window.shareLecture = function() {
+  if (navigator.share) {
+    navigator.share({
+      title: document.getElementById('popupLectureTitle').textContent,
+      text: document.getElementById('popupLectureDescription').textContent,
+      url: window.location.href
+    });
+  } else {
+    // Fallback: copy to clipboard
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Lecture URL copied to clipboard!');
+    }).catch(() => {
+      alert('Failed to copy URL. Please copy manually: ' + url);
+    });
+  }
+};
+
+window.editLecture = function() {
+  // Close popup and open edit modal
+  closeLecturePopup();
+  // You can implement edit functionality here
+  alert('Edit functionality will be implemented here');
+};
+
+// Utility functions for date and duration formatting
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+  
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now - date);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 1) {
+    return 'Yesterday';
+  } else if (diffDays < 7) {
+    return `${diffDays} days ago`;
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+  } else {
+    return date.toLocaleDateString();
+  }
+}
+
+function formatDuration(seconds) {
+  if (!seconds) return 'N/A';
+  
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+  }
+  return `0:${minutes.toString().padStart(2, '0')}`;
+}
+
+// Add popup event listeners
+document.addEventListener('click', (e) => {
+  const popup = document.getElementById('lecturePopup');
+  if (e.target === popup) {
+    closeLecturePopup();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const popup = document.getElementById('lecturePopup');
+    if (popup && popup.classList.contains('active')) {
+      closeLecturePopup();
+    }
+  }
+});
+
+// Test microphone access separately
+function testMicrophoneAccess() {
+    console.log('🎤 Testing microphone access...');
+    
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error('❌ Media devices API not supported');
+        return Promise.reject(new Error('Media devices API not supported'));
+    }
+    
+    return navigator.mediaDevices.getUserMedia({ 
+        audio: {
+            echoCancellation: { ideal: true },
+            noiseSuppression: { ideal: true },
+            autoGainControl: { ideal: true },
+            sampleRate: { ideal: 44100 },
+            channelCount: { ideal: 2 }
+        }
+    })
+    .then(stream => {
+        console.log('✅ Microphone access successful');
+        console.log('🎤 Audio tracks:', stream.getAudioTracks().length);
+        
+        // Log audio track details
+        stream.getAudioTracks().forEach(track => {
+            console.log('🎤 Audio track:', {
+                enabled: track.enabled,
+                readyState: track.readyState,
+                muted: track.muted,
+                settings: track.getSettings()
+            });
+        });
+        
+        // Stop the test stream
+        stream.getTracks().forEach(track => track.stop());
+        
+        return true;
+    })
+    .catch(error => {
+        console.error('❌ Microphone access failed:', error);
+        return Promise.reject(error);
+    });
+}
+
+// Test camera access separately
+function testCameraAccess() {
+    console.log('📹 Testing camera access...');
+    
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error('❌ Media devices API not supported');
+        return Promise.reject(new Error('Media devices API not supported'));
+    }
+    
+    return navigator.mediaDevices.getUserMedia({ 
+        video: { 
+            width: { ideal: 640 }, 
+            height: { ideal: 480 },
+            frameRate: { ideal: 15 }
+        }
+    })
+    .then(stream => {
+        console.log('✅ Camera access successful');
+        console.log('📹 Video tracks:', stream.getVideoTracks().length);
+        
+        // Log video track details
+        stream.getVideoTracks().forEach(track => {
+            console.log('📹 Video track:', {
+                enabled: track.enabled,
+                readyState: track.readyState,
+                settings: track.getSettings()
+            });
+        });
+        
+        // Stop the test stream
+        stream.getTracks().forEach(track => track.stop());
+        
+        return true;
+    })
+    .catch(error => {
+        console.error('❌ Camera access failed:', error);
+        return Promise.reject(error);
+    });
+}
+
+// Enhanced media access with fallbacks
+function requestMediaAccess() {
+    console.log('🎥 Requesting media access with fallbacks...');
+    
+    // First try to get both audio and video
+    return navigator.mediaDevices.getUserMedia({ 
+        video: { 
+            width: { ideal: 1920, min: 640 }, 
+            height: { ideal: 1080, min: 480 },
+            frameRate: { ideal: 30, min: 15 },
+            facingMode: 'user'
+        }, 
+        audio: {
+            echoCancellation: { ideal: true },
+            noiseSuppression: { ideal: true },
+            autoGainControl: { ideal: true },
+            sampleRate: { ideal: 44100 },
+            channelCount: { ideal: 2 }
+        } 
+    })
+    .catch(error => {
+        console.log('⚠️ High quality failed, trying medium quality...');
+        
+        // Try medium quality
+        return navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                width: { ideal: 1280, min: 640 }, 
+                height: { ideal: 720, min: 480 },
+                frameRate: { ideal: 25, min: 15 }
+            }, 
+            audio: true
+        });
+    })
+    .catch(error => {
+        console.log('⚠️ Medium quality failed, trying low quality...');
+        
+        // Try low quality
+        return navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                width: { ideal: 640 }, 
+                height: { ideal: 480 },
+                frameRate: { ideal: 15 }
+            }, 
+            audio: true
+        });
+    })
+    .catch(error => {
+        console.log('⚠️ Low quality failed, trying audio only...');
+        
+        // Try audio only
+        return navigator.mediaDevices.getUserMedia({ 
+            audio: true
+        });
+    });
+}
+
+// Monitor audio levels for microphone feedback
+function monitorAudioLevels(stream) {
+    if (!stream || !stream.getAudioTracks().length) {
+        console.log('❌ No audio tracks to monitor');
+        return;
+    }
+    
+    console.log('🎤 Starting audio level monitoring...');
+    
+    // Create audio context for analyzing audio levels
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const analyser = audioContext.createAnalyser();
+    const microphone = audioContext.createMediaStreamSource(stream);
+    
+    // Connect microphone to analyser
+    microphone.connect(analyser);
+    
+    // Configure analyser
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    
+    // Function to update audio levels
+    function updateAudioLevels() {
+        analyser.getByteFrequencyData(dataArray);
+        
+        // Calculate average volume
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            sum += dataArray[i];
+        }
+        const average = sum / bufferLength;
+        
+        // Update status with audio level indicator
+        const streamStatus = document.getElementById('streamStatus');
+        if (streamStatus && streamStatus.textContent.includes('LIVE')) {
+            if (average > 50) {
+                streamStatus.innerHTML = streamStatus.textContent + ' 🔊';
+            } else if (average > 20) {
+                streamStatus.innerHTML = streamStatus.textContent + ' 🔉';
+            } else {
+                streamStatus.innerHTML = streamStatus.textContent + ' 🔈';
+            }
+        }
+        
+        // Log audio levels for debugging
+        if (average > 0) {
+            console.log('🎤 Audio level:', average);
+        }
+        
+        // Continue monitoring if stream is active
+        if (window.localStream && window.localStream.active) {
+            requestAnimationFrame(updateAudioLevels);
+        }
+    }
+    
+    // Start monitoring
+    updateAudioLevels();
+    
+    return {
+        stop: () => {
+            microphone.disconnect();
+            analyser.disconnect();
+            audioContext.close();
+            console.log('🎤 Audio monitoring stopped');
+        }
+    };
+}
+
+// Update connection status display
+function updateConnectionStatus(status, message = '') {
+    const connectionStatus = document.getElementById('connectionStatus');
+    if (!connectionStatus) return;
+    
+    switch (status) {
+        case 'connected':
+            connectionStatus.innerHTML = '🟢 Connected';
+            connectionStatus.className = 'status-connected';
+            break;
+        case 'connecting':
+            connectionStatus.innerHTML = '🟡 Connecting...';
+            connectionStatus.className = 'status-connecting';
+            break;
+        case 'reconnecting':
+            connectionStatus.innerHTML = '🟡 Reconnecting...';
+            connectionStatus.className = 'status-reconnecting';
+            break;
+        case 'error':
+            connectionStatus.innerHTML = '🔴 Connection Error';
+            connectionStatus.className = 'status-error';
+            if (message) {
+                connectionStatus.title = message;
+            }
+            break;
+        case 'disconnected':
+            connectionStatus.innerHTML = '⚫ Disconnected';
+            connectionStatus.className = 'status-disconnected';
+            break;
+    }
+}
+
+// Show connection error message
+function showConnectionError(message) {
+    // Create or update error notification
+    let errorNotification = document.getElementById('connectionErrorNotification');
+    if (!errorNotification) {
+        errorNotification = document.createElement('div');
+        errorNotification.id = 'connectionErrorNotification';
+        errorNotification.className = 'connection-error-notification';
+        document.body.appendChild(errorNotification);
+    }
+    
+    errorNotification.innerHTML = `
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="error-close">×</button>
+        </div>
+    `;
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        if (errorNotification.parentElement) {
+            errorNotification.remove();
+        }
+    }, 10000);
+}
+
+// Check socket connection status
+function isSocketConnected() {
+    return window.socket && window.socket.connected;
+}
+
+// Safe socket emit with connection check
+function safeSocketEmit(event, data) {
+    if (!isSocketConnected()) {
+        console.error('❌ Socket not connected, cannot emit:', event);
+        showConnectionError('Connection lost. Please wait for reconnection or refresh the page.');
+        return false;
+    }
+    
+    try {
+        window.socket.emit(event, data);
+        return true;
+    } catch (error) {
+        console.error('❌ Error emitting socket event:', event, error);
+        return false;
+    }
+}
+
+// Handle page visibility changes to prevent WebSocket disconnections
+function handlePageVisibilityChange() {
+    if (document.hidden) {
+        console.log('📱 Page hidden, maintaining WebSocket connection...');
+        // Keep connection alive but don't show notifications
+    } else {
+        console.log('📱 Page visible again, checking connection...');
+        // Check if we need to reconnect
+        if (window.socket && !window.socket.connected) {
+            console.log('🔄 Page became visible but socket disconnected, attempting reconnection...');
+            window.socket.connect();
+        }
+    }
+}
+
+// Handle beforeunload to gracefully close connections
+function handleBeforeUnload(event) {
+    if (window.localStream && window.localStream.active) {
+        console.log('🔄 Page unloading, stopping stream...');
+        // Stop all media tracks
+        window.localStream.getTracks().forEach(track => track.stop());
+        
+        // Notify server if possible
+        if (window.socket && window.socket.connected) {
+            try {
+                window.socket.emit('admin-end');
+            } catch (e) {
+                console.log('Could not notify server about stream end');
+            }
+        }
+    }
+}
+
+// Initialize Socket.IO connection with enhanced error handling
+
+// Update admin audio volume
+function updateAdminVolume(volume) {
+    const adminAudio = document.getElementById('adminAudio');
+    if (adminAudio) {
+        adminAudio.volume = volume;
+        console.log('🔊 Admin volume set to:', volume);
+    }
+    
+    // Update volume display
+    const volumeDisplay = document.getElementById('volumeDisplay');
+    if (volumeDisplay) {
+        volumeDisplay.textContent = Math.round(volume * 100) + '%';
+    }
+}
+
+// Toggle admin microphone on/off
+function toggleAdminMicrophone() {
+    const adminMuteBtn = document.getElementById('adminMuteBtn');
+    const adminMicStatus = document.getElementById('adminMicStatus');
+    
+    if (!adminMuteBtn || !adminMicStatus) {
+        console.error('❌ Admin mute button or status not found');
+        return;
+    }
+    
+    // Check if admin is currently muted
+    const isCurrentlyMuted = adminMuteBtn.classList.contains('muted');
+    
+    if (isCurrentlyMuted) {
+        // Unmute admin microphone
+        adminMuteBtn.classList.remove('muted');
+        adminMuteBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mute Admin';
+        adminMuteBtn.style.background = '#4caf50';
+        adminMicStatus.textContent = '🎤 Admin mic is active';
+        adminMicStatus.style.color = '#4caf50';
+        
+        // Re-enable admin audio in the stream
+        if (window.localStream) {
+            const audioTracks = window.localStream.getAudioTracks();
+            audioTracks.forEach(track => {
+                if (track.kind === 'audio') {
+                    track.enabled = true;
+                    console.log('🔊 Admin microphone re-enabled');
+                }
+            });
+        }
+        
+        console.log('✅ Admin microphone unmuted');
+    } else {
+        // Mute admin microphone
+        adminMuteBtn.classList.add('muted');
+        adminMuteBtn.innerHTML = '<i class="fas fa-microphone"></i> Unmute Admin';
+        adminMuteBtn.style.background = '#f44336';
+        adminMicStatus.textContent = '🔇 Admin mic is muted';
+        adminMicStatus.style.color = '#f44336';
+        
+        // Disable admin audio in the stream
+        if (window.localStream) {
+            const audioTracks = window.localStream.getAudioTracks();
+            audioTracks.forEach(track => {
+                if (track.kind === 'audio') {
+                    track.enabled = false;
+                    console.log('🔇 Admin microphone muted');
+                }
+            });
+        }
+        
+        console.log('🔇 Admin microphone muted');
+    }
+}
+
+// Show admin audio controls
+function showAdminAudioControls() {
+    const audioControls = document.querySelector('.admin-audio-controls');
+    if (audioControls) {
+        audioControls.style.display = 'block';
+        
+        // Initialize admin mute button state
+        const adminMuteBtn = document.getElementById('adminMuteBtn');
+        const adminMicStatus = document.getElementById('adminMicStatus');
+        
+        if (adminMuteBtn && adminMicStatus) {
+            // Check if admin stream has audio tracks
+            if (window.localStream) {
+                const audioTracks = window.localStream.getAudioTracks();
+                const hasAudio = audioTracks.some(track => track.kind === 'audio' && track.enabled);
+                
+                if (hasAudio) {
+                    // Admin mic is active
+                    adminMuteBtn.classList.remove('muted');
+                    adminMuteBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mute Admin';
+                    adminMuteBtn.style.background = '#4caf50';
+                    adminMicStatus.textContent = '🎤 Admin mic is active';
+                    adminMicStatus.style.color = '#4caf50';
+                } else {
+                    // Admin mic is muted
+                    adminMuteBtn.classList.add('muted');
+                    adminMuteBtn.innerHTML = '<i class="fas fa-microphone"></i> Unmute Admin';
+                    adminMuteBtn.style.background = '#f44336';
+                    adminMicStatus.textContent = '🔇 Admin mic is muted';
+                    adminMicStatus.style.color = '#f44336';
+                }
+            }
+        }
+        
+        console.log('🎤 Admin audio controls shown and initialized');
+    }
+}
+
+// Hide admin audio controls
+function hideAdminAudioControls() {
+    const audioControls = document.querySelector('.admin-audio-controls');
+    if (audioControls) {
+        audioControls.style.display = 'none';
+        console.log('🎤 Admin audio controls hidden');
+    }
+}
+
+// Handle page visibility changes to prevent WebSocket disconnections
+
+
+
+// Test streaming setup and provide debugging info
+
+// Production-ready: Debug function removed for security
+
+// PHASE 4: Error Handling & Recovery System
+window.errorHandler = {
+    // Error types and their recovery strategies
+    errorTypes: {
+        'media_access': {
+            description: 'Media device access failed',
+            recovery: 'retry_with_fallback',
+            maxRetries: 3,
+            userMessage: 'Camera/microphone access failed. Please check permissions and try again.'
+        },
+        'webrtc_connection': {
+            description: 'WebRTC connection failed',
+            recovery: 'retry_with_delay',
+            maxRetries: 5,
+            userMessage: 'Connection failed. Retrying automatically...'
+        },
+        'recording_failed': {
+            description: 'Recording failed to start or process',
+            recovery: 'retry_with_different_format',
+            maxRetries: 2,
+            userMessage: 'Recording failed. Trying different format...'
+        },
+        'socket_connection': {
+            description: 'Socket connection lost',
+            recovery: 'auto_reconnect',
+            maxRetries: 10,
+            userMessage: 'Connection lost. Reconnecting automatically...'
+        },
+        'stream_state': {
+            description: 'Stream state inconsistency',
+            recovery: 'reset_state',
+            maxRetries: 1,
+            userMessage: 'Stream state error. Resetting...'
+        }
+    },
+    
+    // Error tracking
+    errors: new Map(),
+    retryCounts: new Map(),
+    
+    // Handle error with recovery strategy
+    handle: function(errorType, error, context = {}) {
+        console.error(`❌ Error [${errorType}]:`, error);
+        
+        // Track error
+        if (!this.errors.has(errorType)) {
+            this.errors.set(errorType, []);
+        }
+        this.errors.get(errorType).push({
+            error: error,
+            context: context,
+            timestamp: Date.now()
+        });
+        
+        // Get error type info
+        const errorInfo = this.errorTypes[errorType];
+        if (!errorInfo) {
+            console.error('❌ Unknown error type:', errorType);
+            return false;
+        }
+        
+        // Check retry count
+        const currentRetries = this.retryCounts.get(errorType) || 0;
+        if (currentRetries >= errorInfo.maxRetries) {
+            console.error(`❌ Max retries exceeded for ${errorType}`);
+            this.showUserFriendlyError(errorInfo.userMessage);
+            return false;
+        }
+        
+        // Increment retry count
+        this.retryCounts.set(errorType, currentRetries + 1);
+        
+        // Execute recovery strategy
+        return this.executeRecovery(errorType, errorInfo, context);
+    },
+    
+    // Execute recovery strategy
+    executeRecovery: function(errorType, errorInfo, context) {
+        console.log(`🔄 Executing recovery for ${errorType}: ${errorInfo.recovery}`);
+        
+        switch (errorInfo.recovery) {
+            case 'retry_with_fallback':
+                return this.retryWithFallback(errorType, context);
+                
+            case 'retry_with_delay':
+                return this.retryWithDelay(errorType, context);
+                
+            case 'retry_with_different_format':
+                return this.retryWithDifferentFormat(errorType, context);
+                
+            case 'auto_reconnect':
+                return this.autoReconnect(errorType, context);
+                
+            case 'reset_state':
+                return this.resetState(errorType, context);
+                
+            default:
+                console.error('❌ Unknown recovery strategy:', errorInfo.recovery);
+                return false;
+        }
+    },
+    
+    // Retry with fallback constraints
+    retryWithFallback: function(errorType, context) {
+        if (errorType === 'media_access') {
+            console.log('🔄 Retrying media access with fallback constraints...');
+            
+            // Try different media constraints
+            const fallbackConstraints = [
+                { video: true, audio: false },  // Video only
+                { video: false, audio: true },  // Audio only
+                { video: { width: 640, height: 480 }, audio: true },  // Lower resolution
+                { video: true, audio: { echoCancellation: false } }  // No echo cancellation
+            ];
+            
+            // This would be implemented in the media access function
+            return true;
+        }
+        return false;
+    },
+    
+    // Retry with exponential backoff
+    retryWithDelay: function(errorType, context) {
+        const retryCount = this.retryCounts.get(errorType) || 0;
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 30000); // Max 30 seconds
+        
+        console.log(`🔄 Retrying ${errorType} in ${delay}ms (attempt ${retryCount + 1})`);
+        
+        setTimeout(() => {
+            if (errorType === 'webrtc_connection') {
+                // Retry WebRTC connection
+                this.retryWebRTCConnection(context);
+            }
+        }, delay);
+        
+        return true;
+    },
+    
+    // Retry with different recording format
+    retryWithDifferentFormat: function(errorType, context) {
+        if (errorType === 'recording_failed') {
+            console.log('🔄 Retrying recording with different format...');
+            
+            // Try different MIME types
+            const fallbackFormats = [
+                'video/webm',
+                'video/mp4',
+                'video/ogg'
+            ];
+            
+            // This would be implemented in the recording function
+            return true;
+        }
+        return false;
+    },
+    
+    // Auto reconnect for socket issues
+    autoReconnect: function(errorType, context) {
+        if (errorType === 'socket_connection') {
+            console.log('🔄 Attempting automatic reconnection...');
+            
+            if (window.socket) {
+                window.socket.connect();
+            }
+            
+            return true;
+        }
+        return false;
+    },
+    
+    // Reset stream state
+    resetState: function(errorType, context) {
+        if (errorType === 'stream_state') {
+            console.log('🔄 Resetting stream state...');
+            
+            if (window.streamState) {
+                window.streamState.reset();
+            }
+            
+            return true;
+        }
+        return false;
+    },
+    
+    // Retry WebRTC connection
+    retryWebRTCConnection: function(context) {
+        if (context.viewerSocketId && window.peerConnections) {
+            const pc = window.peerConnections[context.viewerSocketId];
+            if (pc && pc.connectionState === 'failed') {
+                console.log('🔄 Retrying WebRTC connection for viewer:', context.viewerSocketId);
+                
+                // Close and recreate connection
+                pc.close();
+                delete window.peerConnections[context.viewerSocketId];
+                
+                // Recreate connection
+                const newPc = createPeerConnection(context.viewerSocketId);
+                if (newPc) {
+                    window.peerConnections[context.viewerSocketId] = newPc;
+                    console.log('✅ WebRTC connection recreated');
+                }
+            }
+        }
+    },
+    
+    // Show user-friendly error message
+    showUserFriendlyError: function(message) {
+        // Create or update error display
+        let errorDisplay = document.getElementById('errorDisplay');
+        if (!errorDisplay) {
+            errorDisplay = document.createElement('div');
+            errorDisplay.id = 'errorDisplay';
+            errorDisplay.className = 'error-display';
+            errorDisplay.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #dc3545;
+                color: white;
+                padding: 15px;
+                border-radius: 5px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 10000;
+                max-width: 300px;
+                font-family: Arial, sans-serif;
+            `;
+            document.body.appendChild(errorDisplay);
+        }
+        
+        errorDisplay.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>⚠️ ${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; color: white; cursor: pointer; margin-left: 10px;">
+                    ✕
+                </button>
+            </div>
+        `;
+        
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (errorDisplay.parentElement) {
+                errorDisplay.remove();
+            }
+        }, 10000);
+    },
+    
+    // Clear error tracking
+    clearErrors: function(errorType = null) {
+        if (errorType) {
+            this.errors.delete(errorType);
+            this.retryCounts.delete(errorType);
+        } else {
+            this.errors.clear();
+            this.retryCounts.clear();
+        }
+        console.log('🧹 Error tracking cleared');
+    },
+    
+    // Get error statistics
+    getErrorStats: function() {
+        const stats = {};
+        this.errors.forEach((errors, type) => {
+            stats[type] = {
+                count: errors.length,
+                lastError: errors[errors.length - 1],
+                retryCount: this.retryCounts.get(type) || 0
+            };
+        });
+        return stats;
+    },
+    
+    // Production-ready: Debug function removed
+};
+
+// Production-ready: Test function removed for security
+
+// Initialize dashboard

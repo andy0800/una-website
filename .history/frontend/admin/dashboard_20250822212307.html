@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="admin-dashboard">
+    <h1>Admin Dashboard</h1>
+    <button id="logoutBtn">Logout</button>
+
+    <nav class="admin-nav">
+      <button onclick="exportUsersExcel()">📥 Export Users (Excel)</button>
+      <button onclick="loadUsers()">View Users</button>
+      <button onclick="loadForms()">View Submitted Forms</button>
+      <button onclick="loadCourses()">Manage Courses</button>
+      <button onclick="showCreateCourseForm()">Create Course</button>
+      <button onclick="loadStats()">📊 View Stats</button>
+      <button onclick="showCreateUserForm()">➕ Create Student</button>
+      <button onclick="loadEditorTabs()">📝 Edit Website Content</button>
+      <button class="tab-button" data-tab="livestreamTab">🎥 Live Stream</button>
+    </nav>
+
+    <div id="adminContent" class="content-section">
+      <p>Select an option above to begin.</p>
+    </div>
+
+    <div id="adminStats" class="stats-cards"></div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search users by name, phone, ID, course, level..." oninput="filterUsers()" />
+    </div>
+
+    <section id="contentEditorSection" style="display: none; margin-top: 40px;">
+      <h2>Edit Website Content</h2>
+      <label for="contentLang">Language:</label>
+      <select id="contentLang">
+        <option value="en">English</option>
+        <option value="ar">Arabic</option>
+      </select>
+
+      <label for="contentPage" style="margin-left: 15px;">Page:</label>
+      <select id="contentPage">
+        <option value="index">Home (index)</option>
+        <option value="about">About</option>
+        <option value="contact">Contact</option>
+      </select>
+
+      <div id="contentFields" style="margin-top: 20px;">
+        <div id="quillEditor" style="height: 300px;"></div>
+      </div>
+
+      <button id="saveContentBtn" style="margin-top: 15px;">💾 Save Content</button>
+      <div id="contentSaveStatus" style="margin-top: 10px;"></div>
+    </section>
+    <!-- Live Stream Tab -->
+<div id="livestreamTab" class="tab-pane">
+  <h2>🔴 Start Live Stream</h2>
+  
+<button id="startLiveBtn">Start Live</button>
+  <video id="localVideo" autoplay muted playsinline style="width: 100%; margin-top: 10px;"></video>
+
+  <div id="micRequests" style="margin-top: 20px;">
+    <h4>🎤 Mic Requests</h4>
+    <ul id="micRequestList"></ul>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <h4>💬 Chat</h4>
+    <div id="adminMessages" style="border: 1px solid #ccc; height: 150px; overflow-y: scroll;"></div>
+    <input type="text" id="adminChatInput" placeholder="Type a message" />
+    <button id="sendAdminChat">Send</button>
+    <button id="endLiveBtn">End Live</button>
+  </div>
+  <button id="startStreamBtn">Start Stream</button>
+<button id="stopStreamBtn">Stop Stream</button>
+</div>
+  </div>
+
+<script src="backend\socket\streamSocket.js"></script>
+<script src="/admin/js/dashboard.js"></script>
+</body>
+</html>

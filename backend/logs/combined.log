@@ -1,0 +1,37 @@
+{"level":"info","message":"✅ HTTP server running on port 3000","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.550Z"}
+{"level":"info","message":"🌐 Network accessible at: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.553Z"}
+{"level":"info","message":"🏠 Server listening on port 3000","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.553Z"}
+{"level":"info","message":"🔗 Local access: http://localhost:3000","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.554Z"}
+{"level":"info","message":"🌐 Network access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.554Z"}
+{"level":"info","message":"📱 Other devices can access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.555Z"}
+{"level":"info","message":"🔧 Browser detection enabled - microphone access guidance provided","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.555Z"}
+{"level":"info","message":"📊 Health check available at /health","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.555Z"}
+{"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-08-31T11:42:31.556Z"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-08-31T11:42:32.180Z"}
+{"duration":1,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756640572755_vaxc8yyph","service":"una-institute-server","status":204,"timestamp":"2025-08-31T11:42:52.756Z","url":"/favicon.ico","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":16368}
+{"duration":2,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756640617444_k0xt899qw","service":"una-institute-server","status":204,"timestamp":"2025-08-31T11:43:37.446Z","url":"/favicon.ico","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":16368}
+{"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-08-31T11:43:41.916Z"}
+{"level":"info","message":"✅ HTTP server running on port 3000","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.378Z"}
+{"level":"info","message":"🌐 Network accessible at: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.380Z"}
+{"level":"info","message":"🏠 Server listening on port 3000","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.380Z"}
+{"level":"info","message":"🔗 Local access: http://localhost:3000","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.380Z"}
+{"level":"info","message":"🌐 Network access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.381Z"}
+{"level":"info","message":"📱 Other devices can access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.381Z"}
+{"level":"info","message":"🔧 Browser detection enabled - microphone access guidance provided","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.381Z"}
+{"level":"info","message":"📊 Health check available at /health","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.381Z"}
+{"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-08-31T11:44:15.381Z"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-08-31T11:44:16.120Z"}
+{"duration":2,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756640656317_6m95rukdt","service":"una-institute-server","status":204,"timestamp":"2025-08-31T11:44:16.319Z","url":"/favicon.ico","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":16576}
+{"duration":1,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756640661512_6ijzt7py1","service":"una-institute-server","status":204,"timestamp":"2025-08-31T11:44:21.513Z","url":"/favicon.ico","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":16576}
+{"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-08-31T11:45:37.964Z"}
+{"level":"info","message":"✅ HTTP server running on port 3000","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.295Z"}
+{"level":"info","message":"🌐 Network accessible at: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.297Z"}
+{"level":"info","message":"🏠 Server listening on port 3000","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.297Z"}
+{"level":"info","message":"🔗 Local access: http://localhost:3000","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.298Z"}
+{"level":"info","message":"🌐 Network access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.298Z"}
+{"level":"info","message":"📱 Other devices can access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.298Z"}
+{"level":"info","message":"🔧 Browser detection enabled - microphone access guidance provided","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.298Z"}
+{"level":"info","message":"📊 Health check available at /health","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.299Z"}
+{"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.299Z"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-08-31T11:53:38.921Z"}
+{"duration":2,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756641219178_8p78pq944","service":"una-institute-server","status":204,"timestamp":"2025-08-31T11:53:39.181Z","url":"/favicon.ico","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":3368}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - Distinguished Union Institute for Private Training</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+<body>
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = 'header.html'; // Path to the English header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">About Distinguished Union Institute</h1>
+        <p class="hero-subtitle">Excellence in Professional Training - Licensed by PAAET, Accredited by Civil Service Commission, Partnered with AUPS Digital University</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Content Section -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-2">
+        <div>
+          <h2>Who We Are</h2>
+          <p>The Distinguished Union Institute for Private Training is a leading educational institution in Kuwait, officially licensed by the Public Authority for Applied Education and Training (PAAET), accredited by the Civil Service Commission, and partnered with AUPS Digital University.</p>
+          <p>We specialize in providing high-quality professional training programs that combine theoretical knowledge with practical application, ensuring our trainees acquire professional experience that can be directly applied in the workplace.</p>
+          
+          <h3>Our Vision</h3>
+          <p>To be the leading training institute in Kuwait and the region, providing world-class professional education that empowers individuals and organizations to achieve excellence in their respective fields.</p>
+          
+          <h3>Our Mission</h3>
+          <p>To provide comprehensive, innovative, and practical training programs that meet international standards, enabling our trainees to develop the skills and knowledge necessary for professional success and career advancement.</p>
+        </div>
+        
+        <div class="contact-info">
+          <h3>Institute Information</h3>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+              <strong>Location:</strong><br>
+              Kuwait – East, Block 8, Street 157,<br>
+              Justice Tower, First Floor
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div>
+              <strong>WhatsApp:</strong><br>
+              +965 91108981
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <div>
+              <strong>Instagram:</strong><br>
+              @una_institute
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Qualifications Section -->
+  <section class="section bg-secondary">
+    <div class="container">
+      <h2 class="section-title">Qualifications and Accreditations</h2>
+      <p class="section-subtitle">Our official licenses and partnerships ensure the highest quality of training</p>
+      
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <h3 class="card-title">PAAET License</h3>
+          <p class="card-text">Official license from the Public Authority for Applied Education and Training, ensuring compliance with Kuwait's educational standards.</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-award"></i>
+          </div>
+          <h3 class="card-title">Civil Service Commission</h3>
+          <p class="card-text">Accreditation from the Civil Service Commission, validating our training programs for government sector requirements.</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-university"></i>
+          </div>
+          <h3 class="card-title">AUPS Digital University</h3>
+          <p class="card-text">Partnership and accreditation from AUPS Digital University, providing international academic recognition.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Training Programs Section -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Our Training Programs</h2>
+      <p class="section-subtitle">Comprehensive courses designed to advance your professional career</p>
+      
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="card-title">Cybersecurity Diploma</h3>
+          <p class="card-text">Comprehensive cybersecurity training covering ethical hacking, network security, digital forensics, and cyber defense strategies. Our program prepares professionals for the evolving challenges in digital security.</p>
+          <div class="mt-3">
+            <span class="course-duration">3 Months</span>
+            <span class="course-level">Professional</span>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-balance-scale"></i>
+          </div>
+          <h3 class="card-title">International Commercial Arbitration</h3>
+          <p class="card-text">Specialized training in international commercial arbitration, covering dispute resolution, legal frameworks, and practical arbitration procedures. Designed for legal professionals and business executives.</p>
+          <div class="mt-3">
+            <span class="course-duration">12 Months</span>
+            <span class="course-level">Advanced</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Distinguished Union Institute</h3>
+          <p>Excellence in professional training with official accreditations and international partnerships.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="courses.html">Training Programs</a></li>
+            <li><a href="news.html">News & Updates</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Accreditations</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li>PAAET Licensed</li>
+            <li>Civil Service Commission</li>
+            <li>AUPS Digital University</li>
+            <li>International Standards</li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <p><i class="fas fa-map-marker-alt"></i> Kuwait – East, Block 8, Street 157, Justice Tower, First Floor</p>
+          <p><i class="fab fa-whatsapp"></i> +965 91108981</p>
+          <p><i class="fab fa-instagram"></i> @una_institute</p>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Distinguished Union Institute for Private Training. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

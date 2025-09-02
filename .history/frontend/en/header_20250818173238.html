@@ -1,0 +1,73 @@
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="index.html" class="logo">
+        <img src="../images/logo.svg" alt="Distinguished Union Institute Logo" />
+        <span class="logo-text">UNA Institute</span>
+      </a>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li id="profileNavItem" style="display: none;">
+            <a href="profile.html">My Profile</a>
+          </li>
+          <li id="lecturesNavItem" style="display: none;">
+            <a href="recorded-lectures.html">Recorded Lectures</a>
+          </li>
+          <li id="liveNavItem" style="display: none;">
+            <a href="livestream.html">Live Stream</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Hamburger Menu Button -->
+      <button class="hamburger-menu" id="hamburgerMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="lang-toggle">
+        <span style="color:var(--accent-gold);">EN</span> /
+        <a href="../ar/index.html" class="lang-link" lang="ar" hreflang="ar" title="العربية">ع</a>
+      </div>
+      
+      <div class="auth-buttons" id="authButtons">
+        <a href="register.html" id="registerBtn">Register</a>
+        <a href="login.html" id="loginBtn">Login</a>
+        <button id="logoutBtn" style="display: none;">Logout</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Navigation Overlay -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileNavClose">
+    <i class="fas fa-times"></i>
+  </button>
+  <div class="mobile-nav-content">
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="courses.html">Courses</a></li>
+      <li><a href="news.html">News</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li id="mobileProfileNavItem" style="display: none;">
+        <a href="profile.html">My Profile</a>
+      </li>
+      <li id="mobileLecturesNavItem" style="display: none;">
+        <a href="recorded-lectures.html">Recorded Lectures</a>
+      </li>
+      <li id="mobileLiveNavItem" style="display: none;">
+        <a href="livestream.html">Live Stream</a>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('index.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'index.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
+      <a class="logo" href="index.html"><img src="images/logo.png" alt="شعار المركز" /></a>
+
+      <nav class="main-nav" style="margin-right: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدورات</a></li>
+          <li><a href="news.html">الأخبار</a></li>
+          <li><a href="contact.html">تواصل معنا</a></li>
+          <li id="profileNavItem" style="display: none;">
+             <a href="profile.html">صفحتي الشخصية</a>
+          </li>
+                  <li id="liveNavItem" style="display: none;">
+    <a href="livestream.html">البث المباشر</a>
+  </li>
+        </ul>
+      </nav>
+
+<div class="lang-toggle" style="margin-right:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <a href="../en/index.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
+  <span style="color:#ffcc00;">ع</span>
+</div>
+    
+<div class="auth-buttons" id="authButtons">
+  <a href="register.html" id="registerBtn">سجل الأن</a>
+  <a href="login.html" id="loginBtn">تسجيل الدخول</a>
+  <button id="logoutBtn" style="display: none;">تسجيل الخروج</button>
+</div>
+</div>
+  </header>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileNavItem = document.getElementById('profileNavItem');
+    if (localStorage.getItem('userToken') && profileNavItem) {
+      profileNavItem.style.display = 'inline-block';
+    }
+  });
+</script>
+<script>
+ document.addEventListener('DOMContentLoaded', () => {
+  const profileNavItem = document.getElementById('profileNavItem');
+  const liveNavItem = document.getElementById('liveNavItem');
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  const registerBtn = document.getElementById('registerBtn');
+  const loginBtn = document.getElementById('loginBtn');
+
+  const isLoggedIn = localStorage.getItem('userToken');
+
+  if (isLoggedIn) {
+    if (profileNavItem) profileNavItem.style.display = 'inline-block';
+    if (liveNavItem) liveNavItem.style.display = 'inline-block';
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    if (registerBtn) registerBtn.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'none';
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('userToken');
+      window.location.href = 'index.html';
+    });
+  }
+});
+</script>
+
+ 
+  <!-- ### START INSERTED EGY CONTENT ### -->
+ <!-- <section class="banner-slider">
+    <div class="slider-wrapper owl-carousel">
+      Slide 1 
+      <div
+        class="slide"
+        style="background-image: url('https://www.egyarbitration.com/upload/banner/16962435931694702761se1.webp')"
+      >
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+          <h1>مرحبا بك في الهيئة الدولية للتحكيم</h1>
+          <p>
+            اجعل تأثيرك يلمع في عالم العلاقات الدبلوماسية والسياسية: انضم إلى
+            صفوف المستشارين وشارك في صياغة المستقبل.
+          </p>
+          <a href="#" class="btn">انضم الآن</a>
+        </div>
+      </div>
+
+      Slide 2
+      <div
+        class="slide"
+        style="background-image: url('https://www.egyarbitration.com/upload/banner/16962436091694702770se.webp')"
+      >
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+          <h1>مرحبا بك في الهيئة الدولية للتحكيم</h1>
+          <p>
+            انضم إلى أفضل المحكمين الدوليين وكن جزءًا من مستقبل صناعة التحكيم
+            التجاري واحصل على الفرص التي تحلم بها.
+          </p>
+          <a href="#" class="btn">انضم الآن</a>
+        </div>
+      </div>
+
+    </div>
+  </section> -->
+
+  <!-- ======= Featured Stats ======= -->
+  <section class="featured-stats">
+    <div class="container">
+      <h2>أكثر من 42,500 دارس في الوطن العربي</h2>
+      <p>
+        15 عامًا في مجال العلوم الإدارية والسياسية، تمكين القادة والمؤسسات
+        للتغيير العالمي في التحكيم والدبلوماسية.
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <img
+            src="https://www.egyarbitration.com/upload/feature/1695214771nau-internet.webp"
+            alt=""
+          />
+          <h3>دبلومات وبرامج مهنية</h3>
+          <a href="#" class="link-btn">اضغط للمزيد</a>
+        </div>
+        <div class="stat-item">
+          <img
+            src="https://www.egyarbitration.com/upload/feature/169521509954545.webp"
+            alt=""
+          />
+          <h3>أفضل محاضرين الوطن العربي</h3>
+          <a href="#" class="link-btn">اضغط للمزيد</a>
+        </div>
+        <div class="stat-item">
+          <img
+            src="https://www.egyarbitration.com/upload/feature/1695214780nauka-prza-internet.webp"
+            alt=""
+          />
+          <h3>تعلم مرن</h3>
+          <a href="#" class="link-btn">اضغط للمزيد</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Why Us ======= -->
+  <section class="why-us">
+    <div class="container">
+      <h2>لماذا الهيئة الدولية للتحكيم؟</h2>
+      <p>الهيئة البحثية الأكثر اعتماداً في الشرق الأوسط</p>
+
+      <div class="why-grid">
+        <div class="why-item">
+          <img src="https://www.egyarbitration.com/upload/why/16975502441696242939imct.webp" alt="" />
+          <h3>إعتماد IMCT الدولية</h3>
+        </div>
+        <div class="why-item">
+          <img src="https://www.egyarbitration.com/upload/why/169624231716940753681.webp" alt="" />
+          <h3>اعتماد وحدة التحكيم الخاصة</h3>
+        </div>
+        <div class="why-item">
+          <img src="https://www.egyarbitration.com/upload/why/169624225316940754953.webp" alt="" />
+          <h3>اعتماد لجنة حقوق الإنسان</h3>
+        </div>
+        <!-- add more items... -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= About / Experience ======= -->
+  <section class="experience">
+    <div class="container grid-two">
+      <div class="exp-text">
+        <span class="sub">عن الهيئة</span>
+        <h2>الهيئة الدولية للتحكيم</h2>
+        <p>
+          رؤيتنا: أن نكون المرجعية المهنية للخبراء والمتخصصين في مجال القانون
+          والتحكيم الدولي والعلاقات الدبلوماسية.
+        </p>
+        <ul>
+          <li>دبلومات وبرامج مهنية</li>
+          <li>أفضل محاضرين الوطن العربي</li>
+          <li>تعلم مرن</li>
+          <li>تطبيقات عملية</li>
+        </ul>
+        <a href="#" class="btn-outline">عن الهيئة</a>
+      </div>
+      <div class="exp-img">
+        <img src="https://www.egyarbitration.com/upload/about/16962476902.webp" alt="" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Programs ======= -->
+  <section class="programs">
+    <div class="container">
+      <h2>استراتيجيتنا</h2>
+      <p>
+        تمكين القادة والمؤسسات للتنافس عالمياً في التحكيم التجاري والدبلوماسية.
+      </p>
+      <div class="program-grid">
+        <div class="prog-item">
+          <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/1.png" alt="" />
+          <h3>دورات متخصصة</h3>
+        </div>
+        <div class="prog-item">
+          <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/2.png" alt="" />
+          <h3>الأبحاث والدراسات</h3>
+        </div>
+        <div class="prog-item">
+          <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/3.png" alt="" />
+          <h3>تنظيم المؤتمرات</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Courses ======= -->
+  <section class="courses">
+    <div class="container">
+      <h2>أحدث برامجنا</h2>
+      <div class="courses-grid">
+        <div class="course-card">
+          <img
+            src="https://www.egyarbitration.com/upload/course/16962472661695208912بانر-كورسات-التحكيم.webp"
+            alt=""
+          />
+          <h3>دبلومة التحكيم التجاري الدولي</h3>
+          <span class="price">$650</span>
+        </div>
+        <div class="course-card">
+          <img
+            src="https://www.egyarbitration.com/upload/course/1696247466كورس3.webp"
+            alt=""
+          />
+          <h3>صياغة عقد اتفاق التحكيم وآلية تنفيذه</h3>
+          <span class="price">$350</span>
+        </div>
+        <div class="course-card">
+          <img
+            src="https://www.egyarbitration.com/upload/course/169624735216955608701695208940بانر-كورسات-القنصلية.webp"
+            alt=""
+          />
+          <h3>دبلومة العلاقات الدبلوماسية والسياسية</h3>
+          <span class="price">$650</span>
+        </div>
+        <!-- add more cards or a “View all” button -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Footer ======= -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="widget">
+        <h3>اتصل بنا</h3>
+        <ul>
+          <li><i class="bx bx-map"></i> برج أسبين - شارع الشيخ زايد - دبي</li>
+          <li><i class="bx bxl-whatsapp"></i> <a href="#">+971563357115</a></li>
+          <li><i class="bx bx-envelope"></i> <a href="mailto:info@egyarbitration.com">info@egyarbitration.com</a></li>
+        </ul>
+        <div class="social">
+          <a href="#"><i class="bx bxl-facebook"></i></a>
+          <a href="#"><i class="bx bxl-twitter"></i></a>
+          <a href="#"><i class="bx bxl-instagram"></i></a>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3>الدعم</h3>
+        <ul>
+          <li><a href="#">سياسة الخصوصية</a></li>
+          <li><a href="#">الأسئلة الشائعة</a></li>
+          <li><a href="#">جميع المحاضرين</a></li>
+        </ul>
+      </div>
+
+      <div class="widget">
+        <h3>برامجنا</h3>
+        <ul>
+          <li><a href="#">التحكيم التجاري الدولي</a></li>
+          <li><a href="#">عقود التحكيم</a></li>
+          <li><a href="#">العلاقات الدبلوماسية</a></li>
+        </ul>
+      </div>
+
+      <div class="widget">
+        <h3>النشرة البريدية</h3>
+        <p>للحصول على آخر الأخبار والتحديثات.</p>
+        <form class="newsletter">
+          <input type="email" placeholder="أدخل بريدك الإلكتروني" required />
+          <button type="submit">اشتراك</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <a href="#" class="logo">
+          <img
+            src="https://www.egyarbitration.com/upload/setting/1695113866international%20Arbitration%20logo-ai.svg"
+            alt="Logo"
+          />
+        </a>
+        <p>
+          © 2025 الهيئة الدولية للتحكيم | برمجة وتصميم
+          <a href="#">Farouk Group</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Owl Carousel scripts (or your preferred slider) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"
+  ></script>
+  <script>
+    $('.slider-wrapper').owlCarousel({
+      items: 1,
+      loop: true,
+      autoplay: true,
+      nav: false,
+      dots: true,
+      autoplayHoverPause: true,
+    });
+  </script>
+
+
+  <script src="js/animations.js"></script>
+</body>
+</html>

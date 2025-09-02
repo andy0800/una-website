@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recording Test - UNA Institute</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .recording-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .recording-active {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .recording-inactive {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        video {
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 Recording Functionality Test</h1>
+    <p>This page tests the video recording functionality for the UNA Institute website.</p>
+
+    <div class="test-section">
+        <h2>📹 Media Access Test</h2>
+        <p>First, let's test if we can access your camera and microphone:</p>
+        <button class="test-button" onclick="testMediaAccess()">Test Camera & Microphone</button>
+        <div id="mediaTestResult"></div>
+        <video id="testVideo" autoplay muted playsinline style="display: none;"></video>
+    </div>
+
+    <div class="test-section">
+        <h2>🎥 Recording Test</h2>
+        <p>Test the MediaRecorder API with 1080p quality settings:</p>
+        <button class="test-button" id="startRecordBtn" onclick="startRecording()">Start Recording</button>
+        <button class="test-button" id="stopRecordBtn" onclick="stopRecording()" disabled>Stop Recording</button>
+        <button class="test-button" id="downloadBtn" onclick="downloadRecording()" disabled>Download Recording</button>
+        
+        <div id="recordingStatus" class="recording-status recording-inactive">
+            Not Recording
+        </div>
+        
+        <video id="recordedVideo" controls style="display: none;"></video>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Recording Information</h2>
+        <div id="recordingInfo">
+            <p><strong>Status:</strong> <span id="statusText">Ready</span></p>
+            <p><strong>Duration:</strong> <span id="durationText">0s</span></p>
+            <p><strong>File Size:</strong> <span id="fileSizeText">0 MB</span></p>
+            <p><strong>Quality:</strong> <span id="qualityText">1080p</span></p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Test Log</h2>
+        <div id="testLog" class="log"></div>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let recordingStartTime = null;
+        let recordingDuration = 0;
+
+        function log(message) {
+            const logDiv = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+        }
+
+        async function testMediaAccess() {
+            try {
+                log('Testing media access...');
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }, 
+                    audio: true 
+                });
+                
+                document.getElementById('testVideo').srcObject = stream;
+                document.getElementById('testVideo').style.display = 'block';
+                document.getElementById('mediaTestResult').innerHTML = 
+                    '<p style="color: green;">✅ Camera and microphone access successful!</p>';
+                
+                log('Media access test passed');
+                
+                // Store stream for recording
+                window.testStream = stream;
+                
+            } catch (error) {
+                log(`Media access test failed: ${error.message}`);
+                document.getElementById('mediaTestResult').innerHTML = 
+                    `<p style="color: red;">❌ Media access failed: ${error.message}</p>`;
+            }
+        }
+
+        function startRecording() {
+            if (!window.testStream) {
+                alert('Please test media access first!');
+                return;
+            }
+
+            try {
+                log('Starting recording...');
+                
+                // Configure MediaRecorder with high quality settings
+                const options = {
+                    mimeType: 'video/webm;codecs=vp9',
+                    videoBitsPerSecond: 8000000, // 8 Mbps for 1080p
+                    audioBitsPerSecond: 128000   // 128 kbps audio
+                };
+
+                // Fallback to VP8 if VP9 is not supported
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    options.mimeType = 'video/webm;codecs=vp8';
+                    log('VP9 not supported, falling back to VP8');
+                }
+
+                mediaRecorder = new MediaRecorder(window.testStream, options);
+                recordedChunks = [];
+                recordingStartTime = Date.now();
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                        log(`Data chunk received: ${event.data.size} bytes`);
+                    }
+                };
+
+                mediaRecorder.onstart = () => {
+                    log('Recording started successfully');
+                    updateRecordingStatus(true);
+                    updateRecordingInfo('Recording...', '0s', '0 MB');
+                };
+
+                mediaRecorder.onstop = () => {
+                    log('Recording stopped');
+                    updateRecordingStatus(false);
+                    recordingDuration = Math.floor((Date.now() - recordingStartTime) / 1000);
+                    updateRecordingInfo('Stopped', `${recordingDuration}s`, 'Processing...');
+                    
+                    if (recordedChunks.length > 0) {
+                        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                        const fileSize = (blob.size / (1024 * 1024)).toFixed(2);
+                        updateRecordingInfo('Ready', `${recordingDuration}s`, `${fileSize} MB`);
+                        
+                        // Show recorded video
+                        const video = document.getElementById('recordedVideo');
+                        video.src = URL.createObjectURL(blob);
+                        video.style.display = 'block';
+                        
+                        // Enable download button
+                        document.getElementById('downloadBtn').disabled = false;
+                        
+                        log(`Recording completed: ${fileSize} MB, ${recordingDuration}s`);
+                    }
+                };
+
+                mediaRecorder.onerror = (event) => {
+                    log(`Recording error: ${event.error}`);
+                    alert('Recording error occurred: ' + event.error);
+                };
+
+                // Start recording
+                mediaRecorder.start(1000); // Collect data every second
+                
+                // Update UI
+                document.getElementById('startRecordBtn').disabled = true;
+                document.getElementById('stopRecordBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Error starting recording: ${error.message}`);
+                alert('Error starting recording: ' + error.message);
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                
+                // Update UI
+                document.getElementById('startRecordBtn').disabled = false;
+                document.getElementById('stopRecordBtn').disabled = true;
+            }
+        }
+
+        function downloadRecording() {
+            if (recordedChunks.length > 0) {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `test-recording-${Date.now()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                log('Recording downloaded');
+            }
+        }
+
+        function updateRecordingStatus(isRecording) {
+            const statusDiv = document.getElementById('recordingStatus');
+            if (isRecording) {
+                statusDiv.className = 'recording-status recording-active';
+                statusDiv.textContent = '🔴 Recording...';
+            } else {
+                statusDiv.className = 'recording-status recording-inactive';
+                statusDiv.textContent = '⏹️ Not Recording';
+            }
+        }
+
+        function updateRecordingInfo(status, duration, fileSize) {
+            document.getElementById('statusText').textContent = status;
+            document.getElementById('durationText').textContent = duration;
+            document.getElementById('fileSizeText').textContent = fileSize;
+        }
+
+        // Initialize page
+        log('Recording test page loaded');
+        log('Testing MediaRecorder support: ' + (typeof MediaRecorder !== 'undefined' ? 'Supported' : 'Not Supported'));
+        
+        if (typeof MediaRecorder !== 'undefined') {
+            log('Supported MIME types:');
+            ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].forEach(type => {
+                log(`  ${type}: ${MediaRecorder.isTypeSupported(type) ? '✅' : '❌'}`);
+            });
+        }
+    </script>
+</body>
+</html>

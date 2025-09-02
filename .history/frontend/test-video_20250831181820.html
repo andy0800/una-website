@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; }
+        video { max-width: 100%; margin: 20px 0; }
+        #logs { background: #f5f5f5; padding: 10px; max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Video Streaming Test Page</h1>
+    
+    <div class="test-section">
+        <h2>1. Authentication Test</h2>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="authResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Lecture List Test</h2>
+        <button onclick="testLectureList()">Test Lecture List</button>
+        <div id="lectureListResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Video Streaming Test</h2>
+        <input type="text" id="lectureId" placeholder="Enter Lecture ID" style="width: 300px; padding: 5px;">
+        <button onclick="testVideoStream()">Test Video Stream</button>
+        <div id="videoResult"></div>
+        <video id="testVideo" controls style="display: none;">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Debug Logs</h2>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <div id="logs"></div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script>
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        async function testAuth() {
+            const result = document.getElementById('authResult');
+            result.innerHTML = '<div class="info">Testing authentication...</div>';
+            
+            try {
+                const token = localStorage.getItem('userToken');
+                if (!token) {
+                    result.innerHTML = '<div class="error">No user token found in localStorage</div>';
+                    log('❌ No user token found in localStorage', 'error');
+                    return;
+                }
+                
+                log('✅ User token found in localStorage', 'success');
+                result.innerHTML = '<div class="success">User token found in localStorage</div>';
+                
+                // Test token validity by making a request
+                const response = await fetch(`${config.API_BASE_URL}/lectures/user/lectures`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const lectures = await response.json();
+                    log(`✅ Authentication successful. Found ${lectures.length} lectures`, 'success');
+                    result.innerHTML = `<div class="success">Authentication successful. Found ${lectures.length} lectures</div>`;
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Authentication failed: ${response.status} ${errorText}`, 'error');
+                    result.innerHTML = `<div class="error">Authentication failed: ${response.status} ${errorText}</div>`;
+                }
+            } catch (error) {
+                log(`❌ Authentication test error: ${error.message}`, 'error');
+                result.innerHTML = `<div class="error">Authentication test error: ${error.message}</div>`;
+            }
+        }
+
+        async function testLectureList() {
+            const result = document.getElementById('lectureListResult');
+            result.innerHTML = '<div class="info">Testing lecture list...</div>';
+            
+            try {
+                const token = localStorage.getItem('userToken');
+                if (!token) {
+                    result.innerHTML = '<div class="error">No user token found</div>';
+                    return;
+                }
+                
+                const response = await fetch(`${config.API_BASE_URL}/lectures/user/lectures`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const lectures = await response.json();
+                    log(`✅ Lecture list retrieved successfully. Found ${lectures.length} lectures`, 'success');
+                    
+                    let lectureHtml = '<div class="success">Lecture list retrieved successfully:</div><ul>';
+                    lectures.forEach(lecture => {
+                        lectureHtml += `<li><strong>${lecture.title}</strong> (ID: ${lecture._id}) - File: ${lecture.filePath || 'No file'}</li>`;
+                    });
+                    lectureHtml += '</ul>';
+                    
+                    result.innerHTML = lectureHtml;
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Failed to get lecture list: ${response.status} ${errorText}`, 'error');
+                    result.innerHTML = `<div class="error">Failed to get lecture list: ${response.status} ${errorText}</div>`;
+                }
+            } catch (error) {
+                log(`❌ Lecture list test error: ${error.message}`, 'error');
+                result.innerHTML = `<div class="error">Lecture list test error: ${error.message}</div>`;
+            }
+        }
+
+        async function testVideoStream() {
+            const result = document.getElementById('videoResult');
+            const lectureId = document.getElementById('lectureId').value.trim();
+            
+            if (!lectureId) {
+                result.innerHTML = '<div class="error">Please enter a lecture ID</div>';
+                return;
+            }
+            
+            result.innerHTML = '<div class="info">Testing video stream...</div>';
+            
+            try {
+                const token = localStorage.getItem('userToken');
+                if (!token) {
+                    result.innerHTML = '<div class="error">No user token found</div>';
+                    return;
+                }
+                
+                log(`🎬 Testing video stream for lecture: ${lectureId}`, 'info');
+                
+                // Test the streaming endpoint
+                const streamUrl = `${config.API_BASE_URL}/lectures/user/lectures/${lectureId}/stream?token=${encodeURIComponent(token)}`;
+                log(`🔗 Stream URL: ${streamUrl}`, 'info');
+                
+                // Test if the endpoint responds
+                const response = await fetch(streamUrl, { method: 'HEAD' });
+                log(`📡 Stream endpoint response: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                
+                if (response.ok) {
+                    result.innerHTML = '<div class="success">Stream endpoint is accessible!</div>';
+                    
+                    // Try to load the video
+                    const video = document.getElementById('testVideo');
+                    video.style.display = 'block';
+                    video.src = streamUrl;
+                    
+                    video.addEventListener('loadstart', () => log('🚀 Video load started', 'success'));
+                    video.addEventListener('loadeddata', () => log('✅ Video data loaded', 'success'));
+                    video.addEventListener('canplay', () => log('▶️ Video can play', 'success'));
+                    video.addEventListener('error', (e) => {
+                        log(`❌ Video error: ${video.error ? video.error.message : 'Unknown error'}`, 'error');
+                        result.innerHTML = `<div class="error">Video error: ${video.error ? video.error.message : 'Unknown error'}</div>`;
+                    });
+                    
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Stream endpoint error: ${response.status} ${errorText}`, 'error');
+                    result.innerHTML = `<div class="error">Stream endpoint error: ${response.status} ${errorText}</div>`;
+                }
+            } catch (error) {
+                log(`❌ Video stream test error: ${error.message}`, 'error');
+                result.innerHTML = `<div class="error">Video stream test error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

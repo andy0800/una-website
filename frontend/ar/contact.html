@@ -1,107 +1,175 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>اتصل بنا - معهد UNA</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <script>
+    // Language redirection
     (function() {
       const userLang = navigator.language || navigator.userLanguage;
-      const isEnglish = userLang.toLowerCase().startsWith('en');
-      if (isEnglish && window.location.pathname.endsWith('contact.html')) {
+      const isArabic = userLang.toLowerCase().startsWith('ar');
+      if (!isArabic && window.location.pathname.endsWith('contact.html')) {
         if (!localStorage.getItem('langRedirected')) {
           localStorage.setItem('langRedirected', 'true');
-          window.location.href = 'contact.html';
+          window.location.href = '../en/contact.html';
         }
       } else {
         localStorage.removeItem('langRedirected');
       }
     })();
   </script>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
 </head>
 
-<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
-  <header class="site-header">
-    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
-      <a class="logo" href="contact.html"><img src="images/logo.png" alt="شعار المركز" /></a>
-
-      <nav class="main-nav" style="margin-right: 20px;">
-        <ul>
-          <li><a href="index.html" class="active">الرئيسية</a></li>
-          <li><a href="about.html">من نحن</a></li>
-          <li><a href="courses.html">الدورات</a></li>
-          <li><a href="news.html">الأخبار</a></li>
-          <li><a href="contact.html">تواصل معنا</a></li>
-        </ul>
-      </nav>
-
-     <div class="lang-toggle" style="margin-left:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
-  <a href="../en/contact.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
-  <span style="color:#ffcc00;">ع</span>
-</div>
-    </div>
-  </header>
+<body class="arabic">
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = 'header.html'; // Path to the Arabic header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
   
-  <section class="contact-hero">
-    تواصل معنا
-  </section>
 
-  <section class="contact-section container animate-on-scroll">
-    <div class="contact-info">
-      <h2>بيانات التواصل</h2>
-      <p>📍 العنوان: القاهرة، مصر</p>
-      <p>📞 الهاتف: +20 123 456 789</p>
-      <p>✉️ البريد الإلكتروني: info@egyarbitration.com</p>
-    </div>
+  
 
-    <div class="contact-form-wrapper">
-      <h2>أرسل رسالة</h2>
-      <form onsubmit="handleContact(event)">
-        <label for="name">الاسم الكامل</label>
-        <input type="text" id="name" name="name" required />
-
-        <label for="email">البريد الإلكتروني</label>
-        <input type="email" id="email" name="email" required />
-
-        <label for="message">رسالتك</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
-
-        <button type="submit">إرسال</button>
-      </form>
-      <div id="formMessage"></div>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">اتصل بنا</h1>
+        <p class="hero-subtitle">نحب أن نسمع منك! تواصل معنا عبر النموذج أدناه أو زر مكتبنا.</p>
+      </div>
     </div>
   </section>
 
-  <section class="container animate-on-scroll" style="margin-bottom: 60px;">
-    <h2 style="text-align:center; color:#003366;">موقعنا على الخريطة</h2>
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3454.217887001756!2d31.2357115!3d30.0444196!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x145841d5aa24cb9d%3A0x1a2f962dc6f837b9!2z2KfZhNi52YTZiNmF2YrZhtiMINmE2YXYudmK2KfZhiDYp9mE2LPYsdin2Kog2KfZhNiq2LXYqNmK2KfYqiDYp9mE2YHZiNmF2K3YqSDYp9mE2YPYsdmK2Kk!5e0!3m2!1sar!2seg!4v1625491040744!5m2!1sar!2seg"
-      width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy">
-    </iframe>
+  <!-- Contact Section -->
+  <section class="contact-section">
+    <div class="container">
+      <div class="grid grid-2">
+        <div class="contact-info">
+          <h2>مكتبنا</h2>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+              <strong>العنوان:</strong><br>
+              الكويت – شرق، قطعة 8، شارع 157،<br>
+              برج العدالة، الطابق الأول
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div>
+              <strong>واتساب:</strong><br>
+              +965 91108981
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <div>
+              <strong>إنستغرام:</strong><br>
+              @una_institute
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div>
+              <strong>ساعات العمل:</strong><br>
+              الأحد - الخميس: 9:00 ص - 5:00 م
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form">
+          <h2>أرسل لنا رسالة</h2>
+          <form id="contactForm" novalidate>
+            <div class="form-group">
+              <label for="name" class="form-label">الاسم الكامل</label>
+              <input type="text" id="name" name="name" class="form-input" placeholder="اسمك الكامل" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">البريد الإلكتروني</label>
+              <input type="email" id="email" name="email" class="form-input" placeholder="عنوان بريدك الإلكتروني" required />
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label">رقم الهاتف</label>
+              <input type="tel" id="phone" name="phone" class="form-input" placeholder="رقم هاتفك" />
+            </div>
+
+            <div class="form-group">
+              <label for="subject" class="form-label">الموضوع</label>
+              <input type="text" id="subject" name="subject" class="form-input" placeholder="ما هو هذا الموضوع؟" required />
+            </div>
+
+            <div class="form-group">
+              <label for="message" class="form-label">الرسالة</label>
+              <textarea id="message" name="message" class="form-textarea" placeholder="رسالتك" rows="5" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane"></i> إرسال الرسالة
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   </section>
 
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
-      <p>جميع الحقوق محفوظة © 2025 مركز التحكيم المصري</p>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>معهد UNA</h3>
+          <p>تمكين العقول من خلال التعليم الجيد والتطوير المهني.</p>
+        </div>
+        <div class="footer-section">
+          <h4>روابط سريعة</h4>
+          <ul>
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="courses.html">الدورات</a></li>
+            <li><a href="contact.html">اتصل بنا</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>معلومات الاتصال</h4>
+          <p><i class="fas fa-phone"></i> +965 1234 5678</p>
+          <p><i class="fas fa-envelope"></i> info@unainstitute.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 معهد UNA. جميع الحقوق محفوظة.</p>
+      </div>
     </div>
   </footer>
 
-  <script>
-    function handleContact(event) {
-      event.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const message = document.getElementById("message").value.trim();
-      const formMessage = document.getElementById("formMessage");
-
-      if (name && email.includes('@') && message) {
-        formMessage.textContent = 'تم إرسال رسالتك بنجاح!';
-        formMessage.style.color = 'green';
-      } else {
-        formMessage.textContent = 'يرجى تعبئة جميع الحقول بشكل صحيح.';
-        formMessage.style.color = 'red';
-      }
-    }
-  </script>
-  <script src="js/animations.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/contact-form.js"></script>
 </body>
 </html>

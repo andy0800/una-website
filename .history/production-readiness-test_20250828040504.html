@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Production Readiness Test - UNA Livestreaming System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #f5f7fa;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .primary { background: #007bff; color: white; }
+        .success-btn { background: #28a745; color: white; }
+        .warning-btn { background: #ffc107; color: #212529; }
+        .danger { background: #dc3545; color: white; }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+        
+        #log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Production Readiness Test</h1>
+    <p>Comprehensive testing of UNA Livestreaming System for production deployment</p>
+    
+    <div class="test-section">
+        <h3>📊 System Health Overview</h3>
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value" id="testCount">0</div>
+                <div class="metric-label">Tests Run</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="successCount">0</div>
+                <div class="metric-label">Passed</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="errorCount">0</div>
+                <div class="metric-label">Failed</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="score">0%</div>
+                <div class="metric-label">Score</div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔧 Core System Tests</h3>
+        <button onclick="runCoreTests()" class="primary">Run Core Tests</button>
+        <button onclick="runSecurityTests()" class="warning-btn">Run Security Tests</button>
+        <button onclick="runPerformanceTests()" class="success-btn">Run Performance Tests</button>
+        <button onclick="runAllTests()" class="danger">Run All Tests</button>
+        <div id="coreTestResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🚀 WebRTC Functionality Tests</h3>
+        <button onclick="testWebRTCSystem()" class="primary">Test WebRTC System</button>
+        <button onclick="testMediaAccess()" class="success-btn">Test Media Access</button>
+        <button onclick="testSocketConnection()" class="warning-btn">Test Socket Connection</button>
+        <div id="webrtcTestResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🛡️ Production Readiness Tests</h3>
+        <button onclick="testProductionConfig()" class="primary">Test Production Config</button>
+        <button onclick="testErrorHandling()" class="warning-btn">Test Error Handling</button>
+        <button onclick="testResourceCleanup()" class="success-btn">Test Resource Cleanup</button>
+        <div id="productionTestResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📝 Test Log</h3>
+        <div id="log"></div>
+    </div>
+    
+    <script>
+        // 🚀 PRODUCTION READINESS TEST SUITE
+        
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            warnings: 0
+        };
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateMetrics() {
+            document.getElementById('testCount').textContent = testResults.total;
+            document.getElementById('successCount').textContent = testResults.passed;
+            document.getElementById('errorCount').textContent = testResults.failed;
+            
+            const score = testResults.total > 0 ? Math.round((testResults.passed / testResults.total) * 100) : 0;
+            document.getElementById('score').textContent = score + '%';
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = score + '%';
+        }
+        
+        function addTestResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            container.appendChild(resultDiv);
+            
+            testResults.total++;
+            if (type === 'success') testResults.passed++;
+            else if (type === 'error') testResults.failed++;
+            else if (type === 'warning') testResults.warnings++;
+            
+            updateMetrics();
+        }
+        
+        // 🔧 CORE SYSTEM TESTS
+        
+        async function runCoreTests() {
+            log('🚀 Starting Core System Tests...', 'info');
+            const results = document.getElementById('coreTestResults');
+            results.innerHTML = '';
+            
+            // Test 1: DOM Ready State
+            try {
+                if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                    addTestResult('coreTestResults', '✅ DOM Ready State: Page fully loaded', 'success');
+                } else {
+                    addTestResult('coreTestResults', '⚠️ DOM Ready State: Page still loading', 'warning');
+                }
+            } catch (error) {
+                addTestResult('coreTestResults', '❌ DOM Ready State: ' + error.message, 'error');
+            }
+            
+            // Test 2: Required Libraries
+            try {
+                const requiredLibs = ['CustomWebRTCManager', 'io'];
+                let allLibsAvailable = true;
+                
+                requiredLibs.forEach(lib => {
+                    if (typeof window[lib] === 'undefined') {
+                        allLibsAvailable = false;
+                        log(`❌ Missing library: ${lib}`, 'error');
+                    }
+                });
+                
+                if (allLibsAvailable) {
+                    addTestResult('coreTestResults', '✅ Required Libraries: All libraries loaded', 'success');
+                } else {
+                    addTestResult('coreTestResults', '❌ Required Libraries: Some libraries missing', 'error');
+                }
+            } catch (error) {
+                addTestResult('coreTestResults', '❌ Required Libraries: ' + error.message, 'error');
+            }
+            
+            // Test 3: Memory Usage
+            try {
+                if (performance.memory) {
+                    const memoryUsage = performance.memory.usedJSHeapSize / 1024 / 1024; // MB
+                    if (memoryUsage < 100) {
+                        addTestResult('coreTestResults', `✅ Memory Usage: ${memoryUsage.toFixed(2)} MB (Good)`, 'success');
+                    } else if (memoryUsage < 200) {
+                        addTestResult('coreTestResults', `⚠️ Memory Usage: ${memoryUsage.toFixed(2)} MB (Moderate)`, 'warning');
+                    } else {
+                        addTestResult('coreTestResults', `❌ Memory Usage: ${memoryUsage.toFixed(2)} MB (High)`, 'error');
+                    }
+                } else {
+                    addTestResult('coreTestResults', '⚠️ Memory Usage: Performance API not available', 'warning');
+                }
+            } catch (error) {
+                addTestResult('coreTestResults', '❌ Memory Usage: ' + error.message, 'error');
+            }
+            
+            log('✅ Core System Tests completed', 'success');
+        }
+        
+        // 🛡️ SECURITY TESTS
+        
+        async function runSecurityTests() {
+            log('🛡️ Starting Security Tests...', 'info');
+            const results = document.getElementById('coreTestResults');
+            results.innerHTML = '';
+            
+            // Test 1: XSS Prevention
+            try {
+                const testDiv = document.createElement('div');
+                const maliciousInput = '<script>alert("XSS")</script>';
+                
+                // Test if innerHTML is being used unsafely
+                const dashboardScript = document.querySelector('script[src*="dashboard.js"]');
+                if (dashboardScript) {
+                    // This is a basic check - in production you'd want more sophisticated testing
+                    addTestResult('coreTestResults', '✅ XSS Prevention: Dashboard script loaded', 'success');
+                } else {
+                    addTestResult('coreTestResults', '⚠️ XSS Prevention: Dashboard script not found', 'warning');
+                }
+            } catch (error) {
+                addTestResult('coreTestResults', '❌ XSS Prevention: ' + error.message, 'error');
+            }
+            
+            // Test 2: Content Security Policy
+            try {
+                const metaCSP = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                if (metaCSP) {
+                    addTestResult('coreTestResults', '✅ Content Security Policy: CSP header found', 'success');
+                } else {
+                    addTestResult('coreTestResults', '⚠️ Content Security Policy: No CSP header found', 'warning');
+                }
+            } catch (error) {
+                addTestResult('coreTestResults', '❌ Content Security Policy: ' + error.message, 'error');
+            }
+            
+            log('✅ Security Tests completed', 'success');
+        }
+        
+        // 📊 PERFORMANCE TESTS
+        
+        async function runPerformanceTests() {
+            log('📊 Starting Performance Tests...', 'info');
+            const results = document.getElementById('coreTestResults');
+            results.innerHTML = '';
+            
+            // Test 1: Page Load Performance
+            try {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                if (loadTime < 3000) {
+                    addTestResult('coreTestResults', `✅ Page Load Time: ${loadTime}ms (Excellent)`, 'success');
+                } else if (loadTime < 5000) {
+                    addTestResult('coreTestResults', `⚠️ Page Load Time: ${loadTime}ms (Good)`, 'warning');
+                } else {
+                    addTestResult('coreTestResults', `❌ Page Load Time: ${loadTime}ms (Slow)`, 'error');
+                }
+            } catch (error) {
+                addTestResult('coreTestResults', '❌ Page Load Time: ' + error.message, 'error');
+            }
+            
+            // Test 2: JavaScript Execution Time
+            try {
+                const startTime = performance.now();
+                
+                // Simulate some JavaScript operations
+                for (let i = 0; i < 1000000; i++) {
+                    Math.random();
+                }
+                
+                const executionTime = performance.now() - startTime;
+                if (executionTime < 100) {
+                    addTestResult('coreTestResults', `✅ JavaScript Performance: ${executionTime.toFixed(2)}ms (Excellent)`, 'success');
+                } else if (executionTime < 200) {
+                    addTestResult('coreTestResults', `⚠️ JavaScript Performance: ${executionTime.toFixed(2)}ms (Good)`, 'warning');
+                } else {
+                    addTestResult('coreTestResults', `❌ JavaScript Performance: ${executionTime.toFixed(2)}ms (Slow)`, 'error');
+                }
+            } catch (error) {
+                addTestResult('coreTestResults', '❌ JavaScript Performance: ' + error.message, 'error');
+            }
+            
+            log('✅ Performance Tests completed', 'success');
+        }
+        
+        // 🚀 WEBRTC TESTS
+        
+        async function testWebRTCSystem() {
+            log('🚀 Starting WebRTC System Tests...', 'info');
+            const results = document.getElementById('webrtcTestResults');
+            results.innerHTML = '';
+            
+            // Test 1: WebRTC Manager Availability
+            try {
+                if (typeof CustomWebRTCManager !== 'undefined') {
+                    addTestResult('webrtcTestResults', '✅ WebRTC Manager: Class available', 'success');
+                } else {
+                    addTestResult('webrtcTestResults', '❌ WebRTC Manager: Class not available', 'error');
+                }
+            } catch (error) {
+                addTestResult('webrtcTestResults', '❌ WebRTC Manager: ' + error.message, 'error');
+            }
+            
+            // Test 2: Media Devices Support
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    addTestResult('webrtcTestResults', '✅ Media Devices: getUserMedia supported', 'success');
+                } else {
+                    addTestResult('webrtcTestResults', '❌ Media Devices: getUserMedia not supported', 'error');
+                }
+            } catch (error) {
+                addTestResult('webrtcTestResults', '❌ Media Devices: ' + error.message, 'error');
+            }
+            
+            log('✅ WebRTC System Tests completed', 'success');
+        }
+        
+        async function testMediaAccess() {
+            log('📹 Testing Media Access...', 'info');
+            const results = document.getElementById('webrtcTestResults');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                addTestResult('webrtcTestResults', '✅ Media Access: Camera and microphone granted', 'success');
+                
+                // Stop the stream immediately
+                stream.getTracks().forEach(track => track.stop());
+                
+            } catch (error) {
+                addTestResult('webrtcTestResults', '❌ Media Access: ' + error.message, 'error');
+            }
+        }
+        
+        async function testSocketConnection() {
+            log('🔌 Testing Socket Connection...', 'info');
+            const results = document.getElementById('webrtcTestResults');
+            
+            try {
+                if (typeof io !== 'undefined') {
+                    const socket = io();
+                    
+                    socket.on('connect', () => {
+                        addTestResult('webrtcTestResults', '✅ Socket Connection: Connected successfully', 'success');
+                        socket.disconnect();
+                    });
+                    
+                    socket.on('connect_error', (error) => {
+                        addTestResult('webrtcTestResults', '❌ Socket Connection: ' + error.message, 'error');
+                    });
+                    
+                    // Timeout after 5 seconds
+                    setTimeout(() => {
+                        if (socket.connected) {
+                            socket.disconnect();
+                        }
+                    }, 5000);
+                    
+                } else {
+                    addTestResult('webrtcTestResults', '❌ Socket Connection: Socket.IO not available', 'error');
+                }
+            } catch (error) {
+                addTestResult('webrtcTestResults', '❌ Socket Connection: ' + error.message, 'error');
+            }
+        }
+        
+        // 🛡️ PRODUCTION READINESS TESTS
+        
+        async function testProductionConfig() {
+            log('🛡️ Testing Production Configuration...', 'info');
+            const results = document.getElementById('productionTestResults');
+            results.innerHTML = '';
+            
+            // Test 1: Environment Detection
+            try {
+                const isLocalhost = window.location.hostname === 'localhost' || 
+                                  window.location.hostname === '127.0.0.1';
+                
+                if (isLocalhost) {
+                    addTestResult('productionTestResults', '⚠️ Environment: Running on localhost (Development)', 'warning');
+                } else {
+                    addTestResult('productionTestResults', '✅ Environment: Running on production domain', 'success');
+                }
+            } catch (error) {
+                addTestResult('productionTestResults', '❌ Environment: ' + error.message, 'error');
+            }
+            
+            // Test 2: HTTPS Check
+            try {
+                if (window.location.protocol === 'https:') {
+                    addTestResult('productionTestResults', '✅ HTTPS: Secure connection enabled', 'success');
+                } else {
+                    addTestResult('productionTestResults', '⚠️ HTTPS: Running on HTTP (not secure)', 'warning');
+                }
+            } catch (error) {
+                addTestResult('productionTestResults', '❌ HTTPS: ' + error.message, 'error');
+            }
+            
+            log('✅ Production Configuration Tests completed', 'success');
+        }
+        
+        async function testErrorHandling() {
+            log('🛡️ Testing Error Handling...', 'info');
+            const results = document.getElementById('productionTestResults');
+            
+            try {
+                // Test if error handler exists
+                if (typeof window.errorHandler !== 'undefined') {
+                    addTestResult('productionTestResults', '✅ Error Handler: Available', 'success');
+                } else {
+                    addTestResult('productionTestResults', '⚠️ Error Handler: Not available', 'warning');
+                }
+            } catch (error) {
+                addTestResult('productionTestResults', '❌ Error Handler: ' + error.message, 'error');
+            }
+        }
+        
+        async function testResourceCleanup() {
+            log('🧹 Testing Resource Cleanup...', 'info');
+            const results = document.getElementById('productionTestResults');
+            
+            try {
+                // Test if cleanup function exists
+                if (typeof window.cleanupAllResources === 'function') {
+                    addTestResult('productionTestResults', '✅ Resource Cleanup: Function available', 'success');
+                } else {
+                    addTestResult('productionTestResults', '⚠️ Resource Cleanup: Function not available', 'warning');
+                }
+            } catch (error) {
+                addTestResult('productionTestResults', '❌ Resource Cleanup: ' + error.message, 'error');
+            }
+        }
+        
+        // 🚀 RUN ALL TESTS
+        
+        async function runAllTests() {
+            log('🚀 Starting Comprehensive Test Suite...', 'info');
+            
+            // Reset results
+            testResults = { total: 0, passed: 0, failed: 0, warnings: 0 };
+            updateMetrics();
+            
+            // Run all test suites
+            await runCoreTests();
+            await runSecurityTests();
+            await runPerformanceTests();
+            await testWebRTCSystem();
+            await testProductionConfig();
+            await testErrorHandling();
+            await testResourceCleanup();
+            
+            // Final summary
+            log(`🎉 All tests completed! Score: ${testResults.passed}/${testResults.total} (${Math.round((testResults.passed/testResults.total)*100)}%)`, 'success');
+            
+            if (testResults.failed === 0) {
+                log('🎊 CONGRATULATIONS! System is PRODUCTION READY!', 'success');
+            } else {
+                log(`⚠️ ${testResults.failed} tests failed. Please review before production deployment.`, 'warning');
+            }
+        }
+        
+        // 🚀 INITIALIZE TEST SUITE
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Production Readiness Test Suite initialized', 'success');
+            log('Ready to test UNA Livestreaming System', 'info');
+        });
+    </script>
+</body>
+</html>

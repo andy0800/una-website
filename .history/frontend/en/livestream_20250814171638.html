@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live Stream</title>
+  <link rel="stylesheet" href="../style.css" />
+   <script>
+    const token = localStorage.getItem("userToken");
+  if (!token) {
+    // Redirect to login if not authenticated
+    window.location.href = "/en/login.html"; // or /ar/login.html
+  }
+</script>
+</head>
+<body>
+  <header>
+    <h2>Live Lecture</h2>
+  </header>
+
+  <main>
+    <div id="video-container">
+      <video id="live-video" autoplay controls></video>
+    </div>
+
+    <div id="chat-container">
+      <div id="comments-box"></div>
+      <input type="text" id="comment-input" placeholder="Type your question..." />
+      <button onclick="sendComment()">Send</button>
+    </div>
+
+    <div id="mic-request">
+      <button onclick="requestMic()">Request to Speak</button>
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="../js/livestream.js"></script>
+</body>
+</html>

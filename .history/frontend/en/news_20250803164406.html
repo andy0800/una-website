@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isArabic = userLang.toLowerCase().startsWith('ar');
+      if (isArabic && window.location.pathname.endsWith('news.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'news.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center;">
+      <a class="logo" href="news.html"><img src="images/logo.png" alt="Logo" /></a>
+
+      <nav class="main-nav" style="margin-left: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+<div class="lang-toggle" style="margin-left:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <a href="../en/index.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
+  <span style="color:#ffcc00;">ع</span>
+</div>
+    
+    <div class="auth-buttons">
+    <a href="register.html">Register</a>
+<a href="login.html">Login</a>
+</div>
+</div>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="page-hero news-hero">
+    <div class="container">
+      <h1>Latest News & Updates</h1>
+    </div>
+  </section>
+
+  <!-- News Articles -->
+  <section class="news container">
+    <div class="news-grid">
+      <!-- Article 1 -->
+      <article class="news-article animate-on-scroll">
+        <img src="images/news1.jpg" alt="Arbitration Course Graduation" />
+        <h3>Graduation Ceremony for Our Arbitration Course</h3>
+        <p>We proudly celebrated the successful completion of our latest arbitration diploma cohort. Congratulations to all graduates!</p>
+        <a href="news-details.html#graduation" class="btn btn-secondary">Read More</a>
+      </article>
+
+      <!-- Article 2 -->
+      <article class="news-article animate-on-scroll">
+        <img src="images/news2.jpg" alt="New Arbitration Law Seminar" />
+        <h3>Upcoming Seminar on New Arbitration Laws</h3>
+        <p>Join our experts as they discuss recent amendments to arbitration legislation and their impact on dispute resolution.</p>
+        <a href="news-details.html#seminar" class="btn btn-secondary">Read More</a>
+      </article>
+
+      <!-- Article 3 -->
+      <article class="news-article animate-on-scroll">
+        <img src="images/news3.jpg" alt="Family Arbitration Workshop" />
+        <h3>Family Arbitration Workshop Highlights</h3>
+        <p>A recap of our recent workshop focusing on family dispute resolution techniques and mediation practices.</p>
+        <a href="news-details.html#family-workshop" class="btn btn-secondary">Read More</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Newsletter Subscription -->
+  <section class="newsletter container">
+    <h2>Subscribe to Our Newsletter</h2>
+    <p>Stay updated with the latest arbitration news and upcoming courses.</p>
+    <form id="newsletterForm" class="newsletter-form" novalidate>
+      <input
+        type="email"
+        name="email"
+        id="newsletterEmail"
+        placeholder="Enter your email address"
+        required
+        aria-label="Email address"
+      />
+      <button type="submit" class="btn btn-primary">Subscribe</button>
+    </form>
+    <p id="newsletterMessage" role="alert" aria-live="polite"></p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Egypt Arbitration Center. All rights reserved.</p>
+      <nav class="footer-nav">
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Use</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/newsletter.js"></script>
+
+</body>
+</html>

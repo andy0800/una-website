@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard Test - UNA Institute</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .test-container {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .test-button {
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin: 10px;
+      cursor: pointer;
+    }
+    .test-button:hover {
+      background: #0056b3;
+    }
+    .test-result {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>Admin Dashboard Test</h1>
+    
+    <div class="test-result">
+      <h3>Authentication Test</h3>
+      <p>Admin Token: <span id="tokenStatus">Checking...</span></p>
+      <button class="test-button" onclick="checkAuth()">Check Auth</button>
+    </div>
+    
+    <div class="test-result">
+      <h3>API Test</h3>
+      <button class="test-button" onclick="testAPI()">Test Health API</button>
+      <button class="test-button" onclick="testStatsAPI()">Test Stats API</button>
+      <div id="apiResult"></div>
+    </div>
+    
+    <div class="test-result">
+      <h3>Navigation Test</h3>
+      <button class="test-button" onclick="testNavigation()">Test Navigation</button>
+      <div id="navResult"></div>
+    </div>
+    
+    <div class="test-result">
+      <h3>Console Log</h3>
+      <div id="consoleLog" style="background: #f5f5f5; padding: 10px; height: 200px; overflow-y: auto; font-family: monospace;"></div>
+    </div>
+  </div>
+
+  <script>
+    // Simple logging function
+    function log(message) {
+      const consoleLog = document.getElementById('consoleLog');
+      const timestamp = new Date().toLocaleTimeString();
+      consoleLog.innerHTML += `[${timestamp}] ${message}<br>`;
+      console.log(message);
+    }
+    
+    // Check authentication
+    function checkAuth() {
+      const token = localStorage.getItem('adminToken');
+      const tokenStatus = document.getElementById('tokenStatus');
+      
+      if (token) {
+        tokenStatus.textContent = '✅ Found';
+        tokenStatus.style.color = 'green';
+        log('✅ Admin token found');
+      } else {
+        tokenStatus.textContent = '❌ Not found';
+        tokenStatus.style.color = 'red';
+        log('❌ No admin token found');
+      }
+    }
+    
+    // Test API connection
+    async function testAPI() {
+      const apiResult = document.getElementById('apiResult');
+      apiResult.innerHTML = 'Testing...';
+      
+      try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          apiResult.innerHTML = '❌ No admin token found';
+          log('❌ No admin token found for API test');
+          return;
+        }
+        
+        const response = await fetch('/api/admin/health', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          apiResult.innerHTML = `✅ API working: ${data.status}`;
+          log('✅ API connection successful');
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          apiResult.innerHTML = `❌ API error: ${response.status} - ${errorData.message || 'Unknown error'}`;
+          log('❌ API connection failed: ' + response.status);
+        }
+      } catch (error) {
+        apiResult.innerHTML = `❌ Network error: ${error.message}`;
+        log('❌ Network error: ' + error.message);
+      }
+    }
+
+    // Test Stats API connection
+    async function testStatsAPI() {
+      const apiResult = document.getElementById('apiResult');
+      apiResult.innerHTML = 'Testing...';
+
+      try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          apiResult.innerHTML = '❌ No admin token found';
+          log('❌ No admin token found for Stats API test');
+          return;
+        }
+
+        const response = await fetch('/api/admin/stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          apiResult.innerHTML = `✅ Stats API working: ${data.status}`;
+          log('✅ Stats API connection successful');
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          apiResult.innerHTML = `❌ Stats API error: ${response.status} - ${errorData.message || 'Unknown error'}`;
+          log('❌ Stats API connection failed: ' + response.status);
+        }
+      } catch (error) {
+        apiResult.innerHTML = `❌ Network error: ${error.message}`;
+        log('❌ Network error: ' + error.message);
+      }
+    }
+    
+    // Test navigation
+    function testNavigation() {
+      const navResult = document.getElementById('navResult');
+      const elements = [
+        'logoutBtn',
+        'dashboard',
+        'users',
+        'stats'
+      ];
+      
+      let results = '';
+      elements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          results += `✅ ${id}<br>`;
+          log(`✅ Element found: ${id}`);
+        } else {
+          results += `❌ ${id}<br>`;
+          log(`❌ Element missing: ${id}`);
+        }
+      });
+      
+      navResult.innerHTML = results;
+    }
+    
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', function() {
+      log('🚀 Test dashboard loaded');
+      checkAuth();
+    });
+  </script>
+</body>
+</html>

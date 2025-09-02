@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('index.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'index.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+</head>
+
+<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
+      <a class="logo" href="index.html"><img src="images/logo.png" alt="شعار المركز" /></a>
+
+      <nav class="main-nav" style="margin-right: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدورات</a></li>
+          <li><a href="news.html">الأخبار</a></li>
+          <li><a href="contact.html">تواصل معنا</a></li>
+          <li id="profileNavItem" style="display: none;">
+             <a href="profile.html">صفحتي الشخصية</a>
+          </li>
+        </ul>
+      </nav>
+
+<div class="lang-toggle" style="margin-right:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <a href="../en/index.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
+  <span style="color:#ffcc00;">ع</span>
+</div>
+    
+<div class="auth-buttons" id="authButtons">
+  <a href="register.html" id="registerBtn">سجل الأن</a>
+  <a href="login.html" id="loginBtn">تسجيل الدخول</a>
+  <button id="logoutBtn" style="display: none;">تسجيل الخروج</button>
+</div>
+</div>
+  </header>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileNavItem = document.getElementById('profileNavItem');
+    if (localStorage.getItem('userToken') && profileNavItem) {
+      profileNavItem.style.display = 'inline-block';
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileNavItem = document.getElementById('profileNavItem');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+
+    const isLoggedIn = localStorage.getItem('userToken');
+
+    if (isLoggedIn) {
+      if (profileNavItem) profileNavItem.style.display = 'inline-block';
+      if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      if (registerBtn) registerBtn.style.display = 'none';
+      if (loginBtn) loginBtn.style.display = 'none';
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('userToken');
+        window.location.href = 'index.html';
+      });
+    }
+  });
+</script>
+
+  
+  <!-- ### START INSERTED EGY CONTENT ### -->
+<div class="health-coaching-bg-image">
+
+        <!-- Start Main Banner Area -->
+        <section class="health-coaching-banner">
+            <div class="container-fluid">
+                <div class="health-coaching-banner-slides owl-carousel owl-theme">
+                                            <div class="single-banner-item" style=" background: linear-gradient(rgba(255,255,255,0.38), rgba(255,255,255,0.45)), url(https://www.egyarbitration.com/upload/banner/16962435931694702761se1.webp);background-size: cover;background-repeat: no-repeat;">
+                            <h1 class="playfair-display">مرحبا بك في الهيئة الدولية للتحكيم</h1>
+                            <p>اجعل تأثيرك يلمع في عالم العلاقات الدبلوماسية والسياسية: انضم إلى صفوف المستشارين وشارك في صياغة المستقبل  انضم إلى فريقنا وكن مستشارًا دوليًا معتمدًا في تسوية النزاعات التجارية العالمية</p>
+                            <a href="https://www.egyarbitration.com/student-register" class="default-btn"><i class="bx bx-user-circle icon-arrow before"></i><span class="label">انضم الآن</span><i class="bx bx-user-circle icon-arrow after"></i></a>
+                        </div>
+                                            <div class="single-banner-item" style=" background: linear-gradient(rgba(255,255,255,0.38), rgba(255,255,255,0.45)), url(https://www.egyarbitration.com/upload/banner/16962436091694702770se.webp);background-size: cover;background-repeat: no-repeat;">
+                            <h1 class="playfair-display">مرحبا بك في الهيئة الدولية للتحكيم</h1>
+                            <p>انضم إلى أفضل المحكمين الدوليين وكن جزءًا من مستقبل صناعة التحكيم التجاري و  اجعل تأثيرك يشمل التحكيم التجاري الدولي واحصل على الفرص التي تحلم بها</p>
+                            <a href="https://www.egyarbitration.com/student-register" class="default-btn"><i class="bx bx-user-circle icon-arrow before"></i><span class="label">انضم الآن</span><i class="bx bx-user-circle icon-arrow after"></i></a>
+                        </div>
+                                            <div class="single-banner-item" style=" background: linear-gradient(rgba(255,255,255,0.38), rgba(255,255,255,0.45)), url(https://www.egyarbitration.com/upload/banner/1696243628b3.webp);background-size: cover;background-repeat: no-repeat;">
+                            <h1 class="playfair-display">مرحبا بك في الهيئة الدولية للتحكيم</h1>
+                            <p>انضم إلى صفوف الخبراء في العلاقات الدبلوماسية واصنع تأثيرًا قويًا في تشكيل مسار التاريخ العالمي كمستشار دولي معترف به في مجال تحقيق السلام وتسوية النزاعات</p>
+                            <a href="https://www.egyarbitration.com/student-register" class="default-btn"><i class="bx bx-user-circle icon-arrow before"></i><span class="label">انضم الآن</span><i class="bx bx-user-circle icon-arrow after"></i></a>
+                        </div>
+                                            <div class="single-banner-item" style=" background: linear-gradient(rgba(255,255,255,0.38), rgba(255,255,255,0.45)), url(https://www.egyarbitration.com/upload/banner/1696243642b4.webp);background-size: cover;background-repeat: no-repeat;">
+                            <h1 class="playfair-display">مرحبا بك في الهيئة الدولية للتحكيم</h1>
+                            <p>تطوير مستقبل واعد في مجال التحكيم الدولي. انضم إلى فريقنا وتعلم من الخبراء الرائدين في هذا المجال.   واكتشف فرص تحكيم مدهشة وتألق في تسوية النزاعات التجارية الدولية مع فريق المحكمين المحترفين</p>
+                            <a href="https://www.egyarbitration.com/student-register" class="default-btn"><i class="bx bx-user-circle icon-arrow before"></i><span class="label">انضم الآن</span><i class="bx bx-user-circle icon-arrow after"></i></a>
+                        </div>
+                                    </div>
+            </div>
+        </section>
+        <!-- End Main Banner Area -->
+
+        <!-- Start Featured Area -->
+        <section class="featured-area pt-100 pb-70">
+            <div class="container">
+                <div class="section-title">
+                    <h2 class="playfair-display">أكثر من  42,500 دارس في الوطن العربي</h2>
+                    <p>15 عام  في مجال علوم الإدارة القانونية والسياسية لخدمة وتطوير المؤسسات والقادة والسياسيين والباحثين لتمكينهم من التميز في الساحة العالمية في مجال التحكيم التجاري الدولي والعلاقات الدبلوماسية والسياسية الدولية  
+                    <!--<a href="https://www.egyarbitration.com/student-register" class="text-white">سجل مجاناَ الأن !</a>-->
+                    </p>
+                </div>
+
+                <div class="row">
+                                            <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="single-featured-box">
+                                <div class="">
+                                    <img src="https://www.egyarbitration.com/upload/feature/1695214771nau-internet.webp" alt="" style="border-radius: 50%;height: 110px;width: 110px; border-style: solid; border-color: #ffffff;">
+                                </div>
+                                <br>
+                                <h3 class="playfair-display">دبلومات وبرامج مهنية</h3>
+                                <p>أكثر من 18 برنامج وورشة تفاعلية  بما يتوافق مع سوق العمل  بإعتماد دولي موثق</p>
+                                <a href="https://www.egyarbitration.com/ar/courses/courses" class="link-btn"><p>اضغط للمزيد</p></a>
+                            </div>
+                        </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="single-featured-box">
+                                <div class="">
+                                    <img src="https://www.egyarbitration.com/upload/feature/169521509954545.webp" alt="" style="border-radius: 50%;height: 110px;width: 110px; border-style: solid; border-color: #ffffff;">
+                                </div>
+                                <br>
+                                <h3 class="playfair-display">أفضل محاضرين الوطن العربي</h3>
+                                <p>أساتذة جامعيين، سفراء، ورجال قانون  ننتقي لكم الأفضل يشاركونك خبراتهم المهنية</p>
+                                <a href="https://www.egyarbitration.com/ar/teachers" class="link-btn"><p>اضغط للمزيد</p></a>
+                            </div>
+                        </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="single-featured-box">
+                                <div class="">
+                                    <img src="https://www.egyarbitration.com/upload/feature/1695214780nauka-prza-internet.webp" alt="" style="border-radius: 50%;height: 110px;width: 110px; border-style: solid; border-color: #ffffff;">
+                                </div>
+                                <br>
+                                <h3 class="playfair-display">تعلم مرن</h3>
+                                <p>تابع دوراتك بأحدث تقنيات   التعلم عن بعد  متابعة بحثية وأكاديمية</p>
+                                <a href="https://www.egyarbitration.com/ar/courses/courses" class="link-btn"><p>اضغط للمزيد</p></a>
+                            </div>
+                        </div>
+                                    </div>
+            </div>
+        </section>
+        <!-- End Featured Area -->
+
+    </div>
+<section class="services-area pt-100 pb-70">
+        <div class="container">
+            <div class="section-title">
+                <span class="sub-title">لماذا الهيئة الدولية للتحكيم ؟</span>
+                <h2 class="playfair-display">الهيئة البحثية الأكثر اعتمادا في الشرق الأوسط </h2>
+                <p>انضم لتحصل من خلالنا على العلم الجاد والموثوقية </p>
+            </div>
+
+            <div class="row">
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="single-services-box">
+                            <div class="icon">
+                             <img src="https://www.egyarbitration.com/upload/why/16975502441696242939imct.webp" alt="image">
+                            </div>
+                            <h3 class="playfair-display">إعتماد IMCT الدولية</h3>
+                            <p></p><p>للوساطة التجارية الإمارات العربية المتحدة</p><p></p>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="single-services-box">
+                            <div class="icon">
+                             <img src="https://www.egyarbitration.com/upload/why/169624231716940753681.webp" alt="image">
+                            </div>
+                            <h3 class="playfair-display">اعتماد وحدة التحكيم الخاصة</h3>
+                            <p></p><p>بإكويتى كوليدج بلندن</p><p></p>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="single-services-box">
+                            <div class="icon">
+                             <img src="https://www.egyarbitration.com/upload/why/169624225316940754953.webp" alt="image">
+                            </div>
+                            <h3 class="playfair-display">اعتماد لجنة حقوق الإنسان</h3>
+                            <p></p><p>بالنقابة العامة للمحامين بمصر</p><p></p>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="single-services-box">
+                            <div class="icon">
+                             <img src="https://www.egyarbitration.com/upload/why/1696243027International.webp" alt="image">
+                            </div>
+                            <h3 class="playfair-display">كارنية عضوية دولية</h3>
+                            <p></p><p>كارنية عضوية بلقب السيد المستشار</p><p></p>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="single-services-box">
+                            <div class="icon">
+                             <img src="https://www.egyarbitration.com/upload/why/169624227016940754492.webp" alt="image">
+                            </div>
+                            <h3 class="playfair-display">عضوية المحكمة الدولية</h3>
+                            <p></p><p>عضوية المحكمة الدولية لتسوية المنزاعات</p><p></p>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="single-services-box">
+                            <div class="icon">
+                             <img src="https://www.egyarbitration.com/upload/why/1696243018International.webp" alt="image">
+                            </div>
+                            <h3 class="playfair-display">عضوية الهيئة الدولية</h3>
+                            <p></p><p>قائمة المستشارين المعتمدين</p><p></p>
+                        </div>
+                    </div>
+                            </div>
+        </div>
+
+        <div class="health-coaching-shape1"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/health-coaching-shape1.png" alt="image"></div>
+        <div class="health-coaching-shape2"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/health-coaching-shape2.png" alt="image"></div>
+    </section>
+<section class="experience-area ptb-100 bg-f5faf8">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-12">
+                    <div class="experience-content">
+                        <span class="sub-title">عن الهيئة</span>
+                        <h2 class="playfair-display">الهيئة الدولية للتحكيم</h2>
+                        <h6></h6>
+                        <p></p><p>رؤيتنا :<br>
+أن نكون المرجعية المهنية للخبراء والمتخصصين في مجال القانون والتحكيم الدولي والعلاقات السياسية والدبلوماسية &nbsp;من خلال إنشاء مجتمع رقمي للتفكير والتعلم وتبادل الأفكار حول القضايا القانونية والدبلوماسية الهامة، بهدف تمكين القيادات والقانونيين والسياسيين من التميز والابتكار والمنافسة</p><p></p>
+                        <ul class="features-list">
+                                                            <li><span><i class="bx bx-check"></i> دبلومات وبرامج مهنية</span></li>
+                                                            <li><span><i class="bx bx-check"></i> أفضل محاضرين الوطن العربي</span></li>
+                                                            <li><span><i class="bx bx-check"></i> تعلم مرن</span></li>
+                                                            <li><span><i class="bx bx-check"></i> تطبيقات عملية</span></li>
+                                                    </ul>
+                        <a href="https://www.egyarbitration.com/about" class="default-btn"><i class="bx bx-user-circle icon-arrow before"></i><span class="label">عن الهيئة </span><i class="bx bx-user-circle icon-arrow after"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12">
+                    <div class="experience-image">
+                        <img src="https://www.egyarbitration.com/upload/about/16962476902.webp" alt="image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="health-coaching-shape3"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/health-coaching-shape3.png" alt="image"></div>
+        <div class="health-coaching-shape4"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/health-coaching-shape4.png" alt="image"></div>
+    </section>
+<section class="program-area pt-100 pb-70 jarallax" data-jarallax="{&quot;speed&quot;: 0.3}">
+        <div class="container">
+            <div class="section-title">
+                <h2 class="playfair-display">استراتيجيتنا</h2>
+                <p>تطوير المؤسسات والقادة والسياسيين والباحثين لتمكينهم من التميز في الساحة العالمية في مجال التحكيم التجاري الدولي والعلاقات الدبلومسية والسياسة الدولية وذلك من خلال</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 col-sm-6 col-md-6">
+                    <div class="single-program-box">
+                        <!--<div class="shape"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/list-shape1.png" alt="image"></div>-->
+                        <div class="icon">
+                            <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/1.png" alt="image">
+                        </div>
+                        <h3 class="playfair-display">دورات متخصصة</h3>
+                        <p>إتاحة فرص التعليم في مجالات القانون والتحكيم التجاري الدولي والعلاقات الدبلوماسية و السياسية عبر تقديم دورات متميزة ومرنة تتوافق مع متطلبات سوق العمل المحلية والإقليمية.</p>
+                        <a href="https://www.egyarbitration.com/courses/courses" class="link-btn">مشاهدة جميع الكورسات</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 col-md-6">
+                    <div class="single-program-box">
+                        <!--<div class="shape"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/list-shape2.png" alt="image"></div>-->
+                        <div class="icon">
+                            <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/2.png" alt="image">
+                        </div>
+                        <h3 class="playfair-display">الأبحاث والدراسات</h3>
+                        <p>نسعى لتقديم الأبحاث والدراسات القانونية لمساعدة المجتمع وتقديم حلاً علميًا لقضاياه القانونية والدبلوماسية، وربط الأبحاث الأكاديمية بخطط التنمية الشاملة وتطلعات المستقبل .</p>
+                        <a href="https://www.egyarbitration.com/courses/courses" class="link-btn">مشاهدة جميع الكورسات</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 col-md-6 offset-lg-0 offset-md-3 offset-sm-3">
+                    <div class="single-program-box">
+                        <!--<div class="shape"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/list-shape3.png" alt="image"></div>-->
+                        <div class="icon">
+                            <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/3.png" alt="image">
+                        </div>
+                        <h3 class="playfair-display">تنظيم المؤتمرات</h3>
+                        <p>تنظيم مؤتمرات دولية للتحكيم التجاري الدولي والعلاقات الدبلوماسية و تدعيم الصلات والروابط العلمية وتبادل الخبرات مع الجامعات والمؤسسات العلمية في جميع الدول العربية والعالمية.</p>
+                        <a href="https://www.egyarbitration.com/courses/courses" class="link-btn">مشاهدة جميع الكورسات</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="health-coaching-shape5"><img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/health-coaching-shape5.png" alt="image"></div>
+    </section>
+<section class="courses-area pb-100">
+        <div class="container">
+            <div class="section-title">
+                <span class="sub-title">البرامج و الدورات المعتمدة دولياً</span>
+                <h2 class="playfair-display">أحدث برامجنا</h2>
+            </div>
+
+            <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                        <div class="single-courses-box-item">
+                            <div class="courses-image">
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A9_%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D8%A7%D9%84%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A_%D8%A7%D9%84%D8%AF%D9%88%D9%84%D9%8A" class="d-block image">
+                                    <img src="https://www.egyarbitration.com/upload/course/16962472661695208912بانر-كورسات-التحكيم.webp" alt="image">
+                                </a>
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A9_%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D8%A7%D9%84%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A_%D8%A7%D9%84%D8%AF%D9%88%D9%84%D9%8A" class="fav"><i class="bx bx-heart"></i></a>
+                                <div class="price shadow">$650</div>
+                            </div>
+                            <div class="courses-content">
+                                <div class="course-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                                <h3 class="playfair-display"><a href="https://www.egyarbitration.com/courses/course-details/%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A9_%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D8%A7%D9%84%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A_%D8%A7%D9%84%D8%AF%D9%88%D9%84%D9%8A">دبلومة التحكيم التجاري الدولي</a></h3>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6">
+                        <div class="single-courses-box-item">
+                            <div class="courses-image">
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%B5%D9%8A%D8%A7%D8%BA%D8%A9_%D8%B9%D9%82%D8%AF_%D8%A7%D8%AA%D9%81%D8%A7%D9%82_%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D9%88%D8%A2%D9%84%D9%8A%D9%87_%D8%AA%D9%86%D9%81%D9%8A%D8%B0%D9%87" class="d-block image">
+                                    <img src="https://www.egyarbitration.com/upload/course/1696247466كورس3.webp" alt="image">
+                                </a>
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%B5%D9%8A%D8%A7%D8%BA%D8%A9_%D8%B9%D9%82%D8%AF_%D8%A7%D8%AA%D9%81%D8%A7%D9%82_%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D9%88%D8%A2%D9%84%D9%8A%D9%87_%D8%AA%D9%86%D9%81%D9%8A%D8%B0%D9%87" class="fav"><i class="bx bx-heart"></i></a>
+                                <div class="price shadow">$350</div>
+                            </div>
+                            <div class="courses-content">
+                                <div class="course-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                                <h3 class="playfair-display"><a href="https://www.egyarbitration.com/courses/course-details/%D8%B5%D9%8A%D8%A7%D8%BA%D8%A9_%D8%B9%D9%82%D8%AF_%D8%A7%D8%AA%D9%81%D8%A7%D9%82_%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D9%88%D8%A2%D9%84%D9%8A%D9%87_%D8%AA%D9%86%D9%81%D9%8A%D8%B0%D9%87">صياغة عقد اتفاق التحكيم وآليه تنفيذه</a></h3>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6">
+                        <div class="single-courses-box-item">
+                            <div class="courses-image">
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A9_%D8%A7%D9%84%D8%B9%D9%84%D8%A7%D9%82%D8%A7%D8%AA_%D8%A7%D9%84%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A7%D8%B3%D9%8A%D8%A9_%D9%88%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%B3%D9%8A%D8%A9" class="d-block image">
+                                    <img src="https://www.egyarbitration.com/upload/course/169624735216955608701695208940بانر-كورسات-القنصلية.webp" alt="image">
+                                </a>
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A9_%D8%A7%D9%84%D8%B9%D9%84%D8%A7%D9%82%D8%A7%D8%AA_%D8%A7%D9%84%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A7%D8%B3%D9%8A%D8%A9_%D9%88%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%B3%D9%8A%D8%A9" class="fav"><i class="bx bx-heart"></i></a>
+                                <div class="price shadow">$650</div>
+                            </div>
+                            <div class="courses-content">
+                                <div class="course-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                                <h3 class="playfair-display"><a href="https://www.egyarbitration.com/courses/course-details/%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A9_%D8%A7%D9%84%D8%B9%D9%84%D8%A7%D9%82%D8%A7%D8%AA_%D8%A7%D9%84%D8%AF%D8%A8%D9%84%D9%88%D9%85%D8%A7%D8%B3%D9%8A%D8%A9_%D9%88%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%B3%D9%8A%D8%A9">دبلومة العلاقات الدبلوماسية والسياسية</a></h3>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6">
+                        <div class="single-courses-box-item">
+                            <div class="courses-image">
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D9%81%D9%8A_%D9%85%D9%86%D8%A7%D8%B2%D8%B9%D8%A7%D8%AA_%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1_%D9%88%D8%A7%D9%84%D8%B9%D9%82%D9%88%D8%AF_%D8%A7%D9%84%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A%D8%A9" class="d-block image">
+                                    <img src="https://www.egyarbitration.com/upload/course/16962473791695210899fd4cd61bd71f518bcc40db108e5cf8ec.webp" alt="image">
+                                </a>
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D9%81%D9%8A_%D9%85%D9%86%D8%A7%D8%B2%D8%B9%D8%A7%D8%AA_%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1_%D9%88%D8%A7%D9%84%D8%B9%D9%82%D9%88%D8%AF_%D8%A7%D9%84%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A%D8%A9" class="fav"><i class="bx bx-heart"></i></a>
+                                <div class="price shadow">$500</div>
+                            </div>
+                            <div class="courses-content">
+                                <div class="course-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                                <h3 class="playfair-display"><a href="https://www.egyarbitration.com/courses/course-details/%D8%A7%D9%84%D8%AA%D8%AD%D9%83%D9%8A%D9%85_%D9%81%D9%8A_%D9%85%D9%86%D8%A7%D8%B2%D8%B9%D8%A7%D8%AA_%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1_%D9%88%D8%A7%D9%84%D8%B9%D9%82%D9%88%D8%AF_%D8%A7%D9%84%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A%D8%A9">التحكيم في منازعات الاستثمار والعقود التجارية</a></h3>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                                    <div class="col-lg-4 col-md-6">
+                        <div class="single-courses-box-item">
+                            <div class="courses-image">
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%A7%D9%84%D9%82%D8%A7%D9%86%D9%88%D9%86_%D8%A7%D9%84%D8%AF%D9%88%D9%84%D9%8A_%D9%88%D8%AD%D9%82%D9%88%D9%82_%D8%A7%D9%84%D8%A7%D9%86%D8%B3%D8%A7%D9%86" class="d-block image">
+                                    <img src="https://www.egyarbitration.com/upload/course/1696247416كورس4.webp" alt="image">
+                                </a>
+                                <a href="https://www.egyarbitration.com/courses/course-details/%D8%A7%D9%84%D9%82%D8%A7%D9%86%D9%88%D9%86_%D8%A7%D9%84%D8%AF%D9%88%D9%84%D9%8A_%D9%88%D8%AD%D9%82%D9%88%D9%82_%D8%A7%D9%84%D8%A7%D9%86%D8%B3%D8%A7%D9%86" class="fav"><i class="bx bx-heart"></i></a>
+                                <div class="price shadow">$400</div>
+                            </div>
+                            <div class="courses-content">
+                                <div class="course-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                                <h3 class="playfair-display"><a href="https://www.egyarbitration.com/courses/course-details/%D8%A7%D9%84%D9%82%D8%A7%D9%86%D9%88%D9%86_%D8%A7%D9%84%D8%AF%D9%88%D9%84%D9%8A_%D9%88%D8%AD%D9%82%D9%88%D9%82_%D8%A7%D9%84%D8%A7%D9%86%D8%B3%D8%A7%D9%86">القانون الدولي وحقوق الانسان</a></h3>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                                <div class="col-lg-12 col-md-12">
+                    <div class="courses-info">
+                        <p>
+                             <!--الكورسات المتاحة 5+  -->
+                             <a href="https://www.egyarbitration.com/courses/courses">مشاهدة جميع الكورسات</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+<!-- ### END INSERTED EGY CONTENT ### -->
+
+  
+<!-- Start Footer Area -->
+<footer class="footer-area">
+
+  <!-- Top Grid -->
+  <div class="container footer-grid">
+    <div class="single-footer-widget">
+      <h3>اتصل بنا</h3>
+      <ul class="contact-us-link">
+        <li>
+          <i class="bx bx-map"></i>
+          <span>فرع الامارات: برج أسبين - شارع الشيخ زايد - دبي.</span>
+        </li>
+        <li>
+          <i class="bx bxl-whatsapp"></i>
+          <a href="tel:+971563357115" dir="ltr">+971563357115</a>
+        </li>
+        <li>
+          <i class="bx bx-envelope"></i>
+          <a href="mailto:info@egyarbitration.com">info@egyarbitration.com</a>
+        </li>
+      </ul>
+      <ul class="social-list">
+        <li><a href="#"><i class="bx bxl-facebook"></i></a></li>
+        <li><a href="#"><i class="bx bxl-twitter"></i></a></li>
+        <li><a href="#"><i class="bx bxl-instagram"></i></a></li>
+        <li><a href="#"><i class="bx bxl-linkedin"></i></a></li>
+        <li><a href="#"><i class="bx bxl-youtube"></i></a></li>
+      </ul>
+    </div>
+
+    <div class="single-footer-widget">
+      <h3>الدعم</h3>
+      <ul class="link-list">
+        <li><a href="#">سياسة الخصوصية</a></li>
+        <li><a href="#">الأسئلة الشائعة</a></li>
+        <li><a href="#">جميع المحاضرين</a></li>
+        <li><a href="#">اتفاقية الأستخدام</a></li>
+        <li><a href="#">اتصل بنا</a></li>
+      </ul>
+    </div>
+
+    <div class="single-footer-widget">
+      <h3>برامجنا</h3>
+      <ul class="link-list">
+        <li><a href="#">دبلومة التحكيم التجاري الدولي</a></li>
+        <li><a href="#">صياغة عقد اتفاق التحكيم وآلية تنفيذه</a></li>
+        <li><a href="#">دبلومة العلاقات الدبلوماسية والسياسية</a></li>
+        <li><a href="#">التحكيم في منازعات الاستثمار والعقود التجارية</a></li>
+        <li><a href="#">القانون الدولي وحقوق الانسان</a></li>
+      </ul>
+    </div>
+
+    <div class="single-footer-widget">
+      <h3>النشرة البريدية</h3>
+      <p>للحصول على آخر الأخبار وآخر التحديثات منا.</p>
+      <form class="newsletter-form" action="#" method="post">
+        <input type="email" placeholder="ادخل بريدك الإلكتروني هنا" required>
+        <button type="submit">اشتراك</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="footer-bottom">
+    <div class="container">
+      <a href="#" class="footer-logo">
+        <img src="https://www.egyarbitration.com/upload/setting/1695113866international%20Arbitration%20logo-ai.svg" alt="Logo">
+      </a>
+      <p>
+        <i class="bx bx-copyright"></i>
+        2025 <a href="#">الهيئة الدولية للتحكيم</a> |
+        برمجة وتصميم <a href="#">Farouk Group</a> |
+        جميع الحقوق محفوظة.
+      </p>
+    </div>
+  </div>
+</footer>
+
+
+  <script src="js/animations.js"></script>
+</body>
+</html>

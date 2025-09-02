@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+    <head>
+          <script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isArabic = userLang.toLowerCase().startsWith('ar');
+      if (isArabic && window.location.pathname.endsWith('contact.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'contact.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center;">
+      <a class="logo" href="contact.html"><img src="images/logo.png" alt="Logo" /></a>
+
+      <nav class="main-nav" style="margin-left: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li>id="profileNavItem" style="display: none;">
+            <a href="profile.html"></a>/a>My Profile</a>
+          </li>
+          <script>
+  if (localStorage.getItem('userToken')) {
+    document.getElementById('profileNavItem').style.display = 'inline-block';
+  }
+</script>     
+   </ul>
+      </nav>
+
+<div class="lang-toggle" style="margin-left:auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <span style="color:#ffcc00;">EN</span> /
+  <a href="../ar/contact.html" class="lang-link" lang="ar" hreflang="ar" title="العربية" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">ع</a>
+</div>
+    
+    <div class="auth-buttons">
+    <a href="register.html">Register</a>
+<a href="login.html">Login</a>
+</div>
+</div>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="page-hero contact-hero">
+    <div class="container">
+      <h1>Contact Us</h1>
+      <p>We’d love to hear from you! Get in touch with us via the form below or visit our office.</p>
+    </div>
+  </section>
+
+  <!-- Contact Info + Form -->
+  <section class="contact-section container">
+    <div class="contact-info">
+      <h2>Our Office</h2>
+      <p><strong>Address:</strong> 123 Arbitration St, Cairo, Egypt</p>
+      <p><strong>Phone:</strong> +20 123 456 7890</p>
+      <p><strong>Email:</strong> info@egyarbitration.com</p>
+      <p><strong>Working Hours:</strong> Sun - Thu: 9:00 AM - 5:00 PM</p>
+    </div>
+
+    <div class="contact-form-wrapper">
+      <h2>Send Us a Message</h2>
+      <form id="contactForm" novalidate>
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Your full name" required />
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="Your email address" required />
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" placeholder="Your phone number" />
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
+
+        <button type="submit" class="btn btn-primary">Send Message</button>
+      </form>
+      <p id="formMessage" role="alert" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- Google Map -->
+  <section class="map-container">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3456.1234567890123!2d31.2357111!3d30.0444196!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x145847e3a4e269bf%3A0x9abc123def456!2sEgypt%20Arbitration%20Center!5e0!3m2!1sen!2seg!4v1620000000000!5m2!1sen!2seg"
+      width="100%"
+      height="400"
+      style="border:0;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="Egypt Arbitration Center Location"
+    ></iframe>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Egypt Arbitration Center. All rights reserved.</p>
+      <nav class="footer-nav">
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Use</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/contact-form.js"></script>
+</body>
+</html>

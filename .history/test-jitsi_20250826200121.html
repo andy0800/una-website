@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jitsi Meet Test - UNA Institute</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        #jitsi-container {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            display: none;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Jitsi Meet Implementation Test</h1>
+        <p>This page tests the Jitsi Meet livestreaming functionality for UNA Institute.</p>
+        
+        <div class="test-section">
+            <h3>🔧 System Status</h3>
+            <div id="systemStatus" class="status info">Checking system status...</div>
+            <button onclick="checkSystemStatus()">Check Status</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🎥 Create Test Room</h3>
+            <div class="input-group">
+                <label for="roomName">Room Name:</label>
+                <input type="text" id="roomName" value="Test-Room" placeholder="Enter room name">
+            </div>
+            <button onclick="createTestRoom()">Create Room</button>
+            <div id="roomStatus" class="status info">No room created yet</div>
+        </div>
+
+        <div class="test-section">
+            <h3>👥 Join Room</h3>
+            <div class="input-group">
+                <label for="roomId">Room ID:</label>
+                <input type="text" id="roomId" placeholder="Enter room ID to join">
+            </div>
+            <button onclick="joinRoom()">Join Room</button>
+            <button onclick="leaveRoom()" disabled id="leaveBtn">Leave Room</button>
+            <div id="joinStatus" class="status info">Not connected</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎤 Audio Controls</h3>
+            <button onclick="toggleMute()" id="muteBtn">Mute</button>
+            <button onclick="toggleVideo()" id="videoBtn">Stop Video</button>
+            <div id="audioStatus" class="status info">Audio: Enabled, Video: Enabled</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🖥️ Jitsi Meet Interface</h3>
+            <div id="jitsi-container"></div>
+            <button onclick="toggleJitsiContainer()">Show/Hide Jitsi Interface</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="testResults">
+                <p><strong>Tests to run:</strong></p>
+                <ul>
+                    <li>✅ System initialization</li>
+                    <li>⏳ Room creation</li>
+                    <li>⏳ Room joining</li>
+                    <li>⏳ Audio controls</li>
+                    <li>⏳ Video controls</li>
+                    <li>⏳ Jitsi interface</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jitsi Meet SDK -->
+    <script src="https://meet.jit.si/external_api.js"></script>
+    
+    <script>
+        // Global variables
+        let jitsiApi = null;
+        let currentRoom = null;
+        let isConnected = false;
+        let isMuted = false;
+        let isVideoEnabled = true;
+
+        // Test configuration
+        const TEST_CONFIG = {
+            domain: 'meet.jit.si',
+            width: '100%',
+            height: '100%',
+            parentNode: '#jitsi-container',
+            configOverwrite: {
+                startWithAudioMuted: false,
+                startWithVideoMuted: false,
+                prejoinPageEnabled: false,
+                disableDeepLinking: true,
+                enableClosePage: false,
+                enableWelcomePage: false,
+                enableLobbyChat: false,
+                enableKnocking: false,
+                enableInsecureRoomNameWarning: false
+            },
+            interfaceConfigOverwrite: {
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'desktop', 'fullscreen',
+                    'hangup', 'chat', 'settings', 'raisehand'
+                ],
+                SHOW_JITSI_WATERMARK: false,
+                SHOW_WATERMARK_FOR_GUESTS: false,
+                SHOW_POWERED_BY: false,
+                SHOW_BRAND_WATERMARK: false
+            }
+        };
+
+        // Initialize system
+        async function initializeSystem() {
+            try {
+                if (typeof JitsiMeetExternalAPI === 'undefined') {
+                    throw new Error('Jitsi Meet API not loaded');
+                }
+                
+                updateStatus('systemStatus', 'success', '✅ Jitsi Meet system ready');
+                updateTestResult('System initialization', true);
+                return true;
+            } catch (error) {
+                updateStatus('systemStatus', 'error', '❌ Failed to initialize: ' + error.message);
+                updateTestResult('System initialization', false);
+                return false;
+            }
+        }
+
+        // Check system status
+        function checkSystemStatus() {
+            initializeSystem();
+        }
+
+        // Create test room
+        async function createTestRoom() {
+            try {
+                const roomName = document.getElementById('roomName').value;
+                if (!roomName) {
+                    throw new Error('Room name is required');
+                }
+
+                // Generate room ID
+                const roomId = `${roomName}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                
+                updateStatus('roomStatus', 'info', '🔄 Creating room...');
+                
+                // Simulate room creation (in real app, this would call your API)
+                setTimeout(() => {
+                    currentRoom = {
+                        roomId: roomId,
+                        roomName: roomName,
+                        status: 'active'
+                    };
+                    
+                    updateStatus('roomStatus', 'success', `✅ Room created: ${roomId}`);
+                    document.getElementById('roomId').value = roomId;
+                    updateTestResult('Room creation', true);
+                }, 1000);
+
+            } catch (error) {
+                updateStatus('roomStatus', 'error', '❌ Failed to create room: ' + error.message);
+                updateTestResult('Room creation', false);
+            }
+        }
+
+        // Join room
+        async function joinRoom() {
+            try {
+                const roomId = document.getElementById('roomId').value;
+                if (!roomId) {
+                    throw new Error('Room ID is required');
+                }
+
+                updateStatus('joinStatus', 'info', '🔄 Joining room...');
+
+                // Create Jitsi Meet API instance
+                jitsiApi = new JitsiMeetExternalAPI(TEST_CONFIG.domain, {
+                    ...TEST_CONFIG,
+                    roomName: roomId,
+                    userInfo: {
+                        displayName: 'Test User'
+                    }
+                });
+
+                // Set up event listeners
+                jitsiApi.addEventListeners({
+                    'participantJoined': onParticipantJoined,
+                    'participantLeft': onParticipantLeft,
+                    'audioMuteStatusChanged': onAudioMuteStatusChanged,
+                    'videoMuteStatusChanged': onVideoMuteStatusChanged,
+                    'meetingJoined': onMeetingJoined,
+                    'meetingLeft': onMeetingLeft
+                });
+
+                isConnected = true;
+                document.getElementById('leaveBtn').disabled = false;
+                updateStatus('joinStatus', 'success', '✅ Connected to room');
+                updateTestResult('Room joining', true);
+
+            } catch (error) {
+                updateStatus('joinStatus', 'error', '❌ Failed to join room: ' + error.message);
+                updateTestResult('Room joining', false);
+            }
+        }
+
+        // Leave room
+        function leaveRoom() {
+            try {
+                if (jitsiApi) {
+                    jitsiApi.executeCommand('hangup');
+                    jitsiApi.dispose();
+                    jitsiApi = null;
+                }
+                
+                isConnected = false;
+                document.getElementById('leaveBtn').disabled = true;
+                updateStatus('joinStatus', 'info', '👋 Left room');
+                
+            } catch (error) {
+                updateStatus('joinStatus', 'error', '❌ Error leaving room: ' + error.message);
+            }
+        }
+
+        // Toggle mute
+        function toggleMute() {
+            if (jitsiApi && isConnected) {
+                isMuted = !isMuted;
+                jitsiApi.executeCommand('mute', isMuted);
+                
+                const muteBtn = document.getElementById('muteBtn');
+                muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+                muteBtn.style.background = isMuted ? '#dc3545' : '#007bff';
+                
+                updateAudioStatus();
+                updateTestResult('Audio controls', true);
+            }
+        }
+
+        // Toggle video
+        function toggleVideo() {
+            if (jitsiApi && isConnected) {
+                isVideoEnabled = !isVideoEnabled;
+                jitsiApi.executeCommand('video', isVideoEnabled);
+                
+                const videoBtn = document.getElementById('videoBtn');
+                videoBtn.textContent = isVideoEnabled ? 'Stop Video' : 'Start Video';
+                videoBtn.style.background = isVideoEnabled ? '#007bff' : '#dc3545';
+                
+                updateAudioStatus();
+                updateTestResult('Video controls', true);
+            }
+        }
+
+        // Toggle Jitsi container
+        function toggleJitsiContainer() {
+            const container = document.getElementById('jitsi-container');
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                updateTestResult('Jitsi interface', true);
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // Update status display
+        function updateStatus(elementId, type, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = `status ${type}`;
+                element.textContent = message;
+            }
+        }
+
+        // Update audio/video status
+        function updateAudioStatus() {
+            const status = `Audio: ${isMuted ? 'Muted' : 'Enabled'}, Video: ${isVideoEnabled ? 'Enabled' : 'Disabled'}`;
+            updateStatus('audioStatus', 'info', status);
+        }
+
+        // Update test results
+        function updateTestResult(testName, success) {
+            const results = document.getElementById('testResults');
+            const list = results.querySelector('ul');
+            const items = list.querySelectorAll('li');
+            
+            for (let item of items) {
+                if (item.textContent.includes(testName)) {
+                    item.innerHTML = item.innerHTML.replace('⏳', success ? '✅' : '❌');
+                    break;
+                }
+            }
+        }
+
+        // Jitsi Meet event handlers
+        function onParticipantJoined(participant) {
+            console.log('👤 Participant joined:', participant);
+        }
+
+        function onParticipantLeft(participant) {
+            console.log('👤 Participant left:', participant);
+        }
+
+        function onAudioMuteStatusChanged(participant) {
+            console.log('🎤 Audio mute status changed:', participant);
+            if (participant.isLocal) {
+                isMuted = participant.muted;
+                updateAudioStatus();
+            }
+        }
+
+        function onVideoMuteStatusChanged(participant) {
+            console.log('📹 Video mute status changed:', participant);
+            if (participant.isLocal) {
+                isVideoEnabled = !participant.muted;
+                updateAudioStatus();
+            }
+        }
+
+        function onMeetingJoined() {
+            console.log('✅ Successfully joined meeting');
+        }
+
+        function onMeetingLeft() {
+            console.log('👋 Left meeting');
+            isConnected = false;
+            document.getElementById('leaveBtn').disabled = true;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing Jitsi Meet test page...');
+            initializeSystem();
+        });
+    </script>
+</body>
+</html>

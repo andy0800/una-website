@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Menu Test - UNA Institute</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .test-info {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .test-info h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .breakpoint-test {
+            background: #e9ecef;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .current-width {
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <img src="images/logo.png" alt="Distinguished Union Institute Logo" />
+                    <span class="logo-text">UNA Institute</span>
+                </a>
+
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="courses.html">Courses</a></li>
+                        <li><a href="news.html">News</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Hamburger Menu Button -->
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <div class="lang-toggle">
+                    <span style="color:var(--accent-gold);">EN</span> /
+                    <a href="#" class="lang-link" id="arLink" lang="ar" hreflang="ar" title="العربية">ع</a>
+                </div>
+                
+                <div class="auth-buttons" id="authButtons">
+                    <a href="register.html" id="registerBtn">Register</a>
+                    <a href="login.html" id="loginBtn">Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav" id="mobileNav">
+        <button class="mobile-nav-close" id="mobileNavClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mobile-nav-content">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="courses.html">Courses</a></li>
+                <li><a href="news.html">News</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Test Content -->
+    <div class="container" style="margin-top: 100px;">
+        <h1>🔍 Mobile Responsive Menu Test</h1>
+        
+        <div class="test-info">
+            <h3>📱 Testing Instructions</h3>
+            <p>This page tests the mobile responsive menu functionality. To test:</p>
+            <ol>
+                <li><strong>Resize your browser window</strong> to be smaller than 991px width</li>
+                <li><strong>Check if the hamburger menu appears</strong> (three horizontal lines)</li>
+                <li><strong>Click the hamburger menu</strong> to open the mobile navigation</li>
+                <li><strong>Test on mobile devices</strong> or use browser dev tools mobile view</li>
+            </ol>
+        </div>
+
+        <div class="test-info">
+            <h3>🎯 Breakpoint Tests</h3>
+            <div class="breakpoint-test">
+                <strong>Desktop (1200px+):</strong> Main navigation visible, hamburger hidden
+            </div>
+            <div class="breakpoint-test">
+                <strong>Small Desktop (992px-1199px):</strong> Main navigation visible, hamburger hidden
+            </div>
+            <div class="breakpoint-test">
+                <strong>Tablet (768px-991px):</strong> Main navigation hidden, hamburger visible
+            </div>
+            <div class="breakpoint-test">
+                <strong>Mobile Large (576px-767px):</strong> Main navigation hidden, hamburger visible
+            </div>
+            <div class="breakpoint-test">
+                <strong>Mobile Small (375px-575px):</strong> Main navigation hidden, hamburger visible
+            </div>
+            <div class="breakpoint-test">
+                <strong>Mobile Extra Small (≤374px):</strong> Main navigation hidden, hamburger visible
+            </div>
+        </div>
+
+        <div class="test-info">
+            <h3>📏 Current Viewport Size</h3>
+            <div class="current-width" id="currentWidth">Loading...</div>
+            <p>Resize your browser to see the responsive behavior in action!</p>
+        </div>
+
+        <div class="test-info">
+            <h3>🔧 Debug Information</h3>
+            <div id="debugInfo">
+                <p><strong>Hamburger Menu Element:</strong> <span id="hamburgerStatus">Checking...</span></p>
+                <p><strong>Mobile Nav Element:</strong> <span id="mobileNavStatus">Checking...</span></p>
+                <p><strong>Main Nav Element:</strong> <span id="mainNavStatus">Checking...</span></p>
+                <p><strong>JavaScript Loaded:</strong> <span id="jsStatus">Checking...</span></p>
+            </div>
+        </div>
+
+        <div class="test-info">
+            <h3>🎨 CSS Classes Status</h3>
+            <div id="cssStatus">
+                <p><strong>Hamburger Menu Display:</strong> <span id="hamburgerDisplay">Checking...</span></p>
+                <p><strong>Main Nav Display:</strong> <span id="mainNavDisplay">Checking...</span></p>
+                <p><strong>Mobile Nav Display:</strong> <span id="mobileNavDisplay">Checking...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Test mobile menu functionality
+        function testMobileMenu() {
+            console.log('🧪 Testing mobile menu functionality...');
+            
+            // Check elements
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileNav = document.getElementById('mobileNav');
+            const mainNav = document.querySelector('.main-nav');
+            
+            // Update debug info
+            document.getElementById('hamburgerStatus').textContent = 
+                hamburgerMenu ? '✅ Found' : '❌ Not found';
+            document.getElementById('mobileNavStatus').textContent = 
+                mobileNav ? '✅ Found' : '❌ Not found';
+            document.getElementById('mainNavStatus').textContent = 
+                mainNav ? '✅ Found' : '❌ Not found';
+            document.getElementById('jsStatus').textContent = 
+                typeof setupMobileNavigation === 'function' ? '✅ Loaded' : '❌ Not loaded';
+            
+            // Check CSS display properties
+            if (hamburgerMenu) {
+                const hamburgerStyle = window.getComputedStyle(hamburgerMenu);
+                document.getElementById('hamburgerDisplay').textContent = hamburgerStyle.display;
+            }
+            
+            if (mainNav) {
+                const mainNavStyle = window.getComputedStyle(mainNav);
+                document.getElementById('mainNavDisplay').textContent = mainNavStyle.display;
+            }
+            
+            if (mobileNav) {
+                const mobileNavStyle = window.getComputedStyle(mobileNav);
+                document.getElementById('mobileNavDisplay').textContent = mobileNavStyle.display;
+            }
+            
+            console.log('✅ Mobile menu test completed');
+        }
+        
+        // Update viewport size display
+        function updateViewportSize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const currentWidth = document.getElementById('currentWidth');
+            
+            let breakpoint = '';
+            if (width >= 1200) breakpoint = 'Desktop (1200px+)';
+            else if (width >= 992) breakpoint = 'Small Desktop (992px-1199px)';
+            else if (width >= 768) breakpoint = 'Tablet (768px-991px)';
+            else if (width >= 576) breakpoint = 'Mobile Large (576px-767px)';
+            else if (width >= 375) breakpoint = 'Mobile Small (375px-575px)';
+            else breakpoint = 'Mobile Extra Small (≤374px)';
+            
+            currentWidth.textContent = `${width}px × ${height}px - ${breakpoint}`;
+        }
+        
+        // Test hamburger menu click
+        function testHamburgerClick() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            if (hamburgerMenu) {
+                console.log('🖱️ Testing hamburger menu click...');
+                hamburgerMenu.click();
+                
+                setTimeout(() => {
+                    const mobileNav = document.getElementById('mobileNav');
+                    if (mobileNav && mobileNav.classList.contains('active')) {
+                        console.log('✅ Mobile navigation opened successfully');
+                    } else {
+                        console.log('❌ Mobile navigation failed to open');
+                    }
+                }, 100);
+            }
+        }
+        
+        // Initialize tests
+        window.addEventListener('load', () => {
+            console.log('🚀 Mobile menu test page loaded');
+            
+            // Initial test
+            setTimeout(() => {
+                testMobileMenu();
+                updateViewportSize();
+            }, 500);
+            
+            // Update viewport size on resize
+            window.addEventListener('resize', updateViewportSize);
+            
+            // Test hamburger click after 2 seconds
+            setTimeout(testHamburgerClick, 2000);
+        });
+        
+        // Log when mobile navigation is set up
+        const originalSetupMobileNavigation = window.setupMobileNavigation;
+        window.setupMobileNavigation = function() {
+            console.log('🔧 setupMobileNavigation called');
+            if (originalSetupMobileNavigation) {
+                originalSetupMobileNavigation();
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔌 Socket.IO Connection Test</h1>
+        <p>This page tests the Socket.IO connection to verify streaming functionality.</p>
+        
+        <div id="status" class="status info">Initializing...</div>
+        
+        <div>
+            <button id="testConnection">Test Connection</button>
+            <button id="testStream">Test Stream Events</button>
+            <button id="clearLog">Clear Log</button>
+        </div>
+        
+        <div class="log" id="log"></div>
+        
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+    </div>
+
+    <!-- Socket.IO client library -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        let socket;
+        let testResults = {};
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        function updateResults() {
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            
+            for (const [test, result] of Object.entries(testResults)) {
+                const status = result.success ? '✅' : '❌';
+                const color = result.success ? 'success' : 'error';
+                html += `<div class="status ${color}">${status} ${test}: ${result.message}</div>`;
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function addResult(test, success, message) {
+            testResults[test] = { success, message };
+            updateResults();
+        }
+        
+        // Test Socket.IO connection
+        document.getElementById('testConnection').addEventListener('click', async () => {
+            log('🧪 Testing Socket.IO connection...');
+            
+            try {
+                // Test 1: Socket.IO library loaded
+                if (typeof io === 'undefined') {
+                    throw new Error('Socket.IO library not loaded');
+                }
+                addResult('Socket.IO Library', true, 'Library loaded successfully');
+                log('✅ Socket.IO library loaded');
+                
+                // Test 2: Create connection
+                const serverUrl = window.location.origin;
+                log(`🔌 Attempting to connect to: ${serverUrl}`);
+                
+                socket = io(serverUrl, {
+                    transports: ['websocket', 'polling'],
+                    timeout: 10000,
+                    forceNew: true
+                });
+                
+                // Test 3: Connection events
+                socket.on('connect', () => {
+                    log(`✅ Connected successfully! Socket ID: ${socket.id}`);
+                    addResult('Socket Connection', true, `Connected with ID: ${socket.id}`);
+                    updateStatus('Connected to server', 'success');
+                });
+                
+                socket.on('connect_error', (error) => {
+                    log(`❌ Connection error: ${error.message}`);
+                    addResult('Socket Connection', false, `Connection failed: ${error.message}`);
+                    updateStatus('Connection failed', 'error');
+                });
+                
+                socket.on('disconnect', (reason) => {
+                    log(`❌ Disconnected: ${reason}`);
+                    updateStatus('Disconnected', 'warning');
+                });
+                
+                // Test 4: Request to watch stream
+                setTimeout(() => {
+                    if (socket.connected) {
+                        log('📡 Requesting to watch stream...');
+                        socket.emit('watcher', { name: 'Test Viewer' });
+                        addResult('Stream Request', true, 'Request sent successfully');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`);
+                addResult('Socket.IO Test', false, error.message);
+                updateStatus('Test failed', 'error');
+            }
+        });
+        
+        // Test stream events
+        document.getElementById('testStream').addEventListener('click', () => {
+            if (!socket || !socket.connected) {
+                log('❌ Must be connected first');
+                return;
+            }
+            
+            log('🎥 Testing stream events...');
+            
+            // Listen for stream events
+            socket.on('stream-started', () => {
+                log('✅ Received stream-started event');
+                addResult('Stream Events', true, 'Received stream-started event');
+            });
+            
+            socket.on('stream-not-active', () => {
+                log('ℹ️ Received stream-not-active event');
+                addResult('Stream Events', true, 'Received stream-not-active event');
+            });
+            
+            socket.on('stream-stopped', () => {
+                log('ℹ️ Received stream-stopped event');
+                addResult('Stream Events', true, 'Received stream-stopped event');
+            });
+            
+            // Request to watch again
+            socket.emit('watcher', { name: 'Test Viewer' });
+            log('📡 Re-requested to watch stream');
+        });
+        
+        // Clear log
+        document.getElementById('clearLog').addEventListener('click', () => {
+            document.getElementById('log').innerHTML = '';
+            log('🧹 Log cleared');
+        });
+        
+        // Initialize
+        log('🚀 Socket.IO Connection Test initialized');
+        updateStatus('Ready to test', 'info');
+        
+        // Auto-test on load
+        setTimeout(() => {
+            document.getElementById('testConnection').click();
+        }, 1000);
+    </script>
+</body>
+</html>

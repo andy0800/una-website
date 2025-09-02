@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isArabic = userLang.toLowerCase().startsWith('ar');
+      if (isArabic && window.location.pathname.endsWith('about.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'about.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+<link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center;">
+      <a class="logo" href="about.html"><img src="images/logo.png" alt="Logo" /></a>
+
+      <nav class="main-nav" style="margin-left: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="news.html">News</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li id="profileNavItem" style="display: none;">
+           <a href="profile.html">My Profile</a>
+          </li>
+          <li id="liveNavItem" style="display: none;">
+  <a href="livestream.html">Live Stream</a>
+</li>
+        </ul>
+      </nav>
+
+<div class="lang-toggle" style="margin-left:auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <span style="color:#ffcc00;">EN</span> /
+  <a href="../ar/index.html" class="lang-link" lang="ar" hreflang="ar" title="العربية" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">ع</a>
+</div>
+    
+<div class="auth-buttons" id="authButtons">
+  <a href="register.html" id="registerBtn">Register</a>
+  <a href="login.html" id="loginBtn">Login</a>
+  <button id="logoutBtn" style="display: none;">Logout</button>
+</div>
+</div>
+  </header>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileNavItem = document.getElementById('profileNavItem');
+    if (localStorage.getItem('userToken') && profileNavItem) {
+      profileNavItem.style.display = 'inline-block';
+    }
+  });
+</script>
+<script>
+ document.addEventListener('DOMContentLoaded', () => {
+  const profileNavItem = document.getElementById('profileNavItem');
+  const liveNavItem = document.getElementById('liveNavItem');
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  const registerBtn = document.getElementById('registerBtn');
+  const loginBtn = document.getElementById('loginBtn');
+
+  const isLoggedIn = localStorage.getItem('userToken');
+
+  if (isLoggedIn) {
+    if (profileNavItem) profileNavItem.style.display = 'inline-block';
+    if (liveNavItem) liveNavItem.style.display = 'inline-block';
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    if (registerBtn) registerBtn.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'none';
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('userToken');
+      window.location.href = 'index.html';
+    });
+  }
+});
+</script>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <h1>Distinguished Union Institute for Private Training</h1>
+      <p>Your gateway to professional excellence in cybersecurity and international arbitration</p>
+      <a href="courses.html" class="btn btn-primary">Explore Courses</a>
+    </div>
+  </section>
+
+  <!-- About preview -->
+  <section class="about-preview container">
+    <h2>About Us</h2>
+    <p>The Distinguished Union Institute for Private Training is a leading educational institution in Kuwait, licensed by the Public Authority for Applied Education and Training, and accredited by the Civil Service Commission. We provide professional training programs in international arbitration, cybersecurity, and administrative development.</p>
+    <a href="about.html" class="btn btn-secondary">Learn More</a>
+  </section>
+
+  <!-- Location Section -->
+  <section class="location-section container">
+    <h2>📍 Location</h2>
+    <p>Kuwait – East, Block 8, Street 157, Justice Tower, First Floor</p>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section container">
+    <h2>Contact Information</h2>
+    <div class="contact-info">
+      <p>📞 WhatsApp: +965 91108981</p>
+      <p>📱 Instagram: @una_institute</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Distinguished Union Institute for Private Training. All rights reserved.</p>
+      <nav class="footer-nav">
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Use</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('index.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'index.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+</head>
+
+<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
+      <a class="logo" href="index.html"><img src="images/logo.png" alt="شعار المركز" /></a>
+
+      <nav class="main-nav" style="margin-right: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدورات</a></li>
+          <li><a href="news.html">الأخبار</a></li>
+          <li><a href="contact.html">تواصل معنا</a></li>
+          <li id="profileNavItem" style="display: none;">
+             <a href="profile.html">صفحتي الشخصية</a>
+          </li>
+        </ul>
+      </nav>
+
+<div class="lang-toggle" style="margin-right:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <a href="../en/index.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
+  <span style="color:#ffcc00;">ع</span>
+</div>
+    
+<div class="auth-buttons" id="authButtons">
+  <a href="register.html" id="registerBtn">سجل الأن</a>
+  <a href="login.html" id="loginBtn">تسجيل الدخول</a>
+  <button id="logoutBtn" style="display: none;">تسجيل الخروج</button>
+</div>
+</div>
+  </header>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileNavItem = document.getElementById('profileNavItem');
+    if (localStorage.getItem('userToken') && profileNavItem) {
+      profileNavItem.style.display = 'inline-block';
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileNavItem = document.getElementById('profileNavItem');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+
+    const isLoggedIn = localStorage.getItem('userToken');
+
+    if (isLoggedIn) {
+      if (profileNavItem) profileNavItem.style.display = 'inline-block';
+      if (logoutBtn) logoutBtn.style.display = 'inline-block';
+      if (registerBtn) registerBtn.style.display = 'none';
+      if (loginBtn) loginBtn.style.display = 'none';
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('userToken');
+        window.location.href = 'index.html';
+      });
+    }
+  });
+</script>
+
+  <!-- Start Events Area -->
+<section class="events-area ptb-100 bg-fafafb">
+    <div class="container">
+        <div class="section-title">
+            <h2 class="playfair-display">الفعاليات القادمة</h2>
+            <p>نقدم فعاليات ومؤتمرات مميزة بمجال التحكيم والدبلوماسية.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-12">
+                <div class="single-events-box">
+                    <div class="image">
+                        <a href="https://www.egyarbitration.com/event-details/المؤتمر_الرسمى_لحاملى_درجة_الماجستير_و_الدكتوراة_بـــ_شرم_الشيخ" class="d-block">
+                            <img src="https://www.egyarbitration.com/upload/events/1695035063image-02.jpg" alt="image">
+                        </a>
+                    </div>
+                    <div class="content">
+                        <h3 class="playfair-display">
+                            <a href="https://www.egyarbitration.com/event-details/المؤتمر_الرسمى_لحاملى_درجة_الماجستير_و_الدكتوراة_بـــ_شرم_الشيخ">
+                                المؤتمر الرسمى لحاملى درجة الماجستير و الدكتوراة بـــ شرم الشيخ
+                            </a>
+                        </h3>
+                        <span class="location">
+                            <i class="bx bx-map"></i>
+                            المؤتمر الرسمى لحاملى درجة الماجستير و الدكتوراة بـــ شرم الشيخ
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="health-coaching-shape6">
+        <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/health-coaching-shape6.png" alt="image">
+    </div>
+    <div class="health-coaching-shape7">
+        <img src="https://www.egyarbitration.com/frontend/theme1/assets/img/health-coaching/health-coaching-shape7.png" alt="image">
+    </div>
+</section>
+<!-- End Events Area -->
+
+<!-- Start Blog Area -->
+<section class="blog-area bg-image ptb-100">
+    <div class="container">
+        <div class="section-title">
+            <h2 class="playfair-display">أحدث المقالات</h2>
+            <p>أحدث المقالات</p>
+        </div>
+
+        <div class="row">
+            <!-- Blog Post 1 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="single-blog-post-box">
+                    <div class="post-image">
+                        <a href="https://www.egyarbitration.com/blog-details/تحسين_عمليات_التحكيم_التجاري_الدولي_باستخدام_التكنولوجيا_الحديثة" class="d-block">
+                            <img src="https://www.egyarbitration.com/upload/blog/1695125911a35341a307.webp" alt="image">
+                        </a>
+                    </div>
+                    <div class="post-content">
+                        <h3 class="playfair-display">
+                            <a href="https://www.egyarbitration.com/blog-details/تحسين_عمليات_التحكيم_التجاري_الدولي_باستخدام_التكنولوجيا_الحديثة">
+                                تحسين عمليات التحكيم التجاري الدولي باستخدام التكنولوجيا الحديثة
+                            </a>
+                        </h3>
+                        <ul class="post-content-footer d-flex justify-content-between align-items-center">
+                            <li>
+                                <div class="post-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                            </li>
+                            <li><i class='bx bx-calendar'></i> 2017-Sep-13</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Post 2 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="single-blog-post-box">
+                    <div class="post-image">
+                        <a href="https://www.egyarbitration.com/blog-details/دور_الذكاء_الاصطناعي_في_تحسين_عمليات__التحكيم_التجاري_الدولي" class="d-block">
+                            <img src="https://www.egyarbitration.com/upload/blog/1695205765GettyImages-1000963186-286024b9daa04b98bccfc5751e72ca072.jpg" alt="image">
+                        </a>
+                    </div>
+                    <div class="post-content">
+                        <h3 class="playfair-display">
+                            <a href="https://www.egyarbitration.com/blog-details/دور_الذكاء_الاصطناعي_في_تحسين_عمليات__التحكيم_التجاري_الدولي">
+                                دور الذكاء الاصطناعي في تحسين عمليات التحكيم التجاري الدولي
+                            </a>
+                        </h3>
+                        <ul class="post-content-footer d-flex justify-content-between align-items-center">
+                            <li>
+                                <div class="post-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                            </li>
+                            <li><i class='bx bx-calendar'></i> 2015-Jun-09</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Post 3 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="single-blog-post-box">
+                    <div class="post-image">
+                        <a href="https://www.egyarbitration.com/blog-details/تحسين_عمليات_التحكيم_التجاري_الدولي_من_خلال_المنصات_الرقمية" class="d-block">
+                            <img src="https://www.egyarbitration.com/upload/blog/1695212019239554be1c2.jpg" alt="image">
+                        </a>
+                    </div>
+                    <div class="post-content">
+                        <h3 class="playfair-display">
+                            <a href="https://www.egyarbitration.com/blog-details/تحسين_عمليات_التحكيم_التجاري_الدولي_من_خلال_المنصات_الرقمية">
+                                تحسين عمليات التحكيم التجاري الدولي من خلال المنصات الرقمية
+                            </a>
+                        </h3>
+                        <ul class="post-content-footer d-flex justify-content-between align-items-center">
+                            <li>
+                                <div class="post-author d-flex align-items-center">
+                                    <img src="https://www.egyarbitration.com/upload/setting/17327155911695113726international Arbitration logo-ai.webp" class="rounded-circle" alt="image">
+                                    <span>الهيئة الدولية للتحكيم</span>
+                                </div>
+                            </li>
+                            <li><i class='bx bx-calendar'></i> 2014-Apr-02</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Blog Area -->
+
+<!-- Start Footer Area -->
+<footer class="footer-area footer-style-wrap">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Info -->
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="single-footer-widget mb-30">
+                    <h3>اتصل بنا</h3>
+                    <ul class="contact-us-link">
+                        <li><i class='bx bx-map'></i><a>فرع الامارات: برج أسبين - شارع الشيخ زايد - دبي.</a></li>
+                        <li><i class='bx bxl-whatsapp'></i><a href="tel:+971563357115" dir="ltr">+971563357115</a></li>
+                        <li><i class='bx bx-envelope'></i><a href="#"><span>[email&#160;protected]</span></a></li>
+                    </ul>
+                    <ul class="social-link">
+                        <li><a href="https://www.facebook.com/egyiao" class="d-block" target="_blank"><i class='bx bxl-facebook'></i></a></li>
+                        <li><a href="https://x.com/AlhayyatInter" class="d-block" target="_blank"><i class='bx bxl-twitter'></i></a></li>
+                        <li><a href="https://www.instagram.com/egyarbitration/" class="d-block" target="_blank"><i class='bx bxl-instagram'></i></a></li>
+                        <li><a href="https://www.linkedin.com/company/egyarbitration/" class="d-block" target="_blank"><i class='bx bxl-linkedin'></i></a></li>
+                        <li><a href="https://www.youtube.com/channel/UCBbVmoajtsV2fZ87heCKYdQ" class="d-block" target="_blank"><i class='bx bxl-youtube'></i></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Support Links -->
+            <div class="col-lg-2 col-md-6 col-sm-6">
+                <div class="single-footer-widget mb-30">
+                    <h3>الدعم</h3>
+                    <ul class="support-link">
+                        <li><a href="#">سياسة الخصوصية</a></li>
+                        <li><a href="#">الأسئلة الشائعة</a></li>
+                        <li><a href="#">جميع المحاضرين</a></li>
+                        <li><a href="#">اتفاقية الأستخدام</a></li>
+                        <li><a href="#">اتصل بنا</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Programs -->
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="single-footer-widget mb-30">
+                    <h3>برامجنا</h3>
+                    <ul class="useful-link">
+                        <li><a href="#">دبلومة التحكيم التجاري الدولي</a></li>
+                        <li><a href="#">صياغة عقد اتفاق التحكيم وآليه تنفيذه</a></li>
+                        <li><a href="#">دبلومة العلاقات الدبلوماسية والسياسية</a></li>
+                        <li><a href="#">التحكيم في منازعات الاستثمار والعقود التجارية</a></li>
+                        <li><a href="#">القانون الدولي وحقوق الانسان</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="single-footer-widget mb-30">
+                    <h3>النشرة البريدية</h3>
+                    <div class="newsletter-box">
+                        <p>للحصول على آخر الأخبار وآخر التحديثات منا.</p>
+                        <form action="#" method="post">
+                            <input type="email" class="input-newsletter" placeholder="ادخل بريدك الألكتروني هنا" name="email" required>
+                            <button type="submit">اشتراك</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom-area footer-bottom-style-wrap">
+        <div class="container">
+            <div class="logo">
+                <a href="#" class="d-inline-block"><img src="https://www.egyarbitration.com/upload/setting/1695113866international Arbitration logo-ai.svg" alt="image"></a>
+            </div>
+            <p><i class='bx bx-copyright'></i> 2025 الهيئة الدولية للتحكيم |
+                برمجة وتصميم <a href="https://www.faroukgroup.com/ar" target="_blank">Farouk Group</a> |
+                جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+</footer>
+<!-- End Footer Area -->
+
+  <script src="js/animations.js"></script>
+</body>
+</html>

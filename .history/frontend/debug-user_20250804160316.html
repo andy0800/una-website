@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .info { background: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 User Authentication Debug Tool</h1>
+        
+        <div class="section info">
+            <h3>📋 Current Status</h3>
+            <div id="status">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h3>🔑 Token Management</h3>
+            <button onclick="checkToken()">Check Token</button>
+            <button onclick="clearToken()">Clear Token</button>
+            <button onclick="testAPI()">Test API Call</button>
+            <div id="tokenResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>👤 User Info</h3>
+            <button onclick="getUserInfo()">Get User Info</button>
+            <div id="userResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>🎤 Test Mic Request</h3>
+            <button onclick="testMicRequest()">Test Mic Request</button>
+            <div id="micResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check initial status
+        window.addEventListener('load', () => {
+            checkToken();
+        });
+
+        function checkToken() {
+            const token = localStorage.getItem('userToken');
+            const statusDiv = document.getElementById('status');
+            const tokenDiv = document.getElementById('tokenResult');
+            
+            if (token) {
+                statusDiv.innerHTML = '<span style="color: green;">✅ User token found</span>';
+                tokenDiv.innerHTML = `
+                    <div class="success">
+                        <strong>Token found:</strong><br>
+                        <pre>${token.substring(0, 50)}...</pre>
+                    </div>
+                `;
+            } else {
+                statusDiv.innerHTML = '<span style="color: red;">❌ No user token found</span>';
+                tokenDiv.innerHTML = `
+                    <div class="error">
+                        <strong>No token found in localStorage</strong><br>
+                        Please login first to get a token.
+                    </div>
+                `;
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('userToken');
+            checkToken();
+            document.getElementById('userResult').innerHTML = '';
+            document.getElementById('micResult').innerHTML = '';
+        }
+
+        async function testAPI() {
+            const token = localStorage.getItem('userToken');
+            const resultDiv = document.getElementById('userResult');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">No token available</div>';
+                return;
+            }
+
+            try {
+                console.log('Testing API call...');
+                const response = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ API call successful!</strong><br>
+                            <pre>${JSON.stringify(userData, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    const errorData = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <strong>❌ API call failed (${response.status})</strong><br>
+                            <pre>${JSON.stringify(errorData, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Network error</strong><br>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        async function getUserInfo() {
+            await testAPI(); // Reuse the API test function
+        }
+
+        async function testMicRequest() {
+            const token = localStorage.getItem('userToken');
+            const resultDiv = document.getElementById('micResult');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">No token available for mic request</div>';
+                return;
+            }
+
+            try {
+                console.log('Testing mic request...');
+                const response = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Mic request would use:</strong><br>
+                            <strong>Name:</strong> ${userData.name}<br>
+                            <strong>Phone:</strong> ${userData.phone}<br>
+                            <strong>ID:</strong> ${userData._id}
+                        </div>
+                    `;
+                } else {
+                    const errorData = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <strong>❌ Could not get user info for mic request</strong><br>
+                            <pre>${JSON.stringify(errorData, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error during mic request test</strong><br>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

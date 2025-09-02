@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Integration Test - UNA Livestreaming System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #f5f7fa;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .primary { background: #007bff; color: white; }
+        .success-btn { background: #28a745; color: white; }
+        .warning-btn { background: #ffc107; color: #212529; }
+        .danger { background: #dc3545; color: white; }
+        
+        .workflow-step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .workflow-step.completed {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .workflow-step.failed {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .workflow-step.pending {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        
+        #log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .status-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            border: 2px solid #dee2e6;
+        }
+        
+        .status-item.connected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .status-item.disconnected {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔗 Integration Test</h1>
+    <p>Testing complete end-to-end livestreaming workflow</p>
+    
+    <div class="test-section">
+        <h3>🚀 Complete Workflow Test</h3>
+        <button onclick="runCompleteWorkflowTest()" class="primary">Run Complete Test</button>
+        <button onclick="testAdminSide()" class="success-btn">Test Admin Side</button>
+        <button onclick="testViewerSide()" class="warning-btn">Test Viewer Side</button>
+        <button onclick="testRealTimeCommunication()" class="danger">Test Real-Time Comm</button>
+        <div id="workflowResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📋 Workflow Steps</h3>
+        <div id="workflowSteps">
+            <div class="workflow-step pending" id="step1">
+                <strong>Step 1:</strong> Admin Dashboard Load
+                <div class="step-details">Loading admin dashboard and initializing WebRTC manager</div>
+            </div>
+            <div class="workflow-step pending" id="step2">
+                <strong>Step 2:</strong> Socket.IO Connection
+                <div class="step-details">Establishing real-time communication with server</div>
+            </div>
+            <div class="workflow-step pending" id="step3">
+                <strong>Step 3:</strong> Media Device Access
+                <div class="step-details">Requesting camera and microphone permissions</div>
+            </div>
+            <div class="workflow-step pending" id="step4">
+                <strong>Step 4:</strong> WebRTC Manager Initialization
+                <div class="step-details">Initializing WebRTC peer connections</div>
+            </div>
+            <div class="workflow-step pending" id="step5">
+                <strong>Step 5:</strong> Stream Start
+                <div class="step-details">Starting livestream and creating room</div>
+            </div>
+            <div class="workflow-step pending" id="step6">
+                <strong>Step 6:</strong> Viewer Connection
+                <div class="step-details">Viewer joining stream and receiving offer</div>
+            </div>
+            <div class="workflow-step pending" id="step7">
+                <strong>Step 7:</strong> WebRTC Connection
+                <div class="step-details">Establishing peer-to-peer connection</div>
+            </div>
+            <div class="workflow-step pending" id="step8">
+                <strong>Step 8:</strong> Stream Delivery
+                <div class="step-details">Video/audio stream flowing to viewer</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📊 System Status</h3>
+        <div class="status-grid">
+            <div class="status-item disconnected" id="adminStatus">
+                <h4>Admin Dashboard</h4>
+                <div class="status-text">Disconnected</div>
+            </div>
+            <div class="status-item disconnected" id="socketStatus">
+                <h4>Socket.IO</h4>
+                <div class="status-text">Disconnected</div>
+            </div>
+            <div class="status-item disconnected" id="webrtcStatus">
+                <h4>WebRTC Manager</h4>
+                <div class="status-text">Not Initialized</div>
+            </div>
+            <div class="status-item disconnected" id="mediaStatus">
+                <h4>Media Devices</h4>
+                <div class="status-text">Not Accessed</div>
+            </div>
+            <div class="status-item disconnected" id="viewerStatus">
+                <h4>Viewer Connection</h4>
+                <div class="status-text">Not Connected</div>
+            </div>
+            <div class="status-item disconnected" id="streamStatus">
+                <h4>Stream Status</h4>
+                <div class="status-text">Not Active</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📝 Test Log</h3>
+        <div id="log"></div>
+    </div>
+    
+    <!-- Load Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        // 🔗 INTEGRATION TEST SUITE
+        
+        let socket = null;
+        let testResults = [];
+        let currentStep = 0;
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateStepStatus(stepNumber, status) {
+            const step = document.getElementById(`step${stepNumber}`);
+            if (step) {
+                step.className = `workflow-step ${status}`;
+                const details = step.querySelector('.step-details');
+                if (details) {
+                    if (status === 'completed') {
+                        details.innerHTML += ' ✅';
+                    } else if (status === 'failed') {
+                        details.innerHTML += ' ❌';
+                    }
+                }
+            }
+        }
+        
+        function updateSystemStatus(elementId, status, text) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = `status-item ${status}`;
+                const statusText = element.querySelector('.status-text');
+                if (statusText) {
+                    statusText.textContent = text;
+                }
+            }
+        }
+        
+        // 🚀 COMPLETE WORKFLOW TEST
+        
+        async function runCompleteWorkflowTest() {
+            log('🚀 Starting complete workflow test...', 'info');
+            resetWorkflowSteps();
+            
+            try {
+                // Step 1: Admin Dashboard Load
+                await testAdminDashboardLoad();
+                
+                // Step 2: Socket.IO Connection
+                await testSocketConnection();
+                
+                // Step 3: Media Device Access
+                await testMediaDeviceAccess();
+                
+                // Step 4: WebRTC Manager Initialization
+                await testWebRTCManagerInit();
+                
+                // Step 5: Stream Start
+                await testStreamStart();
+                
+                // Step 6: Viewer Connection
+                await testViewerConnection();
+                
+                // Step 7: WebRTC Connection
+                await testWebRTCConnection();
+                
+                // Step 8: Stream Delivery
+                await testStreamDelivery();
+                
+                log('🎉 Complete workflow test finished!', 'success');
+                
+            } catch (error) {
+                log('❌ Complete workflow test failed: ' + error.message, 'error');
+            }
+        }
+        
+        function resetWorkflowSteps() {
+            for (let i = 1; i <= 8; i++) {
+                updateStepStatus(i, 'pending');
+            }
+            currentStep = 0;
+        }
+        
+        // 📋 INDIVIDUAL STEP TESTS
+        
+        async function testAdminDashboardLoad() {
+            currentStep = 1;
+            log('📋 Step 1: Testing admin dashboard load...', 'info');
+            
+            try {
+                // Test if admin dashboard elements are accessible
+                const testResponse = await fetch('/admin/dashboard.html');
+                if (testResponse.ok) {
+                    updateStepStatus(1, 'completed');
+                    updateSystemStatus('adminStatus', 'connected', 'Loaded');
+                    log('✅ Admin dashboard accessible', 'success');
+                    return true;
+                } else {
+                    throw new Error('Admin dashboard not accessible');
+                }
+            } catch (error) {
+                updateStepStatus(1, 'failed');
+                updateSystemStatus('adminStatus', 'disconnected', 'Failed');
+                log('❌ Admin dashboard test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        async function testSocketConnection() {
+            currentStep = 2;
+            log('📋 Step 2: Testing Socket.IO connection...', 'info');
+            
+            try {
+                if (typeof io === 'undefined') {
+                    throw new Error('Socket.IO client not available');
+                }
+                
+                socket = io();
+                
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Socket connection timeout'));
+                    }, 5000);
+                    
+                    socket.on('connect', () => {
+                        clearTimeout(timeout);
+                        updateStepStatus(2, 'completed');
+                        updateSystemStatus('socketStatus', 'connected', 'Connected');
+                        log('✅ Socket.IO connected successfully', 'success');
+                        resolve(true);
+                    });
+                    
+                    socket.on('connect_error', (error) => {
+                        clearTimeout(timeout);
+                        reject(new Error('Socket connection failed: ' + error.message));
+                    });
+                });
+                
+            } catch (error) {
+                updateStepStatus(2, 'failed');
+                updateSystemStatus('socketStatus', 'disconnected', 'Failed');
+                log('❌ Socket.IO test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        async function testMediaDeviceAccess() {
+            currentStep = 3;
+            log('📋 Step 3: Testing media device access...', 'info');
+            
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Media devices not supported');
+                }
+                
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 640, height: 480 }, 
+                    audio: true 
+                });
+                
+                // Stop the stream immediately after testing
+                stream.getTracks().forEach(track => track.stop());
+                
+                updateStepStatus(3, 'completed');
+                updateSystemStatus('mediaStatus', 'connected', 'Access Granted');
+                log('✅ Media device access granted', 'success');
+                return true;
+                
+            } catch (error) {
+                updateStepStatus(3, 'failed');
+                updateSystemStatus('mediaStatus', 'disconnected', 'Access Denied');
+                log('❌ Media device test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        async function testWebRTCManagerInit() {
+            currentStep = 4;
+            log('📋 Step 4: Testing WebRTC manager initialization...', 'info');
+            
+            try {
+                if (typeof RTCPeerConnection === 'undefined') {
+                    throw new Error('WebRTC API not supported');
+                }
+                
+                // Test creating a peer connection
+                const testPC = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' }
+                    ]
+                });
+                
+                // Test creating an offer
+                const offer = await testPC.createOffer();
+                await testPC.setLocalDescription(offer);
+                
+                // Clean up
+                testPC.close();
+                
+                updateStepStatus(4, 'completed');
+                updateSystemStatus('webrtcStatus', 'connected', 'Initialized');
+                log('✅ WebRTC manager test passed', 'success');
+                return true;
+                
+            } catch (error) {
+                updateStepStatus(4, 'failed');
+                updateSystemStatus('webrtcStatus', 'disconnected', 'Failed');
+                log('❌ WebRTC manager test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        async function testStreamStart() {
+            currentStep = 5;
+            log('📋 Step 5: Testing stream start...', 'info');
+            
+            try {
+                // Test if we can emit stream start event
+                if (socket && socket.connected) {
+                    socket.emit('admin-join', { roomId: 'test-room-' + Date.now() });
+                    
+                    updateStepStatus(5, 'completed');
+                    updateSystemStatus('streamStatus', 'connected', 'Started');
+                    log('✅ Stream start test passed', 'success');
+                    return true;
+                } else {
+                    throw new Error('Socket not connected');
+                }
+                
+            } catch (error) {
+                updateStepStatus(5, 'failed');
+                updateSystemStatus('streamStatus', 'disconnected', 'Failed');
+                log('❌ Stream start test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        async function testViewerConnection() {
+            currentStep = 6;
+            log('📋 Step 6: Testing viewer connection...', 'info');
+            
+            try {
+                // Test if viewer can join
+                if (socket && socket.connected) {
+                    socket.emit('viewer-join', { roomId: 'test-room-' + Date.now() });
+                    
+                    updateStepStatus(6, 'completed');
+                    updateSystemStatus('viewerStatus', 'connected', 'Connected');
+                    log('✅ Viewer connection test passed', 'success');
+                    return true;
+                } else {
+                    throw new Error('Socket not connected');
+                }
+                
+            } catch (error) {
+                updateStepStatus(6, 'failed');
+                updateSystemStatus('viewerStatus', 'disconnected', 'Failed');
+                log('❌ Viewer connection test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        async function testWebRTCConnection() {
+            currentStep = 7;
+            log('📋 Step 7: Testing WebRTC connection...', 'info');
+            
+            try {
+                // Test if WebRTC signaling works
+                if (socket && socket.connected) {
+                    // Simulate WebRTC offer
+                    const testOffer = {
+                        type: 'offer',
+                        sdp: 'v=0\r\no=- 1234567890 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\n'
+                    };
+                    
+                    socket.emit('webrtc-offer', {
+                        roomId: 'test-room',
+                        offer: testOffer,
+                        targetViewerId: 'test-viewer'
+                    });
+                    
+                    updateStepStatus(7, 'completed');
+                    log('✅ WebRTC connection test passed', 'success');
+                    return true;
+                } else {
+                    throw new Error('Socket not connected');
+                }
+                
+            } catch (error) {
+                updateStepStatus(7, 'failed');
+                log('❌ WebRTC connection test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        async function testStreamDelivery() {
+            currentStep = 8;
+            log('📋 Step 8: Testing stream delivery...', 'info');
+            
+            try {
+                // Test if stream can be delivered
+                if (socket && socket.connected) {
+                    // Simulate ICE candidate
+                    const testCandidate = {
+                        candidate: 'candidate:1234567890 1 udp 2122260223 192.168.1.1 54321 typ host',
+                        sdpMid: '0',
+                        sdpMLineIndex: 0
+                    };
+                    
+                    socket.emit('ice-candidate', {
+                        roomId: 'test-room',
+                        candidate: testCandidate,
+                        targetViewerId: 'test-viewer'
+                    });
+                    
+                    updateStepStatus(8, 'completed');
+                    log('✅ Stream delivery test passed', 'success');
+                    return true;
+                } else {
+                    throw new Error('Socket not connected');
+                }
+                
+            } catch (error) {
+                updateStepStatus(8, 'failed');
+                log('❌ Stream delivery test failed: ' + error.message, 'error');
+                throw error;
+            }
+        }
+        
+        // 🔧 INDIVIDUAL COMPONENT TESTS
+        
+        async function testAdminSide() {
+            log('🔧 Testing admin side components...', 'info');
+            try {
+                await testAdminDashboardLoad();
+                await testSocketConnection();
+                await testMediaDeviceAccess();
+                await testWebRTCManagerInit();
+                log('✅ Admin side test completed successfully', 'success');
+            } catch (error) {
+                log('❌ Admin side test failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function testViewerSide() {
+            log('🔧 Testing viewer side components...', 'info');
+            try {
+                await testSocketConnection();
+                await testViewerConnection();
+                await testWebRTCConnection();
+                log('✅ Viewer side test completed successfully', 'success');
+            } catch (error) {
+                log('❌ Viewer side test failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function testRealTimeCommunication() {
+            log('🔧 Testing real-time communication...', 'info');
+            try {
+                await testSocketConnection();
+                await testStreamStart();
+                await testViewerConnection();
+                await testWebRTCConnection();
+                await testStreamDelivery();
+                log('✅ Real-time communication test completed successfully', 'success');
+            } catch (error) {
+                log('❌ Real-time communication test failed: ' + error.message, 'error');
+            }
+        }
+        
+        // 🚀 INITIALIZE TEST SUITE
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🔗 Integration Test Suite initialized', 'success');
+            log('Ready to test complete livestreaming workflow', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('index.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'index.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
+      <a class="logo" href="index.html"><img src="images/logo.png" alt="شعار المعهد" /></a>
+
+      <nav class="main-nav" style="margin-right: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدورات</a></li>
+          <li><a href="news.html">الأخبار</a></li>
+          <li><a href="contact.html">تواصل معنا</a></li>
+          <li id="profileNavItem" style="display: none;">
+             <a href="profile.html">صفحتي الشخصية</a>
+          </li>
+                  <li id="liveNavItem" style="display: none;">
+    <a href="livestream.html">البث المباشر</a>
+  </li>
+        </ul>
+      </nav>
+
+<div class="lang-toggle" style="margin-right:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
+  <a href="../en/index.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
+  <span style="color:#ffcc00;">ع</span>
+</div>
+    
+<div class="auth-buttons" id="authButtons">
+  <a href="register.html" id="registerBtn">سجل الأن</a>
+  <a href="login.html" id="loginBtn">تسجيل الدخول</a>
+  <button id="logoutBtn" style="display: none;">تسجيل الخروج</button>
+</div>
+</div>
+  </header>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileNavItem = document.getElementById('profileNavItem');
+    if (localStorage.getItem('userToken') && profileNavItem) {
+      profileNavItem.style.display = 'inline-block';
+    }
+  });
+</script>
+<script>
+ document.addEventListener('DOMContentLoaded', () => {
+  const profileNavItem = document.getElementById('profileNavItem');
+  const liveNavItem = document.getElementById('liveNavItem');
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  const registerBtn = document.getElementById('registerBtn');
+  const loginBtn = document.getElementById('loginBtn');
+
+  const isLoggedIn = localStorage.getItem('userToken');
+
+  if (isLoggedIn) {
+    if (profileNavItem) profileNavItem.style.display = 'inline-block';
+    if (liveNavItem) liveNavItem.style.display = 'inline-block';
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    if (registerBtn) registerBtn.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'none';
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('userToken');
+      window.location.href = 'index.html';
+    });
+  }
+});
+</script>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <h1>معهد الاتحاد المميز للتدريب الأهلي</h1>
+      <p>بوابتك للتميز المهني في الأمن السيبراني والتحكيم الدولي</p>
+      <a href="courses.html" class="btn btn-primary">استكشف الدورات</a>
+    </div>
+  </section>
+
+  <!-- About preview -->
+  <section class="about-preview container">
+    <h2>من نحن</h2>
+    <p>معهد الاتحاد المميز للتدريب الأهلي هو مؤسسة تعليمية رائدة في مجال التدريب الاحترافي بالكويت، معتمدة من الجهات الرسمية المحلية والدولية، وتعمل على تزويد المتدربين بالمهارات العملية والشهادات المعتمدة التي تؤهلهم لدخول سوق العمل بثقة وكفاءة.</p>
+    <a href="about.html" class="btn btn-secondary">اعرف المزيد</a>
+  </section>
+
+  <!-- Location Section -->
+  <section class="location-section container">
+    <h2>📍 الموقع</h2>
+    <p>الكويت – شرق، قطعة 8، شارع 157، برج العدالة، الدور الأول</p>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section container">
+    <h2>معلومات التواصل</h2>
+    <div class="contact-info">
+      <p>📞 واتساب: +965 91108981</p>
+      <p>📱 إنستغرام: @una_institute</p>
+    </div>
+  </section>
+
+  <!-- Qualifications Section -->
+  <section class="qualifications-section container">
+    <h2>المؤهلات والاعتمادات</h2>
+    <ul>
+      <li>ترخيص رسمي من الهيئة العامة للتعليم التطبيقي والتدريب</li>
+      <li>اعتماد من ديوان الخدمة المدنية بدولة الكويت</li>
+      <li>شراكة واعتماد من AUPS Digital University وجهات أكاديمية ومهنية متعددة</li>
+      <li>شهادات مهنية معتمدة محليًا ودوليًا</li>
+    </ul>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 معهد الاتحاد المميز للتدريب الأهلي. جميع الحقوق محفوظة.</p>
+      <nav class="footer-nav">
+        <ul>
+          <li><a href="privacy.html">سياسة الخصوصية</a></li>
+          <li><a href="terms.html">شروط الاستخدام</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+// backend/routes/agoraRoutes.js
+// Agora.io token generation routes
+
+const express = require('express');
+const router = express.Router();
+const crypto = require('crypto');
+
+// Agora.io App ID and App Certificate (you need to get these from Agora Console)
+const AGORA_APP_ID = '05cadaa553c44f7a8d73ee303c4c0156';
+const AGORA_APP_CERTIFICATE = 'YOUR_APP_CERTIFICATE_HERE'; // You need to get this from Agora Console
+
+// Generate Agora.io token
+function generateToken(uid, channelName, privilegeExpiredTs = 3600) {
+    const appID = AGORA_APP_ID;
+    const appCertificate = AGORA_APP_CERTIFICATE;
+    
+    if (!appCertificate) {
+        throw new Error('Agora App Certificate not configured');
+    }
+    
+    const role = 1; // 1: Publisher, 2: Subscriber
+    
+    const timestamp = Math.floor(Date.now() / 1000);
+    const randomInt = Math.floor(Math.random() * 0xFFFFFFFF);
+    
+    const message = Buffer.alloc(20);
+    message.writeUInt32LE(timestamp, 0);
+    message.writeUInt32LE(randomInt, 4);
+    message.writeUInt32LE(uid, 8);
+    message.writeUInt32LE(privilegeExpiredTs, 12);
+    message.writeUInt32LE(role, 16);
+    
+    const key = Buffer.from(appCertificate, 'utf8');
+    const sign = crypto.createHmac('sha256', key).update(message).digest();
+    
+    const token = Buffer.alloc(32);
+    sign.copy(token, 0, 0, 32);
+    message.copy(token, 32, 0, 20);
+    
+    return token.toString('base64');
+}
+
+// Get token for a channel
+router.get('/token/:channel/:uid', (req, res) => {
+    try {
+        const { channel, uid } = req.params;
+        const token = generateToken(parseInt(uid), channel);
+        
+        res.json({
+            success: true,
+            token: token,
+            appId: AGORA_APP_ID,
+            channel: channel,
+            uid: parseInt(uid)
+        });
+    } catch (error) {
+        console.error('❌ Token generation failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Get token for current user
+router.post('/token', (req, res) => {
+    try {
+        const { channel, uid } = req.body;
+        
+        if (!channel || !uid) {
+            return res.status(400).json({
+                success: false,
+                error: 'Channel and UID are required'
+            });
+        }
+        
+        const token = generateToken(parseInt(uid), channel);
+        
+        res.json({
+            success: true,
+            token: token,
+            appId: AGORA_APP_ID,
+            channel: channel,
+            uid: parseInt(uid)
+        });
+    } catch (error) {
+        console.error('❌ Token generation failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+module.exports = router;

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>من نحن - معهد الاتحاد المميز للتدريب الأهلي</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+<body class="arabic">
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <img src="../images/logo.png" alt="شعار معهد الاتحاد المميز" />
+          <span class="logo-text">معهد الاتحاد</span>
+        </a>
+
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html" class="active">من نحن</a></li>
+            <li><a href="courses.html">الدورات</a></li>
+            <li><a href="news.html">الأخبار</a></li>
+            <li><a href="contact.html">اتصل بنا</a></li>
+            <li id="profileNavItem" style="display: none;">
+              <a href="profile.html">ملفي الشخصي</a>
+            </li>
+            <li id="liveNavItem" style="display: none;">
+              <a href="livestream.html">البث المباشر</a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Hamburger Menu Button -->
+        <button class="hamburger-menu" id="hamburgerMenu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="lang-toggle">
+          <a href="../en/about.html" class="lang-link" lang="en" hreflang="en" title="English">EN</a> /
+          <span style="color:var(--accent-gold);">ع</span>
+        </div>
+        
+        <div class="auth-buttons" id="authButtons">
+          <a href="register.html" id="registerBtn">تسجيل</a>
+          <a href="login.html" id="loginBtn">دخول</a>
+          <button id="logoutBtn" style="display: none;">تسجيل خروج</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" id="mobileNavClose">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="mobile-nav-content">
+      <ul>
+        <li><a href="index.html">الرئيسية</a></li>
+        <li><a href="about.html" class="active">من نحن</a></li>
+        <li><a href="courses.html">الدورات</a></li>
+        <li><a href="news.html">الأخبار</a></li>
+        <li><a href="contact.html">اتصل بنا</a></li>
+        <li id="mobileProfileNavItem" style="display: none;">
+          <a href="profile.html">ملفي الشخصي</a>
+        </li>
+        <li id="mobileLiveNavItem" style="display: none;">
+          <a href="livestream.html">البث المباشر</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">من نحن - معهد الاتحاد المميز</h1>
+        <p class="hero-subtitle">التميز في التدريب المهني - مرخص من الهيئة العامة للتعليم التطبيقي والتدريب، معتمد من ديوان الخدمة المدنية، شريك مع الجامعة الأمريكية للدراسات المهنية</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Content Section -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-2">
+        <div>
+          <h2>من نحن</h2>
+          <p>معهد الاتحاد المميز للتدريب الأهلي هو مؤسسة تعليمية رائدة في الكويت، مرخص رسمياً من الهيئة العامة للتعليم التطبيقي والتدريب، معتمد من ديوان الخدمة المدنية، وشريك مع الجامعة الأمريكية للدراسات المهنية.</p>
+          <p>نتخصص في تقديم برامج تدريب مهني عالية الجودة تجمع بين المعرفة النظرية والتطبيق العملي، مما يضمن للمتدربين اكتساب خبرة مهنية يمكن تطبيقها مباشرة في بيئة العمل.</p>
+          
+          <h3>رؤيتنا</h3>
+          <p>أن نكون المعهد التدريبي الرائد في الكويت والمنطقة، ونقدم تعليماً مهنياً عالمياً يمكّن الأفراد والمؤسسات من تحقيق التميز في مجالاتهم المختلفة.</p>
+          
+          <h3>مهمتنا</h3>
+          <p>تقديم برامج تدريبية شاملة ومبتكرة وعملية تلبي المعايير الدولية، وتمكّن متدربينا من تطوير المهارات والمعرفة اللازمة للنجاح المهني والتطور الوظيفي.</p>
+        </div>
+        
+        <div class="contact-info">
+          <h3>معلومات المعهد</h3>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+              <strong>الموقع:</strong><br>
+              الكويت – شرق، قطعة 8، شارع 157،<br>
+              برج العدالة، الدور الأول
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div>
+              <strong>واتساب:</strong><br>
+              +965 91108981
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <div>
+              <strong>إنستغرام:</strong><br>
+              @una_institute
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Qualifications Section -->
+  <section class="section bg-secondary">
+    <div class="container">
+      <h2 class="section-title">المؤهلات والاعتمادات</h2>
+      <p class="section-subtitle">تراخيصنا الرسمية وشراكاتنا تضمن أعلى جودة في التدريب</p>
+      
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <h3 class="card-title">ترخيص الهيئة العامة</h3>
+          <p class="card-text">ترخيص رسمي من الهيئة العامة للتعليم التطبيقي والتدريب، مما يضمن الامتثال لمعايير الكويت التعليمية.</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-award"></i>
+          </div>
+          <h3 class="card-title">ديوان الخدمة المدنية</h3>
+          <p class="card-text">اعتماد من ديوان الخدمة المدنية، مما يثبت صحة برامجنا التدريبية لمتطلبات القطاع الحكومي.</p>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-university"></i>
+          </div>
+          <h3 class="card-title">الجامعة الأمريكية للدراسات المهنية</h3>
+          <p class="card-text">شراكة واعتماد من الجامعة الأمريكية للدراسات المهنية، مما يوفر اعترافاً أكاديمياً دولياً.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Training Programs Section -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">برامجنا التدريبية</h2>
+      <p class="section-subtitle">دورات شاملة مصممة لتطوير مسيرتك المهنية</p>
+      
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="card-title">دبلوم الأمن السيبراني</h3>
+          <p class="card-text">تدريب شامل في الأمن السيبراني يشمل الاختراق الأخلاقي وأمن الشبكات والتحليل الجنائي الرقمي واستراتيجيات الدفاع السيبراني. برنامجنا يعد المحترفين للتحديات المتطورة في الأمن الرقمي.</p>
+          <div class="mt-3">
+            <span class="course-duration">3 أشهر</span>
+            <span class="course-level">مهني</span>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-icon">
+            <i class="fas fa-balance-scale"></i>
+          </div>
+          <h3 class="card-title">التحكيم التجاري الدولي</h3>
+          <p class="card-text">تدريب متخصص في التحكيم التجاري الدولي، يشمل حل النزاعات والأطر القانونية وإجراءات التحكيم العملية. مصمم للمحترفين القانونيين والمديرين التنفيذيين.</p>
+          <div class="mt-3">
+            <span class="course-duration">12 شهر</span>
+            <span class="course-level">متقدم</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>معهد الاتحاد المميز للتدريب الأهلي</h3>
+          <p>التميز في التدريب المهني مع اعتمادات رسمية وشراكات دولية.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3>روابط سريعة</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="courses.html">برامج التدريب</a></li>
+            <li><a href="news.html">الأخبار والتحديثات</a></li>
+            <li><a href="contact.html">اتصل بنا</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>الاعتمادات</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li>مرخص من الهيئة العامة</li>
+            <li>ديوان الخدمة المدنية</li>
+            <li>الجامعة الأمريكية للدراسات المهنية</li>
+            <li>معايير دولية</li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>معلومات التواصل</h3>
+          <p><i class="fas fa-map-marker-alt"></i> الكويت – شرق، قطعة 8، شارع 157، برج العدالة، الدور الأول</p>
+          <p><i class="fab fa-whatsapp"></i> +965 91108981</p>
+          <p><i class="fab fa-instagram"></i> @una_institute</p>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 معهد الاتحاد المميز للتدريب الأهلي. جميع الحقوق محفوظة.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Authentication check
+    document.addEventListener('DOMContentLoaded', () => {
+      const profileNavItem = document.getElementById('profileNavItem');
+      const liveNavItem = document.getElementById('liveNavItem');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const registerBtn = document.getElementById('registerBtn');
+      const loginBtn = document.getElementById('loginBtn');
+
+      const isLoggedIn = localStorage.getItem('userToken');
+
+      if (isLoggedIn) {
+        if (profileNavItem) profileNavItem.style.display = 'inline-block';
+        if (liveNavItem) liveNavItem.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        if (registerBtn) registerBtn.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'none';
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('userToken');
+          window.location.href = 'index.html';
+        });
+      }
+    });
+  </script>
+</body>
+</html>

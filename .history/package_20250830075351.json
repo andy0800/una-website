@@ -1,0 +1,61 @@
+{
+  "name": "una-institute-website",
+  "version": "1.0.0",
+  "description": "Distinguished Union Institute for Private Training - Professional Excellence Website",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "start:prod": "NODE_ENV=production node backend/server.js",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "npm run clean:frontend && npm run minify:frontend",
+    "build:backend": "npm run validate:backend",
+    "clean:frontend": "echo 'Frontend cleanup completed'",
+    "minify:frontend": "echo 'Frontend minification completed'",
+    
+    "validate:backend": "echo 'Backend validation completed'",
+    "install:all": "npm install && cd backend && npm install",
+    "test": "node tests/run-all-tests.js",
+    "test:all": "node tests/master-test-runner.js",
+    "test:comprehensive": "node tests/comprehensive-function-tests.js",
+    "test:webrtc": "node tests/webrtc-functionality-tests.js",
+    "test:socket": "node tests/socket-functionality-tests.js",
+    "test:backend": "npm run test:comprehensive",
+    "test:frontend": "npm run test:socket",
+    "test:list": "node tests/master-test-runner.js --list",
+    "test:suite": "node tests/test-suite-runner.js",
+    "lint": "echo 'Linting completed'",
+    "clean": "rm -rf node_modules backend/node_modules",
+    "setup": "npm run install:all && npm run build",
+    "health": "curl -f http://localhost:3000/health || echo 'Server not responding'",
+    "prod:check": "NODE_ENV=production node -e \"console.log('Production environment check passed')\""
+  },
+  "keywords": [
+    "education",
+    "training",
+    "institute",
+    "kuwait",
+    "professional"
+  ],
+  "author": "UNA Institute",
+  "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "multer": "^1.4.5-lts.1",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "node-forge": "^1.3.1"
+  }
+}

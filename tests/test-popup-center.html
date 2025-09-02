@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Centered Popup</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        /* Popup styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 450px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .popup-overlay.show .popup-content {
+            transform: scale(1);
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .popup-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.4em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #333;
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        .viewer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .viewer-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .viewer-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .mic-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .mic-icon {
+            font-size: 18px;
+        }
+
+        .mic-muted {
+            color: #dc3545;
+        }
+
+        .mic-unmuted {
+            color: #28a745;
+        }
+
+        .success { color: green; font-weight: bold; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎯 Test Centered Popup</h1>
+        <p>This page tests the centered popup functionality with smooth animations.</p>
+        
+        <div style="margin: 20px 0;">
+            <button class="test-button" onclick="testPopup()">🎥 Test Viewer Popup</button>
+            <button class="test-button" onclick="testWithData()">👥 Test with Sample Data</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <h3>📋 Test Instructions:</h3>
+            <ul>
+                <li>Click "Test Viewer Popup" to see an empty popup</li>
+                <li>Click "Test with Sample Data" to see popup with mock viewers</li>
+                <li>Try closing with the X button, clicking outside, or pressing Escape</li>
+                <li>Verify the popup is perfectly centered on screen</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Test Popup -->
+    <div id="testPopup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3>👥 Live Viewers</h3>
+                <button class="close-btn" onclick="hidePopup()">&times;</button>
+            </div>
+            <div class="viewers-list" id="viewersList">
+                <p>No viewers currently watching</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function testPopup() {
+            const popup = document.getElementById('testPopup');
+            const viewersList = document.getElementById('viewersList');
+            
+            viewersList.innerHTML = '<p>No viewers currently watching</p>';
+            
+            // Show popup with smooth animation
+            popup.style.display = 'flex';
+            setTimeout(() => {
+                popup.classList.add('show');
+            }, 10);
+            
+            log('✅ Popup opened - check if it\'s centered', 'success');
+        }
+
+        function testWithData() {
+            const popup = document.getElementById('testPopup');
+            const viewersList = document.getElementById('viewersList');
+            
+            // Mock viewer data
+            const mockViewers = [
+                { name: 'Andrew', hasMic: true },
+                { name: 'Sarah', hasMic: false },
+                { name: 'John', hasMic: true },
+                { name: 'Emma', hasMic: false },
+                { name: 'Michael', hasMic: true }
+            ];
+            
+            let html = '';
+            mockViewers.forEach(viewer => {
+                const micIcon = viewer.hasMic ? 
+                    '<span class="mic-icon mic-unmuted">🎤</span>' : 
+                    '<span class="mic-icon mic-muted">🔇</span>';
+                
+                html += `
+                    <div class="viewer-item">
+                        <span class="viewer-name">${viewer.name}</span>
+                        <div class="mic-status">
+                            ${micIcon}
+                            <span>${viewer.hasMic ? 'Unmuted' : 'Muted'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            viewersList.innerHTML = html;
+            
+            // Show popup with smooth animation
+            popup.style.display = 'flex';
+            setTimeout(() => {
+                popup.classList.add('show');
+            }, 10);
+            
+            log('✅ Popup opened with sample data', 'success');
+        }
+
+        function hidePopup() {
+            const popup = document.getElementById('testPopup');
+            
+            // Hide popup with smooth animation
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+            
+            log('✅ Popup closed', 'success');
+        }
+
+        // Close popup when clicking outside
+        document.addEventListener('click', (e) => {
+            const popup = document.getElementById('testPopup');
+            if (e.target === popup) {
+                hidePopup();
+            }
+        });
+
+        // Close popup with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const popup = document.getElementById('testPopup');
+                if (popup.style.display === 'flex') {
+                    hidePopup();
+                }
+            }
+        });
+
+        // Auto-log on page load
+        window.onload = function() {
+            log('🚀 Test page loaded - popup should be perfectly centered', 'info');
+        };
+    </script>
+</body>
+</html> 

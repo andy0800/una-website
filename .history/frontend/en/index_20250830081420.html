@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distinguished Union Institute for Private Training - Professional Excellence</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+<body>
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = 'header.html'; // Path to the English header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Distinguished Union Institute</h1>
+        <p class="hero-subtitle">Excellence in Professional Training - Licensed by PAAET, Accredited by Civil Service Commission, Partnered with AUPS Digital University</p>
+        <div class="hero-buttons">
+          <a href="courses.html" class="btn btn-primary">
+            <i class="fas fa-graduation-cap"></i>
+            Explore Courses
+          </a>
+          <a href="about.html" class="btn btn-secondary">
+            <i class="fas fa-info-circle"></i>
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banner/Slideshow Section -->
+  <section class="banner-section">
+    <div class="container">
+      <div class="banner-slider">
+        <div class="banner-slide banner-slide-1 active">
+          <div class="banner-content">
+            <h2 class="banner-title">Professional Training Excellence</h2>
+            <p class="banner-text">Comprehensive training programs designed to enhance your professional skills and career advancement</p>
+            <a href="courses.html" class="btn btn-primary">View Programs</a>
+          </div>
+        </div>
+        <div class="banner-slide banner-slide-2">
+          <div class="banner-content">
+            <h2 class="banner-title">International Arbitration Expertise</h2>
+            <p class="banner-text">Specialized courses in commercial arbitration from beginner to doctorate levels</p>
+            <a href="courses.html" class="btn btn-primary">Learn More</a>
+          </div>
+        </div>
+        <div class="banner-slide banner-slide-3">
+          <div class="banner-content">
+            <h2 class="banner-title">Cybersecurity & Digital Innovation</h2>
+            <p class="banner-text">Cutting-edge cybersecurity training with ethical hacking and digital protection</p>
+            <a href="courses.html" class="btn btn-primary">Explore Courses</a>
+          </div>
+        </div>
+        <div class="banner-nav">
+          <div class="banner-dot active" data-slide="0"></div>
+          <div class="banner-dot" data-slide="1"></div>
+          <div class="banner-dot" data-slide="2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section features-section">
+    <div class="container">
+      <h2 class="section-title">Why Choose UNA Institute?</h2>
+      <p class="section-subtitle">We provide world-class training with official accreditations and professional excellence</p>
+      
+      <div class="grid grid-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <h3>Official Accreditation</h3>
+          <p>Licensed by PAAET, accredited by Civil Service Commission, and partnered with AUPS Digital University</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Expert Instructors</h3>
+          <p>Learn from industry professionals with years of experience in arbitration, cybersecurity, and training</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-globe"></i>
+          </div>
+          <h3>International Standards</h3>
+          <p>Our programs meet international standards and prepare you for global professional opportunities</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Courses Preview Section -->
+  <section class="section courses-section">
+    <div class="container">
+      <h2 class="section-title">Featured Training Programs</h2>
+      <p class="section-subtitle">Comprehensive courses designed to advance your professional career</p>
+      
+      <div class="grid grid-3">
+        <div class="course-card">
+          <div class="course-image">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="course-content">
+            <h3 class="course-title">Cybersecurity Diploma</h3>
+            <p class="course-description">Comprehensive cybersecurity training covering ethical hacking, network security, and digital protection.</p>
+            <div class="course-meta">
+              <span class="course-duration">3 Months</span>
+              <span class="course-level">Professional</span>
+            </div>
+            <a href="courses.html" class="btn btn-primary">Learn More</a>
+          </div>
+        </div>
+        
+        <div class="course-card">
+          <div class="course-image">
+            <i class="fas fa-balance-scale"></i>
+          </div>
+          <div class="course-content">
+            <h3 class="course-title">Commercial Arbitration Diploma</h3>
+            <p class="course-description">Specialized training in international commercial arbitration and dispute resolution.</p>
+            <div class="course-meta">
+              <span class="course-duration">12 Months</span>
+              <span class="course-level">Advanced</span>
+            </div>
+            <a href="courses.html" class="btn btn-primary">Learn More</a>
+          </div>
+        </div>
+        
+        <div class="course-card">
+          <div class="course-image">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="course-content">
+            <h3 class="course-title">Administrative Development</h3>
+            <p class="course-description">Professional development programs for administrative and management excellence.</p>
+            <div class="course-meta">
+              <span class="course-duration">6 Months</span>
+              <span class="course-level">Intermediate</span>
+            </div>
+            <a href="courses.html" class="btn btn-primary">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Preview Section -->
+  <section class="section bg-secondary">
+    <div class="container">
+      <div class="grid grid-2">
+        <div>
+          <h2>About Distinguished Union Institute</h2>
+          <p>We are a leading private training institute in Kuwait, officially licensed by the Public Authority for Applied Education and Training (PAAET), accredited by the Civil Service Commission, and partnered with AUPS Digital University.</p>
+          <p>Our mission is to provide high-quality professional training that combines theoretical knowledge with practical application, ensuring our trainees acquire professional experience that can be directly applied in the workplace.</p>
+          <div class="mt-3">
+            <a href="about.html" class="btn btn-primary">Learn More About Us</a>
+          </div>
+        </div>
+        <div class="contact-info">
+          <h3>Contact Information</h3>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+              <strong>Location:</strong><br>
+              Kuwait – East, Block 8, Street 157,<br>
+              Justice Tower, First Floor
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div>
+              <strong>WhatsApp:</strong><br>
+              +965 91108981
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <div>
+              <strong>Instagram:</strong><br>
+              @una_institute
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Distinguished Union Institute</h3>
+          <p>Excellence in professional training with official accreditations and international partnerships.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="courses.html">Training Programs</a></li>
+            <li><a href="news.html">News & Updates</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Accreditations</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li>PAAET Licensed</li>
+            <li>Civil Service Commission</li>
+            <li>AUPS Digital University</li>
+            <li>International Standards</li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <p><i class="fas fa-map-marker-alt"></i> Kuwait – East, Block 8, Street 157, Justice Tower, First Floor</p>
+          <p><i class="fab fa-whatsapp"></i> +965 91108981</p>
+          <p><i class="fab fa-instagram"></i> @una_institute</p>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Distinguished Union Institute for Private Training. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <!-- Banner Slideshow JavaScript -->
+  <script>
+    // Banner slideshow functionality
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.banner-slide');
+    const dots = document.querySelectorAll('.banner-dot');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+      // Hide all slides
+      slides.forEach(slide => slide.classList.remove('active'));
+      dots.forEach(dot => dot.classList.remove('active'));
+      
+      // Show current slide
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    // Auto-advance slides
+    setInterval(nextSlide, 5000);
+
+    // Dot navigation
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        currentSlide = index;
+        showSlide(currentSlide);
+      });
+    });
+
+    // Authentication is now handled globally by main.js
+  </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isArabic = userLang.toLowerCase().startsWith('ar');
+      if (isArabic && window.location.pathname.endsWith('news.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'news.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <img src="../images/logo.png" alt="Distinguished Union Institute Logo" />
+          <span class="logo-text">UNA Institute</span>
+        </a>
+
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="courses.html">Courses</a></li>
+            <li><a href="news.html" class="active">News</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li id="profileNavItem" style="display: none;">
+              <a href="profile.html">My Profile</a>
+            </li>
+            <li id="lecturesNavItem" style="display: none;">
+              <a href="recorded-lectures.html">Recorded Lectures</a>
+            </li>
+            <li id="liveNavItem" style="display: none;">
+              <a href="livestream.html">Live Stream</a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Hamburger Menu Button -->
+        <button class="hamburger-menu" id="hamburgerMenu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="lang-toggle">
+          <span style="color:var(--accent-gold);">EN</span> /
+          <a href="../ar/news.html" class="lang-link" lang="ar" hreflang="ar" title="العربية">ع</a>
+        </div>
+        
+        <div class="auth-buttons" id="authButtons">
+          <a href="register.html" id="registerBtn">Register</a>
+          <a href="login.html" id="loginBtn">Login</a>
+          <button id="logoutBtn" style="display: none;">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" id="mobileNavClose">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="mobile-nav-content">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="news.html" class="active">News</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li id="mobileProfileNavItem" style="display: none;">
+          <a href="profile.html">My Profile</a>
+        </li>
+        <li id="mobileLecturesNavItem" style="display: none;">
+          <a href="recorded-lectures.html">Recorded Lectures</a>
+        </li>
+        <li id="mobileLiveNavItem" style="display: none;">
+          <a href="livestream.html">Live Stream</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Authentication is now handled globally by main.js -->
+  <!-- Page Hero -->
+  <section class="page-hero news-hero">
+    <div class="container">
+      <h1>Latest News & Updates</h1>
+    </div>
+  </section>
+
+  <!-- News Articles -->
+  <section class="news container">
+    <div class="news-grid">
+      <!-- Article 1 -->
+      <article class="news-article animate-on-scroll">
+        <img src="images/news1.jpg" alt="Arbitration Course Graduation" />
+        <h3>Graduation Ceremony for Our Arbitration Course</h3>
+        <p>We proudly celebrated the successful completion of our latest arbitration diploma cohort. Congratulations to all graduates!</p>
+        <a href="news-details.html#graduation" class="btn btn-secondary">Read More</a>
+      </article>
+
+      <!-- Article 2 -->
+      <article class="news-article animate-on-scroll">
+        <img src="images/news2.jpg" alt="New Arbitration Law Seminar" />
+        <h3>Upcoming Seminar on New Arbitration Laws</h3>
+        <p>Join our experts as they discuss recent amendments to arbitration legislation and their impact on dispute resolution.</p>
+        <a href="news-details.html#seminar" class="btn btn-secondary">Read More</a>
+      </article>
+
+      <!-- Article 3 -->
+      <article class="news-article animate-on-scroll">
+        <img src="images/news3.jpg" alt="Family Arbitration Workshop" />
+        <h3>Family Arbitration Workshop Highlights</h3>
+        <p>A recap of our recent workshop focusing on family dispute resolution techniques and mediation practices.</p>
+        <a href="news-details.html#family-workshop" class="btn btn-secondary">Read More</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Newsletter Subscription -->
+  <section class="newsletter container">
+    <h2>Subscribe to Our Newsletter</h2>
+    <p>Stay updated with the latest arbitration news and upcoming courses.</p>
+    <form id="newsletterForm" class="newsletter-form" novalidate>
+      <input
+        type="email"
+        name="email"
+        id="newsletterEmail"
+        placeholder="Enter your email address"
+        required
+        aria-label="Email address"
+      />
+      <button type="submit" class="btn btn-primary">Subscribe</button>
+    </form>
+    <p id="newsletterMessage" role="alert" aria-live="polite"></p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Egypt Arbitration Center. All rights reserved.</p>
+      <nav class="footer-nav">
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Use</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/newsletter.js"></script>
+
+</body>
+</html>

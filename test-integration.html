@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Integration Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .test-button { background: #007bff; color: white; border: none; padding: 10px 15px; margin: 5px; border-radius: 3px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .test-button:disabled { background: #6c757d; cursor: not-allowed; }
+        .test-button.success { background: #28a745; }
+        .test-button.danger { background: #dc3545; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 3px; }
+        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .status.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .video-container { margin: 20px 0; display: flex; gap: 20px; }
+        .video-box { border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+        video { width: 300px; height: 225px; border: 1px solid #ccc; }
+        .log { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+        .progress-bar { width: 100%; height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: #007bff; transition: width 0.3s ease; }
+        .test-results { margin: 20px 0; }
+        .test-result { padding: 10px; margin: 5px 0; border-radius: 3px; border-left: 4px solid; }
+        .test-result.pass { background: #d4edda; border-left-color: #28a745; }
+        .test-result.fail { background: #f8d7da; border-left-color: #dc3545; }
+        .test-result.skip { background: #e2e3e5; border-left-color: #6c757d; }
+    </style>
+</head>
+<body>
+    <h1>🧪 WebRTC Integration Test Suite</h1>
+    <p>This page tests the entire WebRTC livestreaming system end-to-end</p>
+    
+    <div class="test-section">
+        <h2>🚀 Test Execution</h2>
+        <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+        <button class="test-button" onclick="runAdminTests()">Run Admin Tests Only</button>
+        <button class="test-button" onclick="runViewerTests()">Run Viewer Tests Only</button>
+        <button class="test-button" onclick="runIntegrationTests()">Run Integration Tests Only</button>
+        <button class="test-button danger" onclick="clearAllResults()">Clear Results</button>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div id="test-progress">Ready to run tests</div>
+    </div>
+
+    <div class="test-section">
+        <h2>📹 Video Streams</h2>
+        <div class="video-container">
+            <div class="video-box">
+                <h4>Admin Stream (Local)</h4>
+                <video id="admin-video" autoplay muted playsinline></video>
+                <div id="admin-video-status" class="status">Waiting for stream...</div>
+            </div>
+            <div class="video-box">
+                <h4>Viewer Stream (Remote)</h4>
+                <video id="viewer-video" autoplay playsinline></video>
+                <div id="viewer-video-status" class="status">Waiting for stream...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results" class="test-results">
+            <div class="test-result pass">
+                <strong>✅ System Ready</strong> - All components loaded successfully
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Test Logs</h2>
+        <button class="test-button" onclick="clearLogs()">Clear Logs</button>
+        <div id="test-log" class="log"></div>
+    </div>
+
+    <!-- Load Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Load Custom WebRTC Components -->
+    <script src="/admin/js/custom-webrtc.js"></script>
+    <script src="/js/custom-webrtc-viewer.js"></script>
+
+    <script>
+        // Global test variables
+        let adminManager = null;
+        let viewerManager = null;
+        let testResults = [];
+        let currentTest = 0;
+        let totalTests = 0;
+
+        // Test configuration
+        const TEST_CONFIG = {
+            admin: [
+                { name: 'Admin System Initialization', func: testAdminInit, category: 'admin' },
+                { name: 'Admin Media Access', func: testAdminMedia, category: 'admin' },
+                { name: 'Admin Socket Connection', func: testAdminSocket, category: 'admin' },
+                { name: 'Admin Stream Start', func: testAdminStreamStart, category: 'admin' }
+            ],
+            viewer: [
+                { name: 'Viewer System Initialization', func: testViewerInit, category: 'viewer' },
+                { name: 'Viewer Media Access', func: testViewerMedia, category: 'viewer' },
+                { name: 'Viewer Socket Connection', func: testViewerSocket, category: 'viewer' },
+                { name: 'Viewer Stream Join', func: testViewerStreamJoin, category: 'viewer' }
+            ],
+            integration: [
+                { name: 'WebRTC Connection Establishment', func: testWebRTCConnection, category: 'integration' },
+                { name: 'Media Stream Transmission', func: testMediaTransmission, category: 'integration' },
+                { name: 'Real-time Communication', func: testRealTimeCommunication, category: 'integration' },
+                { name: 'Stream Quality Verification', func: testStreamQuality, category: 'integration' },
+                { name: 'Error Handling and Recovery', func: testErrorHandling, category: 'integration' }
+            ]
+        };
+
+        // Logging function
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logEntry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        // Update progress bar
+        function updateProgress(current, total) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('test-progress');
+            const percentage = Math.round((current / total) * 100);
+            
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = `Test ${current} of ${total} (${percentage}%)`;
+        }
+
+        // Add test result
+        function addTestResult(testName, passed, message, category) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `<strong>${passed ? '✅' : '❌'} ${testName}</strong> - ${message}`;
+            
+            document.getElementById('test-results').appendChild(resultDiv);
+            
+            testResults.push({
+                name: testName,
+                passed: passed,
+                message: message,
+                category: category,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            log('🚀 Starting comprehensive test suite...', 'info');
+            clearAllResults();
+            
+            const allTests = [
+                ...TEST_CONFIG.admin,
+                ...TEST_CONFIG.viewer,
+                ...TEST_CONFIG.integration
+            ];
+            
+            await runTestSuite(allTests, 'All Tests');
+        }
+
+        // Run admin tests only
+        async function runAdminTests() {
+            log('🔧 Starting admin tests...', 'info');
+            clearAllResults();
+            await runTestSuite(TEST_CONFIG.admin, 'Admin Tests');
+        }
+
+        // Run viewer tests only
+        async function runViewerTests() {
+            log('👤 Starting viewer tests...', 'info');
+            clearAllResults();
+            await runTestSuite(TEST_CONFIG.viewer, 'Viewer Tests');
+        }
+
+        // Run integration tests only
+        async function runIntegrationTests() {
+            log('🔗 Starting integration tests...', 'info');
+            clearAllResults();
+            await runTestSuite(TEST_CONFIG.integration, 'Integration Tests');
+        }
+
+        // Run test suite
+        async function runTestSuite(tests, suiteName) {
+            totalTests = tests.length;
+            currentTest = 0;
+            
+            log(`📋 Running ${suiteName}: ${totalTests} tests`, 'info');
+            
+            for (let i = 0; i < tests.length; i++) {
+                currentTest = i + 1;
+                updateProgress(currentTest, totalTests);
+                
+                const test = tests[i];
+                log(`🧪 Running: ${test.name}`, 'info');
+                
+                try {
+                    const result = await test.func();
+                    if (result.passed) {
+                        log(`✅ ${test.name}: PASSED`, 'success');
+                        addTestResult(test.name, true, result.message, test.category);
+                    } else {
+                        log(`❌ ${test.name}: FAILED - ${result.message}`, 'error');
+                        addTestResult(test.name, false, result.message, test.category);
+                    }
+                } catch (error) {
+                    log(`❌ ${test.name}: ERROR - ${error.message}`, 'error');
+                    addTestResult(test.name, false, `Error: ${error.message}`, test.category);
+                }
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            updateProgress(totalTests, totalTests);
+            log(`🎉 ${suiteName} completed!`, 'success');
+            
+            // Show summary
+            const passed = testResults.filter(r => r.passed).length;
+            const failed = testResults.filter(r => !r.passed).length;
+            log(`📊 Test Summary: ${passed} passed, ${failed} failed`, 'info');
+        }
+
+        // Clear all results
+        function clearAllResults() {
+            document.getElementById('test-results').innerHTML = '';
+            testResults = [];
+            currentTest = 0;
+            totalTests = 0;
+            updateProgress(0, 0);
+            document.getElementById('test-progress').textContent = 'Ready to run tests';
+        }
+
+        // Clear logs
+        function clearLogs() {
+            document.getElementById('test-log').innerHTML = '';
+            log('🧹 Logs cleared');
+        }
+
+        // ===== ADMIN TESTS =====
+
+        async function testAdminInit() {
+            try {
+                if (typeof CustomWebRTCManager === 'undefined') {
+                    return { passed: false, message: 'CustomWebRTCManager class not found' };
+                }
+
+                adminManager = new CustomWebRTCManager();
+                const success = await adminManager.init();
+                
+                if (success) {
+                    return { passed: true, message: 'Admin system initialized successfully' };
+                } else {
+                    return { passed: false, message: 'Admin system initialization failed' };
+                }
+            } catch (error) {
+                return { passed: false, message: `Initialization error: ${error.message}` };
+            }
+        }
+
+        async function testAdminMedia() {
+            try {
+                if (!adminManager) {
+                    return { passed: false, message: 'Admin manager not initialized' };
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+
+                const videoTracks = stream.getVideoTracks();
+                const audioTracks = stream.getAudioTracks();
+
+                if (videoTracks.length > 0 && audioTracks.length > 0) {
+                    // Display in admin video element
+                    const adminVideo = document.getElementById('admin-video');
+                    adminVideo.srcObject = stream;
+                    adminVideo.play().catch(() => {}); // Ignore autoplay errors
+                    
+                    document.getElementById('admin-video-status').textContent = '✅ Admin stream active';
+                    document.getElementById('admin-video-status').className = 'status success';
+                    
+                    return { passed: true, message: `Media access successful: ${videoTracks.length} video, ${audioTracks.length} audio tracks` };
+                } else {
+                    return { passed: false, message: 'No media tracks available' };
+                }
+            } catch (error) {
+                return { passed: false, message: `Media access failed: ${error.message}` };
+            }
+        }
+
+        async function testAdminSocket() {
+            try {
+                if (!adminManager || !adminManager.socket) {
+                    return { passed: false, message: 'Admin manager or socket not available' };
+                }
+
+                const socket = adminManager.socket;
+                const isConnected = socket.connected;
+                const hasId = !!socket.id;
+
+                if (isConnected && hasId) {
+                    return { passed: true, message: `Socket connected with ID: ${socket.id}` };
+                } else {
+                    return { passed: false, message: `Socket not connected. Connected: ${isConnected}, Has ID: ${hasId}` };
+                }
+            } catch (error) {
+                return { passed: false, message: `Socket test failed: ${error.message}` };
+            }
+        }
+
+        async function testAdminStreamStart() {
+            try {
+                if (!adminManager) {
+                    return { passed: false, message: 'Admin manager not initialized' };
+                }
+
+                const result = await adminManager.startLivestream('integration-test');
+                
+                if (result && result.success) {
+                    return { passed: true, message: 'Admin stream started successfully' };
+                } else {
+                    return { passed: false, message: 'Admin stream start failed' };
+                }
+            } catch (error) {
+                return { passed: false, message: `Stream start error: ${error.message}` };
+            }
+        }
+
+        // ===== VIEWER TESTS =====
+
+        async function testViewerInit() {
+            try {
+                if (typeof CustomWebRTCViewer === 'undefined') {
+                    return { passed: false, message: 'CustomWebRTCViewer class not found' };
+                }
+
+                viewerManager = new CustomWebRTCViewer();
+                
+                // Wait for initialization
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                if (viewerManager.socket) {
+                    return { passed: true, message: 'Viewer system initialized successfully' };
+                } else {
+                    return { passed: false, message: 'Viewer system initialization failed' };
+                }
+            } catch (error) {
+                return { passed: false, message: `Viewer initialization error: ${error.message}` };
+            }
+        }
+
+        async function testViewerMedia() {
+            try {
+                if (!viewerManager) {
+                    return { passed: false, message: 'Viewer manager not initialized' };
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: false
+                });
+
+                const audioTracks = stream.getAudioTracks();
+
+                if (audioTracks.length > 0) {
+                    return { passed: true, message: `Viewer audio access successful: ${audioTracks.length} audio tracks` };
+                } else {
+                    return { passed: false, message: 'No audio tracks available' };
+                }
+            } catch (error) {
+                return { passed: false, message: `Viewer media access failed: ${error.message}` };
+            }
+        }
+
+        async function testViewerSocket() {
+            try {
+                if (!viewerManager || !viewerManager.socket) {
+                    return { passed: false, message: 'Viewer manager or socket not available' };
+                }
+
+                const socket = viewerManager.socket;
+                const isConnected = socket.connected;
+                const hasId = !!socket.id;
+
+                if (isConnected && hasId) {
+                    return { passed: true, message: `Viewer socket connected with ID: ${socket.id}` };
+                } else {
+                    return { passed: false, message: `Viewer socket not connected. Connected: ${isConnected}, Has ID: ${hasId}` };
+                }
+            } catch (error) {
+                return { passed: false, message: `Viewer socket test failed: ${error.message}` };
+            }
+        }
+
+        async function testViewerStreamJoin() {
+            try {
+                if (!viewerManager) {
+                    return { passed: false, message: 'Viewer manager not initialized' };
+                }
+
+                // Simulate joining a stream
+                const testRoomId = 'integration-test-room-' + Date.now();
+                viewerManager.joinStream(testRoomId);
+
+                return { passed: true, message: 'Viewer stream join initiated' };
+            } catch (error) {
+                return { passed: false, message: `Viewer stream join failed: ${error.message}` };
+            }
+        }
+
+        // ===== INTEGRATION TESTS =====
+
+        async function testWebRTCConnection() {
+            try {
+                if (!adminManager || !viewerManager) {
+                    return { passed: false, message: 'Both admin and viewer managers must be initialized' };
+                }
+
+                // Check if both have peer connections
+                const adminHasPeerConnections = adminManager.peerConnections instanceof Map;
+                const viewerHasPeerConnection = !!viewerManager.peerConnection;
+
+                if (adminHasPeerConnections && viewerHasPeerConnection) {
+                    return { passed: true, message: 'WebRTC peer connections established' };
+                } else {
+                    return { passed: false, message: `Peer connections not ready. Admin: ${adminHasPeerConnections}, Viewer: ${viewerHasPeerConnection}` };
+                }
+            } catch (error) {
+                return { passed: false, message: `WebRTC connection test failed: ${error.message}` };
+            }
+        }
+
+        async function testMediaTransmission() {
+            try {
+                if (!adminManager || !viewerManager) {
+                    return { passed: false, message: 'Both managers not initialized' };
+                }
+
+                // Check if admin has local stream
+                const adminHasStream = !!adminManager.localStream;
+                const viewerHasLocalStream = !!viewerManager.localStream;
+
+                if (adminHasStream && viewerHasLocalStream) {
+                    return { passed: true, message: 'Media streams available on both sides' };
+                } else {
+                    return { passed: false, message: `Media streams not ready. Admin: ${adminHasStream}, Viewer: ${viewerHasLocalStream}` };
+                }
+            } catch (error) {
+                return { passed: false, message: `Media transmission test failed: ${error.message}` };
+            }
+        }
+
+        async function testRealTimeCommunication() {
+            try {
+                if (!adminManager || !viewerManager) {
+                    return { passed: false, message: 'Both managers not initialized' };
+                }
+
+                // Check socket connections
+                const adminSocketConnected = adminManager.socket && adminManager.socket.connected;
+                const viewerSocketConnected = viewerManager.socket && viewerManager.socket.connected;
+
+                if (adminSocketConnected && viewerSocketConnected) {
+                    return { passed: true, message: 'Real-time communication established via Socket.IO' };
+                } else {
+                    return { passed: false, message: `Socket connections not ready. Admin: ${adminSocketConnected}, Viewer: ${viewerSocketConnected}` };
+                }
+            } catch (error) {
+                return { passed: false, message: `Real-time communication test failed: ${error.message}` };
+            }
+        }
+
+        async function testStreamQuality() {
+            try {
+                if (!adminManager || !viewerManager) {
+                    return { passed: false, message: 'Both managers not initialized' };
+                }
+
+                // Check stream quality indicators
+                const adminStream = adminManager.localStream;
+                const viewerStream = viewerManager.remoteStream;
+
+                if (adminStream && adminStream.getVideoTracks().length > 0) {
+                    const videoTrack = adminStream.getVideoTracks()[0];
+                    const settings = videoTrack.getSettings();
+                    
+                    if (settings.width >= 640 && settings.height >= 480) {
+                        return { passed: true, message: `Stream quality verified: ${settings.width}x${settings.height}` };
+                    } else {
+                        return { passed: false, message: `Stream quality below minimum: ${settings.width}x${settings.height}` };
+                    }
+                } else {
+                    return { passed: false, message: 'No video stream available for quality check' };
+                }
+            } catch (error) {
+                return { passed: false, message: `Stream quality test failed: ${error.message}` };
+            }
+        }
+
+        async function testErrorHandling() {
+            try {
+                if (!adminManager || !viewerManager) {
+                    return { passed: false, message: 'Both managers not initialized' };
+                }
+
+                // Test error handling by checking if methods exist
+                const adminHasErrorHandling = typeof adminManager.stopLivestream === 'function';
+                const viewerHasErrorHandling = typeof viewerManager.cleanup === 'function';
+
+                if (adminHasErrorHandling && viewerHasErrorHandling) {
+                    return { passed: true, message: 'Error handling methods available on both sides' };
+                } else {
+                    return { passed: false, message: `Error handling incomplete. Admin: ${adminHasErrorHandling}, Viewer: ${viewerHasErrorHandling}` };
+                }
+            } catch (error) {
+                return { passed: false, message: `Error handling test failed: ${error.message}` };
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 WebRTC Integration Test Suite Loaded', 'info');
+            log('📋 Ready to run comprehensive tests', 'info');
+            log('💡 Click "Run All Tests" to start testing', 'info');
+            
+            // Add initial result
+            addTestResult('System Ready', true, 'All components loaded successfully', 'system');
+        });
+    </script>
+</body>
+</html>

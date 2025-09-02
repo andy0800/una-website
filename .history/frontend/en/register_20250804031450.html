@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - UNA Institute</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('register.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'register.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <h2>UNA Institute</h2>
+      </div>
+      <nav class="nav-menu">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="courses.html">Courses</a>
+        <a href="contact.html">Contact</a>
+        <a href="livestream.html">Live Stream</a>
+      </nav>
+
+      <!-- Hamburger Menu Button -->
+      <button class="hamburger-menu" id="hamburgerMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="header-actions">
+        <div class="lang-toggle">
+          <span>EN</span> /
+          <a href="../ar/register.html" class="lang-link">ع</a>
+        </div>
+        <a href="login.html" class="btn btn-outline">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" id="mobileNavClose">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="mobile-nav-content">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="livestream.html">Live Stream</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero-section register-hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>Join Our Community</h1>
+        <p>Create your account and start your educational journey with UNA Institute</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Register Form Section -->
+  <section class="register-section">
+    <div class="container">
+      <div class="register-card">
+        <div class="register-header">
+          <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+          <p>Fill in your details to create your account</p>
+        </div>
+        
+        <form id="registerForm" class="register-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">
+                <i class="fas fa-user"></i> Full Name *
+              </label>
+              <input type="text" id="name" name="name" placeholder="Enter your full name" required />
+            </div>
+            
+            <div class="form-group">
+              <label for="phone">
+                <i class="fas fa-phone"></i> Phone Number *
+              </label>
+              <input type="text" id="phone" name="phone" placeholder="Enter your phone number" required />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="civilId">
+                <i class="fas fa-id-card"></i> Civil ID
+              </label>
+              <input type="text" id="civilId" name="civilId" placeholder="Enter your civil ID" />
+            </div>
+            
+            <div class="form-group">
+              <label for="passportNumber">
+                <i class="fas fa-passport"></i> Passport Number
+              </label>
+              <input type="text" id="passportNumber" name="passportNumber" placeholder="Enter your passport number" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dateOfBirth">
+                <i class="fas fa-calendar"></i> Date of Birth
+              </label>
+              <input type="date" id="dateOfBirth" name="dateOfBirth" />
+            </div>
+            
+            <div class="form-group">
+              <label for="password">
+                <i class="fas fa-lock"></i> Password *
+              </label>
+              <input type="password" id="password" name="password" placeholder="Create a strong password" required />
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+        
+        <div class="register-footer">
+          <p>Already have an account? <a href="login.html">Sign in here</a></p>
+        </div>
+        
+        <div id="registerMessage" class="message-box"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>UNA Institute</h3>
+          <p>Empowering minds through quality education and professional development.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="courses.html">Courses</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contact Info</h4>
+          <p><i class="fas fa-phone"></i> +965 1234 5678</p>
+          <p><i class="fas fa-envelope"></i> info@unainstitute.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 UNA Institute. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/register.js"></script>
+</body>
+</html>

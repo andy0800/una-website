@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News - Distinguished Union Institute</title>
   <script>
     (function() {
       const userLang = navigator.language || navigator.userLanguage;
@@ -15,32 +18,36 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="container" style="display:flex; align-items:center;">
-      <a class="logo" href="news.html"><img src="images/logo.png" alt="Logo" /></a>
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = 'header.html'; // Path to the English header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+  
 
-      <nav class="main-nav" style="margin-left: 20px;">
-        <ul>
-          <li><a href="index.html" class="active">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="courses.html">Courses</a></li>
-          <li><a href="news.html">News</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </nav>
+  
 
-      <div class="lang-toggle" style="margin-left:auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem;">
-  <span style="color:#ffcc00;">EN</span> /
-  <a href="../ar/news.html" class="lang-link" lang="ar" hreflang="ar" title="العربية" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">ع</a>
-</div>
-    </div>
-  </header>
-
+  <!-- Authentication is now handled globally by main.js -->
   <!-- Page Hero -->
   <section class="page-hero news-hero">
     <div class="container">
@@ -98,19 +105,55 @@
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
-      <p>&copy; 2025 Egypt Arbitration Center. All rights reserved.</p>
-      <nav class="footer-nav">
-        <ul>
-          <li><a href="privacy.html">Privacy Policy</a></li>
-          <li><a href="terms.html">Terms of Use</a></li>
-        </ul>
-      </nav>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Distinguished Union Institute</h3>
+          <p>Excellence in professional training with official accreditations and international partnerships.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="courses.html">Training Programs</a></li>
+            <li><a href="news.html">News & Updates</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Accreditations</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li>PAAET Licensed</li>
+            <li>Civil Service Commission</li>
+            <li>AUPS Digital University</li>
+            <li>International Standards</li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <p><i class="fas fa-map-marker-alt"></i> Kuwait – East, Block 8, Street 157, Justice Tower, First Floor</p>
+          <p><i class="fab fa-whatsapp"></i> +965 91108981</p>
+          <p><i class="fab fa-instagram"></i> @una_institute</p>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Distinguished Union Institute for Private Training. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
-  <script src="js/animations.js"></script>
-  <script src="js/newsletter.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/animations.js"></script>
+  <script src="/js/newsletter.js"></script>
 
 </body>
 </html>

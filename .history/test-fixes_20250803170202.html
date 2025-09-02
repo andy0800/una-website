@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fixes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px; margin: 5px; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Fixes</h1>
+    
+    <div class="test-section">
+        <h2>1. User Token Test</h2>
+        <button onclick="testUserToken()">Test User Token</button>
+        <div id="tokenResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. User Info API Test</h2>
+        <button onclick="testUserInfo()">Test User Info API</button>
+        <div id="userInfoResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Socket Connection Test</h2>
+        <button onclick="testSocketConnection()">Test Socket Connection</button>
+        <div id="socketResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Viewer Count Test</h2>
+        <button onclick="testViewerCount()">Test Viewer Count</button>
+        <div id="viewerCountResult"></div>
+    </div>
+    
+    <div id="results"></div>
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        async function testUserToken() {
+            const resultDiv = document.getElementById('tokenResult');
+            resultDiv.innerHTML = '';
+            
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                resultDiv.innerHTML = '<span class="error">❌ No user token found. Please login first.</span>';
+                log('❌ No user token found', 'error');
+                return;
+            }
+            
+            resultDiv.innerHTML = '<span class="success">✅ User token found</span>';
+            log('✅ User token found', 'success');
+        }
+
+        async function testUserInfo() {
+            const resultDiv = document.getElementById('userInfoResult');
+            resultDiv.innerHTML = '';
+            
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                resultDiv.innerHTML = '<span class="error">❌ No user token found</span>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ User info loaded successfully</span><br>
+                        <strong>Name:</strong> ${userInfo.name}<br>
+                        <strong>Phone:</strong> ${userInfo.phone}
+                    `;
+                    log(`✅ User info loaded: ${userInfo.name}`, 'success');
+                } else {
+                    const error = await response.json();
+                    resultDiv.innerHTML = `<span class="error">❌ API Error: ${error.message}</span>`;
+                    log(`❌ API Error: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Network Error: ${error.message}</span>`;
+                log(`❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testSocketConnection() {
+            const resultDiv = document.getElementById('socketResult');
+            resultDiv.innerHTML = '';
+            
+            const socket = io();
+            
+            socket.on('connect', () => {
+                resultDiv.innerHTML = '<span class="success">✅ Socket connected successfully</span>';
+                log('✅ Socket connected', 'success');
+                
+                // Test user info emission
+                const token = localStorage.getItem('userToken');
+                let userInfo = null;
+                
+                if (token) {
+                    // Simulate user info fetch
+                    fetch('/api/users/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        userInfo = data;
+                        socket.emit('watcher', userInfo);
+                        log(`👤 Emitted watcher with user: ${userInfo.name}`, 'info');
+                    })
+                    .catch(error => {
+                        socket.emit('watcher', null);
+                        log('👤 Emitted watcher without user info', 'info');
+                    });
+                } else {
+                    socket.emit('watcher', null);
+                    log('👤 Emitted watcher without user info', 'info');
+                }
+            });
+            
+            socket.on('connect_error', (error) => {
+                resultDiv.innerHTML = `<span class="error">❌ Socket connection failed: ${error.message}</span>`;
+                log(`❌ Socket connection failed: ${error.message}`, 'error');
+            });
+            
+            socket.on('stream-not-active', () => {
+                log('📺 Stream not active (expected)', 'info');
+            });
+            
+            socket.on('stream-started', () => {
+                log('🎥 Stream started', 'info');
+            });
+        }
+
+        function testViewerCount() {
+            const resultDiv = document.getElementById('viewerCountResult');
+            resultDiv.innerHTML = '';
+            
+            // This would need an active admin stream to test properly
+            resultDiv.innerHTML = '<span class="info">ℹ️ Viewer count test requires active admin stream</span>';
+            log('ℹ️ Viewer count test requires active admin stream', 'info');
+        }
+
+        // Auto-run basic tests
+        window.onload = function() {
+            log('🚀 Starting tests...', 'info');
+            setTimeout(testUserToken, 1000);
+            setTimeout(testUserInfo, 2000);
+            setTimeout(testSocketConnection, 3000);
+        };
+    </script>
+</body>
+</html> 

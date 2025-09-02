@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('contact.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'contact.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+</head>
+
+<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
+      <a class="logo" href="contact.html"><img src="images/logo.png" alt="شعار المركز" /></a>
+
+      <nav class="main-nav" style="margin-right: 20px;">
+        <ul>
+          <li><a href="index.html" class="active">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدورات</a></li>
+          <li><a href="news.html">الأخبار</a></li>
+          <li><a href="contact.html">تواصل معنا</a></li>
+        </ul>
+      </nav>
+
+<<div class="lang-toggle" style="margin-left:auto; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem;">
+        <a href="../en/contact.html" class="lang-link active" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> |
+      </div>
+    
+    <div class="auth-buttons">
+    <a href="register.html">التسجيل</a>
+<a href="login.html">تسجيل الدخول</a>
+</div>
+</div>
+  </header>
+  
+  <section class="contact-hero">
+    تواصل معنا
+  </section>
+
+  <section class="contact-section container animate-on-scroll">
+    <div class="contact-info">
+      <h2>بيانات التواصل</h2>
+      <p>📍 العنوان: القاهرة، مصر</p>
+      <p>📞 الهاتف: +20 123 456 789</p>
+      <p>✉️ البريد الإلكتروني: info@egyarbitration.com</p>
+    </div>
+
+    <div class="contact-form-wrapper">
+      <h2>أرسل رسالة</h2>
+      <form onsubmit="handleContact(event)">
+        <label for="name">الاسم الكامل</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="email">البريد الإلكتروني</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="message">رسالتك</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+
+        <button type="submit">إرسال</button>
+      </form>
+      <div id="formMessage"></div>
+    </div>
+  </section>
+
+  <section class="container animate-on-scroll" style="margin-bottom: 60px;">
+    <h2 style="text-align:center; color:#003366;">موقعنا على الخريطة</h2>
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3454.217887001756!2d31.2357115!3d30.0444196!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x145841d5aa24cb9d%3A0x1a2f962dc6f837b9!2z2KfZhNi52YTZiNmF2YrZhtiMINmE2YXYudmK2KfZhiDYp9mE2LPYsdin2Kog2KfZhNiq2LXYqNmK2KfYqiDYp9mE2YHZiNmF2K3YqSDYp9mE2YPYsdmK2Kk!5e0!3m2!1sar!2seg!4v1625491040744!5m2!1sar!2seg"
+      width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy">
+    </iframe>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>جميع الحقوق محفوظة © 2025 مركز التحكيم المصري</p>
+    </div>
+  </footer>
+
+  <script>
+    function handleContact(event) {
+      event.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
+      const formMessage = document.getElementById("formMessage");
+
+      if (name && email.includes('@') && message) {
+        formMessage.textContent = 'تم إرسال رسالتك بنجاح!';
+        formMessage.style.color = 'green';
+      } else {
+        formMessage.textContent = 'يرجى تعبئة جميع الحقول بشكل صحيح.';
+        formMessage.style.color = 'red';
+      }
+    }
+  </script>
+  <script src="js/animations.js"></script>
+</body>
+</html>
