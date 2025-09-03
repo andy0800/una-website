@@ -1,0 +1,193 @@
+{
+  "version": 2,
+  "buildCommand": "echo 'No build required for static site'",
+  "outputDirectory": "frontend",
+  "installCommand": "echo 'No dependencies to install'",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/about",
+      "destination": "/ar/about.html"
+    },
+    {
+      "source": "/ar/contact",
+      "destination": "/ar/contact.html"
+    },
+    {
+      "source": "/ar/course-details",
+      "destination": "/ar/course-details.html"
+    },
+    {
+      "source": "/ar/courses",
+      "destination": "/ar/courses.html"
+    },
+    {
+      "source": "/ar/header",
+      "destination": "/ar/header.html"
+    },
+    {
+      "source": "/ar/livestream",
+      "destination": "/ar/livestream.html"
+    },
+    {
+      "source": "/ar/login",
+      "destination": "/ar/login.html"
+    },
+    {
+      "source": "/ar/news",
+      "destination": "/ar/news.html"
+    },
+    {
+      "source": "/ar/profile",
+      "destination": "/ar/profile.html"
+    },
+    {
+      "source": "/ar/recorded-lectures",
+      "destination": "/ar/recorded-lectures.html"
+    },
+    {
+      "source": "/ar/register",
+      "destination": "/ar/register.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/about",
+      "destination": "/en/about.html"
+    },
+    {
+      "source": "/en/contact",
+      "destination": "/en/contact.html"
+    },
+    {
+      "source": "/en/course-details",
+      "destination": "/en/course-details.html"
+    },
+    {
+      "source": "/en/courses",
+      "destination": "/en/courses.html"
+    },
+    {
+      "source": "/en/enroll",
+      "destination": "/en/enroll.html"
+    },
+    {
+      "source": "/en/header",
+      "destination": "/en/header.html"
+    },
+    {
+      "source": "/en/livestream",
+      "destination": "/en/livestream.html"
+    },
+    {
+      "source": "/en/login",
+      "destination": "/en/login.html"
+    },
+    {
+      "source": "/en/news",
+      "destination": "/en/news.html"
+    },
+    {
+      "source": "/en/profile",
+      "destination": "/en/profile.html"
+    },
+    {
+      "source": "/en/recorded-lectures",
+      "destination": "/en/recorded-lectures.html"
+    },
+    {
+      "source": "/en/register",
+      "destination": "/en/register.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/login.html"
+    },
+    {
+      "source": "/admin/dashboard",
+      "destination": "/admin/dashboard.html"
+    },
+    {
+      "source": "/admin/login",
+      "destination": "/admin/login.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ar/index.html",
+      "destination": "/ar",
+      "permanent": true
+    },
+    {
+      "source": "/en/index.html",
+      "destination": "/en",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "frontend/api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  
+    {
+      "source": "/",
+      "destination": "ar/index.html"
+    },
+    {
+      "source": "/ar",
+      "destination": "ar/index.html"
+    },
+    {
+      "source": "/en",
+      "destination": "en/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "admin/login.html"
+    }
+  ]
+}

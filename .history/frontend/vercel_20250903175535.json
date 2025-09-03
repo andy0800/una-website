@@ -1,0 +1,193 @@
+{
+  "version": 2,
+  "buildCommand": "echo 'No build required for static site'",
+  "outputDirectory": "frontend",
+  "installCommand": "echo 'No dependencies to install'",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/frontend/ar/index.html"
+    },
+    {
+      "source": "/ar",
+      "destination": "/frontend/ar/index.html"
+    },
+    {
+      "source": "/ar/about",
+      "destination": "/frontend/ar/about.html"
+    },
+    {
+      "source": "/ar/contact",
+      "destination": "/frontend/ar/contact.html"
+    },
+    {
+      "source": "/ar/course-details",
+      "destination": "/frontend/ar/course-details.html"
+    },
+    {
+      "source": "/ar/courses",
+      "destination": "/frontend/ar/courses.html"
+    },
+    {
+      "source": "/ar/header",
+      "destination": "/frontend/ar/header.html"
+    },
+    {
+      "source": "/ar/livestream",
+      "destination": "/frontend/ar/livestream.html"
+    },
+    {
+      "source": "/ar/login",
+      "destination": "/frontend/ar/login.html"
+    },
+    {
+      "source": "/ar/news",
+      "destination": "/frontend/ar/news.html"
+    },
+    {
+      "source": "/ar/profile",
+      "destination": "/frontend/ar/profile.html"
+    },
+    {
+      "source": "/ar/recorded-lectures",
+      "destination": "/frontend/ar/recorded-lectures.html"
+    },
+    {
+      "source": "/ar/register",
+      "destination": "/frontend/ar/register.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/frontend/en/index.html"
+    },
+    {
+      "source": "/en/about",
+      "destination": "/frontend/en/about.html"
+    },
+    {
+      "source": "/en/contact",
+      "destination": "/frontend/en/contact.html"
+    },
+    {
+      "source": "/en/course-details",
+      "destination": "/frontend/en/course-details.html"
+    },
+    {
+      "source": "/en/courses",
+      "destination": "/frontend/en/courses.html"
+    },
+    {
+      "source": "/en/enroll",
+      "destination": "/frontend/en/enroll.html"
+    },
+    {
+      "source": "/en/header",
+      "destination": "/frontend/en/header.html"
+    },
+    {
+      "source": "/en/livestream",
+      "destination": "/frontend/en/livestream.html"
+    },
+    {
+      "source": "/en/login",
+      "destination": "/frontend/en/login.html"
+    },
+    {
+      "source": "/en/news",
+      "destination": "/frontend/en/news.html"
+    },
+    {
+      "source": "/en/profile",
+      "destination": "/frontend/en/profile.html"
+    },
+    {
+      "source": "/en/recorded-lectures",
+      "destination": "/frontend/en/recorded-lectures.html"
+    },
+    {
+      "source": "/en/register",
+      "destination": "/frontend/en/register.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/frontend/admin/login.html"
+    },
+    {
+      "source": "/admin/dashboard",
+      "destination": "/frontend/admin/dashboard.html"
+    },
+    {
+      "source": "/admin/login",
+      "destination": "/frontend/admin/login.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ar/index.html",
+      "destination": "/ar",
+      "permanent": true
+    },
+    {
+      "source": "/en/index.html",
+      "destination": "/en",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "frontend/api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}

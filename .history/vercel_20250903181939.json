@@ -1,0 +1,121 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/frontend/",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/frontend/ar",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/frontend/ar/about",
+      "destination": "/ar/about.html"
+    },
+    {
+      "source": "/frontend/ar/contact",
+      "destination": "/ar/contact.html"
+    },
+    {
+      "source": "/frontend/ar/course-details",
+      "destination": "/ar/course-details.html"
+    },
+    {
+      "source": "/frontend/ar/courses",
+      "destination": "/ar/courses.html"
+    },
+    {
+      "source": "/frontend/ar/header",
+      "destination": "/ar/header.html"
+    },
+    {
+      "source": "/frontend/ar/livestream",
+      "destination": "/ar/livestream.html"
+    },
+    {
+      "source": "/frontend/ar/login",
+      "destination": "/ar/login.html"
+    },
+    {
+      "source": "/frontend/ar/news",
+      "destination": "/ar/news.html"
+    },
+    {
+      "source": "/frontend/ar/profile",
+      "destination": "/ar/profile.html"
+    },
+    {
+      "source": "/frontend/ar/recorded-lectures",
+      "destination": "/ar/recorded-lectures.html"
+    },
+    {
+      "source": "/frontend/ar/register",
+      "destination": "/ar/register.html"
+    },
+    {
+      "source": "/frontend/en",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/frontend/en/about",
+      "destination": "/en/about.html"
+    },
+    {
+      "source": "/frontend/en/contact",
+      "destination": "/en/contact.html"
+    },
+    {
+      "source": "/frontend/en/course-details",
+      "destination": "/en/course-details.html"
+    },
+    {
+      "source": "/frontend/en/courses",
+      "destination": "/en/courses.html"
+    },
+    {
+      "source": "/frontend/en/enroll",
+      "destination": "/en/enroll.html"
+    },
+    {
+      "source": "/frontend/en/header",
+      "destination": "/en/header.html"
+    },
+    {
+      "source": "/frontend/en/livestream",
+      "destination": "/en/livestream.html"
+    },
+    {
+      "source": "/frontend/en/login",
+      "destination": "/en/login.html"
+    },
+    {
+      "source": "/frontend/en/news",
+      "destination": "/en/news.html"
+    },
+    {
+      "source": "/frontend/en/profile",
+      "destination": "/en/profile.html"
+    },
+    {
+      "source": "/frontend/en/recorded-lectures",
+      "destination": "/en/recorded-lectures.html"
+    },
+    {
+      "source": "/frontend/en/register",
+      "destination": "/en/register.html"
+    },
+    {
+      "source": "/frontend/admin",
+      "destination": "/admin/login.html"
+    },
+    {
+      "source": "/frontend/admin/dashboard",
+      "destination": "/admin/dashboard.html"
+    },
+    {
+      "source": "/frontend/admin/login",
+      "destination": "/admin/login.html"
+    }
+  ]
+}

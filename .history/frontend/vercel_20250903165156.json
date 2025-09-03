@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": ".",
+  "installCommand": "echo 'No dependencies to install'",
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/login.html"
+    }
+  ]
+}
