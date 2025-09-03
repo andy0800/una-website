@@ -433,10 +433,6 @@ app.post('/performance-optimize', async (req, res) => {
   }
 });
 
-// Register API routes
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/lectures', require('./routes/lectureRoutes'));
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Worker error:', err);
@@ -659,12 +655,32 @@ app.get('/', (req, res) => {
   });
 });
 
+// Test endpoint to verify server is working
+app.get('/test', (req, res) => {
+  res.json({
+    message: 'Server is working!',
+    timestamp: new Date().toISOString(),
+    routes: {
+      login: '/api/users/login',
+      register: '/api/users/register',
+      health: '/health'
+    }
+  });
+});
+
 // 8.1. API route handlers
+console.log('🔍 DEBUG: Registering API routes...');
 app.use('/api/users',       require('./routes/userRoutes'));
+console.log('🔍 DEBUG: /api/users route registered');
 app.use('/api/courses',     require('./routes/courseRoutes'));
+console.log('🔍 DEBUG: /api/courses route registered');
 app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
+console.log('🔍 DEBUG: /api/enrollments route registered');
 app.use('/api/admin',       require('./routes/adminRoutes'));
+console.log('🔍 DEBUG: /api/admin route registered');
 app.use('/api/lectures',    require('./routes/lectureRoutes')); // NEW: Lecture management routes
+console.log('🔍 DEBUG: /api/lectures route registered');
+console.log('🔍 DEBUG: All API routes registered successfully');
 
 
 // 8.5. Health check endpoint for production monitoring
