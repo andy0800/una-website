@@ -7,134 +7,134 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/frontend/ar/index.html"
+      "destination": "/ar/index.html"
     },
     {
       "source": "/ar",
-      "destination": "/frontend/ar/index.html"
+      "destination": "/ar/index.html"
     },
     {
       "source": "/ar/about",
-      "destination": "/frontend/ar/about.html"
+      "destination": "/ar/about.html"
     },
     {
       "source": "/ar/contact",
-      "destination": "/frontend/ar/contact.html"
+      "destination": "/ar/contact.html"
     },
     {
       "source": "/ar/course-details",
-      "destination": "/frontend/ar/course-details.html"
+      "destination": "/ar/course-details.html"
     },
     {
       "source": "/ar/courses",
-      "destination": "/frontend/ar/courses.html"
+      "destination": "/ar/courses.html"
     },
     {
       "source": "/ar/header",
-      "destination": "/frontend/ar/header.html"
+      "destination": "/ar/header.html"
     },
     {
       "source": "/ar/livestream",
-      "destination": "/frontend/ar/livestream.html"
+      "destination": "/ar/livestream.html"
     },
     {
       "source": "/ar/login",
-      "destination": "/frontend/ar/login.html"
+      "destination": "/ar/login.html"
     },
     {
       "source": "/ar/news",
-      "destination": "/frontend/ar/news.html"
+      "destination": "/ar/news.html"
     },
     {
       "source": "/ar/profile",
-      "destination": "/frontend/ar/profile.html"
+      "destination": "/ar/profile.html"
     },
     {
       "source": "/ar/recorded-lectures",
-      "destination": "/frontend/ar/recorded-lectures.html"
+      "destination": "/ar/recorded-lectures.html"
     },
     {
       "source": "/ar/register",
-      "destination": "/frontend/ar/register.html"
+      "destination": "/ar/register.html"
     },
     {
       "source": "/en",
-      "destination": "/frontend/en/index.html"
+      "destination": "/en/index.html"
     },
     {
       "source": "/en/about",
-      "destination": "/frontend/en/about.html"
+      "destination": "/en/about.html"
     },
     {
       "source": "/en/contact",
-      "destination": "/frontend/en/contact.html"
+      "destination": "/en/contact.html"
     },
     {
       "source": "/en/course-details",
-      "destination": "/frontend/en/course-details.html"
+      "destination": "/en/course-details.html"
     },
     {
       "source": "/en/courses",
-      "destination": "/frontend/en/courses.html"
+      "destination": "/en/courses.html"
     },
     {
       "source": "/en/enroll",
-      "destination": "/frontend/en/enroll.html"
+      "destination": "/en/enroll.html"
     },
     {
       "source": "/en/header",
-      "destination": "/frontend/en/header.html"
+      "destination": "/en/header.html"
     },
     {
       "source": "/en/livestream",
-      "destination": "/frontend/en/livestream.html"
+      "destination": "/en/livestream.html"
     },
     {
       "source": "/en/login",
-      "destination": "/frontend/en/login.html"
+      "destination": "/en/login.html"
     },
     {
       "source": "/en/news",
-      "destination": "/frontend/en/news.html"
+      "destination": "/en/news.html"
     },
     {
       "source": "/en/profile",
-      "destination": "/frontend/en/profile.html"
+      "destination": "/en/profile.html"
     },
     {
       "source": "/en/recorded-lectures",
-      "destination": "/frontend/en/recorded-lectures.html"
+      "destination": "/en/recorded-lectures.html"
     },
     {
       "source": "/en/register",
-      "destination": "/frontend/en/register.html"
+      "destination": "/en/register.html"
     },
     {
       "source": "/admin",
-      "destination": "/frontend/admin/login.html"
+      "destination": "/admin/login.html"
     },
     {
       "source": "/admin/dashboard",
-      "destination": "/frontend/admin/dashboard.html"
+      "destination": "/admin/dashboard.html"
     },
     {
       "source": "/admin/login",
-      "destination": "/frontend/admin/login.html"
+      "destination": "/admin/login.html"
     }
   ],
   "redirects": [
     {
-      "source": "/frontend/index.html",
+      "source": "/index.html",
       "destination": "/",
       "permanent": true
     },
     {
-      "source": "/frontend/ar/index.html",
+      "source": "/ar/index.html",
       "destination": "/ar",
       "permanent": true
     },
     {
-      "source": "/frontend/en/index.html",
+      "source": "/en/index.html",
       "destination": "/en",
       "permanent": true
     }
@@ -184,10 +184,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "frontend/api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  ]
 }
