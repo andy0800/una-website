@@ -13,8 +13,6 @@ console.log('🔍 DEBUG: MONGO_URI exists:', !!process.env.MONGO_URI);
 console.log('🔍 DEBUG: JWT_SECRET exists:', !!process.env.JWT_SECRET);
 console.log('🔍 DEBUG: JWT_SECRET length:', process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 'undefined');
 console.log('🔍 DEBUG: JWT_SECRET first 8 chars:', process.env.JWT_SECRET ? process.env.JWT_SECRET.substring(0, 8) + '...' : 'undefined');
-console.log('🔍 DEBUG: All environment variables with JWT:', Object.keys(process.env).filter(key => key.includes('JWT')));
-console.log('🔍 DEBUG: All environment variables with SECRET:', Object.keys(process.env).filter(key => key.includes('SECRET')));
 
 // 2. Module imports
 console.log('🔍 DEBUG: Loading core modules...');
