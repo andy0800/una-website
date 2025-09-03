@@ -2,20 +2,20 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/ar/:path*",
-      "destination": "/ar/:path*.html"
-    },
-    {
-      "source": "/en/:path*",
-      "destination": "/en/:path*.html"
-    },
-    {
-      "source": "/admin/:path*",
-      "destination": "/admin/:path*.html"
-    },
-    {
       "source": "/",
-      "destination": "/ar/index.html"
+      "destination": "ar/index.html"
+    },
+    {
+      "source": "/ar",
+      "destination": "ar/index.html"
+    },
+    {
+      "source": "/en",
+      "destination": "en/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "admin/login.html"
     }
   ]
 }
