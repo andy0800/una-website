@@ -70,16 +70,6 @@ console.log('🔍 DEBUG: Express app initialized successfully');
 
 // NEW: Production logging configuration
 console.log('🔍 DEBUG: Initializing Winston logger...');
-
-// Check if logs directory exists, create if not
-const fs = require('fs');
-const logsDir = 'logs';
-if (!fs.existsSync(logsDir)) {
-  console.log('🔍 DEBUG: Creating logs directory...');
-  fs.mkdirSync(logsDir, { recursive: true });
-  console.log('🔍 DEBUG: Logs directory created successfully');
-}
-
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: winston.format.combine(

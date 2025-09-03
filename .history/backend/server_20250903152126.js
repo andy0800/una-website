@@ -70,16 +70,6 @@ console.log('🔍 DEBUG: Express app initialized successfully');
 
 // NEW: Production logging configuration
 console.log('🔍 DEBUG: Initializing Winston logger...');
-
-// Check if logs directory exists, create if not
-const fs = require('fs');
-const logsDir = 'logs';
-if (!fs.existsSync(logsDir)) {
-  console.log('🔍 DEBUG: Creating logs directory...');
-  fs.mkdirSync(logsDir, { recursive: true });
-  console.log('🔍 DEBUG: Logs directory created successfully');
-}
-
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: winston.format.combine(
@@ -434,13 +424,8 @@ app.use((err, req, res, next) => {
 });
 
 // 4. Create HTTP server and bind Socket.IO
-console.log('🔍 DEBUG: Creating HTTP server...');
 const server = http.createServer(app);
-console.log('🔍 DEBUG: HTTP server created successfully');
-
-console.log('🔍 DEBUG: Creating Socket.IO server...');
 const io = new Server(server);
-console.log('🔍 DEBUG: Socket.IO server created successfully');
 
 // NEW: Socket.IO production configuration
 io.engine.on('connection_error', (err) => {
@@ -800,17 +785,11 @@ app.use((err, req, res, next) => {
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 
 // 11. Socket.IO event routing
-console.log('🔍 DEBUG: Loading Socket.IO event routing...');
 require('./socket/streamSocket')(io);
-console.log('🔍 DEBUG: Socket.IO event routing loaded successfully');
 
 // 12. Start listening
 const PORT = process.env.PORT || 3000;
-console.log('🔍 DEBUG: Starting HTTP server on port', PORT);
-
-try {
   server.listen(PORT, '0.0.0.0', () => {
-    console.log('🔍 DEBUG: HTTP server started successfully');
     logger.info(`✅ HTTP server running on port ${PORT}`);
     logger.info(`🌐 Network accessible at: http://192.168.187.16:${PORT}`);
     logger.info(`🏠 Server listening on port ${PORT}`);
@@ -823,10 +802,6 @@ try {
     logger.info(`📊 Health check available at /health`);
     logger.info(`📈 Metrics available at /metrics`);
   });
-} catch (error) {
-  console.error('🔍 DEBUG: Server startup error:', error);
-  process.exit(1);
-}
 
   // NEW: Load balancing and clustering support
   if (cluster.isMaster && loadBalancerConfig.enabled) {
