@@ -1,7 +1,0 @@
-/ /ar/index.html
-/ar /ar/index.html
-/ar/* /ar/:splat.html
-/en /en/index.html
-/en/* /en/:splat.html
-/admin /admin/login.html
-/admin/* /admin/:splat.html
