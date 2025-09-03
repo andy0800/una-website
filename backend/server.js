@@ -674,11 +674,11 @@ app.post('/cors-test', (req, res) => {
 // 8.1. API route handlers
 console.log('🔍 DEBUG: Registering API routes...');
 
-// Test route to verify basic routing works
-app.get('/api/test', (req, res) => {
+// Test route to verify basic routing works - moved to avoid conflicts
+app.get('/api/health-check', (req, res) => {
   res.json({ message: 'API is working!', timestamp: new Date().toISOString() });
 });
-console.log('🔍 DEBUG: Test route registered');
+console.log('🔍 DEBUG: Health check route registered');
 
 try {
   app.use('/api/users',       require('./routes/userRoutes'));
