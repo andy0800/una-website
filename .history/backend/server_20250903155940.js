@@ -630,20 +630,10 @@ app.use(express.static(path.join(__dirname, '..'), {
   }
 }));
 
-// Serve static files
 app.use('/certs', express.static(path.join(__dirname, '../frontend/certs')));
-app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
-app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
-app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
-app.use('/socket.io', express.static(path.join(__dirname, '../frontend/socket.io')));
 
-// 8. Root route - Serve Frontend
+// 8. Root route - API Information
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/ar/index.html'));
-});
-
-// 8.0.1. API Information route (moved to /api/info)
-app.get('/api/info', (req, res) => {
   res.json({
     message: '🚀 UNA Institute Backend API',
     version: '1.0.0',
@@ -657,8 +647,7 @@ app.get('/api/info', (req, res) => {
       courses: '/api/courses',
       enrollments: '/api/enrollments',
       admin: '/api/admin',
-      lectures: '/api/lectures',
-      apiInfo: '/api/info'
+      lectures: '/api/lectures'
     },
     documentation: 'Visit /health for server status and /api/* for API endpoints'
   });
@@ -1090,13 +1079,8 @@ try {
           }
         });
         
-        // Root route - Serve Frontend
+        // Root route - API Information
         app.get('/', (req, res) => {
-          res.sendFile(path.join(__dirname, '../frontend/ar/index.html'));
-        });
-
-        // API Information route (moved to /api/info)
-        app.get('/api/info', (req, res) => {
           res.json({
             message: '🚀 UNA Institute Backend API (Worker)',
             version: '1.0.0',
@@ -1111,8 +1095,7 @@ try {
               courses: '/api/courses',
               enrollments: '/api/enrollments',
               admin: '/api/admin',
-              lectures: '/api/lectures',
-              apiInfo: '/api/info'
+              lectures: '/api/lectures'
             },
             documentation: 'Visit /health for server status and /api/* for API endpoints'
           });

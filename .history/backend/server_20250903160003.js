@@ -630,12 +630,7 @@ app.use(express.static(path.join(__dirname, '..'), {
   }
 }));
 
-// Serve static files
 app.use('/certs', express.static(path.join(__dirname, '../frontend/certs')));
-app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
-app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
-app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
-app.use('/socket.io', express.static(path.join(__dirname, '../frontend/socket.io')));
 
 // 8. Root route - Serve Frontend
 app.get('/', (req, res) => {
