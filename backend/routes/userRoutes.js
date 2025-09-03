@@ -6,6 +6,11 @@ const router = express.Router();
 const verifyUserToken = require('../middleware/verifyUserToken');
 const { validateUserRegistration, validateUserLogin } = require('../middleware/validation');
 
+// Test route to verify userRoutes is loaded
+router.get('/test', (req, res) => {
+  res.json({ message: 'User routes are working!', timestamp: new Date().toISOString() });
+});
+
 // Register
 router.post('/register', validateUserRegistration, async (req, res) => {
   const { name, phone, civilId, passportNumber, dateOfBirth, password } = req.body;
