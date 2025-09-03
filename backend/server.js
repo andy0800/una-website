@@ -199,81 +199,40 @@ if (performanceOptimizer) {
   });
 }
 
-// NEW: Production middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "'unsafe-inline'", // Required for inline scripts in HTML
-        "https://cdn.socket.io"
-      ],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'", // Required for inline styles
-        "https://fonts.googleapis.com",
-        "https://cdnjs.cloudflare.com"
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com",
-        "https://cdnjs.cloudflare.com"
-      ],
-      imgSrc: [
-        "'self'",
-        "data:",
-        "https:"
-      ],
-      mediaSrc: [
-        "'self'",
-        "data:"
-      ],
-      connectSrc: [
-        "'self'",
-        "ws:",   // WebSocket connections
-        "wss:"   // Secure WebSocket connections
-      ],
-      frameSrc: [
-        "'self'"
-      ],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: []
+// NEW: Production middleware - TEMPORARILY SIMPLIFIED FOR DEBUGGING
+console.log('🔍 DEBUG: Setting up helmet...');
+try {
+  app.use(helmet({
+    contentSecurityPolicy: false, // Temporarily disable CSP
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
     }
-  },
-  crossOriginEmbedderPolicy: false,
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
-  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}));
+  }));
+  console.log('🔍 DEBUG: Helmet setup successful');
+} catch (error) {
+  console.error('🔍 DEBUG: Helmet setup error:', error);
+}
 
-// Additional security middleware
-app.use((req, res, next) => {
-  // Security headers
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  
-  // Cross-origin headers
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
-  
-  // Rate limiting headers
-  res.setHeader('X-RateLimit-Limit', '100');
-  res.setHeader('X-RateLimit-Remaining', '99');
-  res.setHeader('X-RateLimit-Reset', Date.now() + 60000);
-  
-  // Worker identification header
-  res.setHeader('X-Worker-ID', process.pid);
-  
-  next();
-});
+// Additional security middleware - TEMPORARILY SIMPLIFIED FOR DEBUGGING
+console.log('🔍 DEBUG: Setting up security middleware...');
+try {
+  app.use((req, res, next) => {
+    // Basic security headers only
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-Worker-ID', process.pid);
+    next();
+  });
+  console.log('🔍 DEBUG: Security middleware setup successful');
+} catch (error) {
+  console.error('🔍 DEBUG: Security middleware setup error:', error);
+}
 
 // Compression middleware
 app.use(compression());
