@@ -131,26 +131,24 @@ try {
   performanceOptimizer = null;
 }
 
-// Performance optimization event listeners (only if optimizer is available)
-if (performanceOptimizer) {
-  performanceOptimizer.on('metrics-updated', (currentMetrics) => {
-    // Update global metrics for external monitoring
-    global.currentPerformanceMetrics = currentMetrics;
-    
-    // Log performance metrics
-    if (currentMetrics.memoryUsage > 0.8 || currentMetrics.cpuUsage > 0.9) {
-      logger.warn('High resource usage detected', currentMetrics);
-    }
-  });
+// Performance optimization event listeners
+performanceOptimizer.on('metrics-updated', (currentMetrics) => {
+  // Update global metrics for external monitoring
+  global.currentPerformanceMetrics = currentMetrics;
+  
+  // Log performance metrics
+  if (currentMetrics.memoryUsage > 0.8 || currentMetrics.cpuUsage > 0.9) {
+    logger.warn('High resource usage detected', currentMetrics);
+  }
+});
 
-  performanceOptimizer.on('optimization-completed', (strategies) => {
-    logger.info(`Performance optimization completed: ${strategies.map(s => s.name).join(', ')}`);
-    
-    // Update metrics after optimization
-    metrics.lastOptimization = Date.now();
-    metrics.optimizationCount = (metrics.optimizationCount || 0) + strategies.length;
-  });
-}
+performanceOptimizer.on('optimization-completed', (strategies) => {
+  logger.info(`Performance optimization completed: ${strategies.map(s => s.name).join(', ')}`);
+  
+  // Update metrics after optimization
+  metrics.lastOptimization = Date.now();
+  metrics.optimizationCount = (metrics.optimizationCount || 0) + strategies.length;
+});
 
 // NEW: Production middleware
 app.use(helmet({
@@ -283,22 +281,6 @@ app.get('/worker-metrics', (req, res) => {
 // Performance optimization metrics
 app.get('/performance-metrics', (req, res) => {
   try {
-    if (!performanceOptimizer) {
-      return res.json({
-        workerId: process.pid,
-        timestamp: new Date().toISOString(),
-        performance: {
-          isEnabled: false,
-          message: 'Performance optimizer not available'
-        },
-        currentMetrics: {
-          memoryUsage: process.memoryUsage(),
-          cpuUsage: process.cpuUsage(),
-          uptime: process.uptime()
-        }
-      });
-    }
-
     const performanceStats = performanceOptimizer.getOptimizationStats();
     const currentMetrics = global.currentPerformanceMetrics || {};
     
@@ -340,14 +322,6 @@ app.get('/performance-metrics', (req, res) => {
 // Manual performance optimization trigger
 app.post('/performance-optimize', async (req, res) => {
   try {
-    if (!performanceOptimizer) {
-      return res.status(503).json({
-        error: 'Performance optimizer not available',
-        worker: process.pid,
-        timestamp: new Date().toISOString()
-      });
-    }
-
     const { strategy } = req.body;
     
     if (strategy && !performanceOptimizer.optimizationStrategies.has(strategy)) {
@@ -1067,13 +1041,11 @@ const PORT = process.env.PORT || 3000;
       logger.info('✅ HTTP server closed');
       
       // Shutdown performance optimizer
-      if (performanceOptimizer) {
-        try {
-          await performanceOptimizer.shutdown();
-          logger.info('✅ Performance optimizer shutdown completed');
-        } catch (error) {
-          logger.error('❌ Performance optimizer shutdown failed:', error);
-        }
+      try {
+        await performanceOptimizer.shutdown();
+        logger.info('✅ Performance optimizer shutdown completed');
+      } catch (error) {
+        logger.error('❌ Performance optimizer shutdown failed:', error);
       }
       
       // NEW: Cleanup metrics interval
@@ -1116,20 +1088,10 @@ const PORT = process.env.PORT || 3000;
   // NEW: Uncaught exception handling
   process.on('uncaughtException', (err) => {
     logger.error('Uncaught Exception:', err);
-    // Don't shutdown immediately in production, log and continue
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('Continuing despite uncaught exception in production');
-    } else {
-      gracefulShutdown('uncaughtException');
-    }
+    gracefulShutdown('uncaughtException');
   });
 
   process.on('unhandledRejection', (reason, promise) => {
     logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    // Don't shutdown immediately in production, log and continue
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('Continuing despite unhandled rejection in production');
-    } else {
-      gracefulShutdown('unhandledRejection');
-    }
-  });
+    gracefulShutdown('unhandledRejection');
+});

@@ -340,14 +340,6 @@ app.get('/performance-metrics', (req, res) => {
 // Manual performance optimization trigger
 app.post('/performance-optimize', async (req, res) => {
   try {
-    if (!performanceOptimizer) {
-      return res.status(503).json({
-        error: 'Performance optimizer not available',
-        worker: process.pid,
-        timestamp: new Date().toISOString()
-      });
-    }
-
     const { strategy } = req.body;
     
     if (strategy && !performanceOptimizer.optimizationStrategies.has(strategy)) {
@@ -1067,13 +1059,11 @@ const PORT = process.env.PORT || 3000;
       logger.info('✅ HTTP server closed');
       
       // Shutdown performance optimizer
-      if (performanceOptimizer) {
-        try {
-          await performanceOptimizer.shutdown();
-          logger.info('✅ Performance optimizer shutdown completed');
-        } catch (error) {
-          logger.error('❌ Performance optimizer shutdown failed:', error);
-        }
+      try {
+        await performanceOptimizer.shutdown();
+        logger.info('✅ Performance optimizer shutdown completed');
+      } catch (error) {
+        logger.error('❌ Performance optimizer shutdown failed:', error);
       }
       
       // NEW: Cleanup metrics interval
@@ -1116,20 +1106,10 @@ const PORT = process.env.PORT || 3000;
   // NEW: Uncaught exception handling
   process.on('uncaughtException', (err) => {
     logger.error('Uncaught Exception:', err);
-    // Don't shutdown immediately in production, log and continue
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('Continuing despite uncaught exception in production');
-    } else {
-      gracefulShutdown('uncaughtException');
-    }
+    gracefulShutdown('uncaughtException');
   });
 
   process.on('unhandledRejection', (reason, promise) => {
     logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    // Don't shutdown immediately in production, log and continue
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('Continuing despite unhandled rejection in production');
-    } else {
-      gracefulShutdown('unhandledRejection');
-    }
-  });
+    gracefulShutdown('unhandledRejection');
+});

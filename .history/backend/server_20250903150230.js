@@ -1116,20 +1116,10 @@ const PORT = process.env.PORT || 3000;
   // NEW: Uncaught exception handling
   process.on('uncaughtException', (err) => {
     logger.error('Uncaught Exception:', err);
-    // Don't shutdown immediately in production, log and continue
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('Continuing despite uncaught exception in production');
-    } else {
-      gracefulShutdown('uncaughtException');
-    }
+    gracefulShutdown('uncaughtException');
   });
 
   process.on('unhandledRejection', (reason, promise) => {
     logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    // Don't shutdown immediately in production, log and continue
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('Continuing despite unhandled rejection in production');
-    } else {
-      gracefulShutdown('unhandledRejection');
-    }
-  });
+    gracefulShutdown('unhandledRejection');
+});

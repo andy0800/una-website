@@ -93,27 +93,16 @@ class PerformanceOptimizer extends EventEmitter {
       return;
     }
 
-    try {
-      console.log('🚀 Starting Performance Optimizer...');
-      
-      setInterval(() => {
-        this.monitorPerformance().catch(error => {
-          console.error('❌ Performance monitoring interval failed:', error);
-        });
-      }, this.options.optimizationInterval);
-      
-      // Initial optimization check
-      setTimeout(() => {
-        this.monitorPerformance().catch(error => {
-          console.error('❌ Initial performance check failed:', error);
-        });
-      }, 5000);
-      
-      console.log('✅ Performance Optimizer started successfully');
-    } catch (error) {
-      console.error('❌ Failed to start Performance Optimizer:', error);
-      // Don't throw the error, just log it and continue
-    }
+    console.log('🚀 Starting Performance Optimizer...');
+    
+    setInterval(() => {
+      this.monitorPerformance();
+    }, this.options.optimizationInterval);
+    
+    // Initial optimization check
+    setTimeout(() => {
+      this.monitorPerformance();
+    }, 5000);
   }
 
   // Monitor system performance

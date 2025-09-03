@@ -16,7 +16,7 @@ services:
       - key: ENABLE_CLUSTERING
         value: false
       - key: ENABLE_PERFORMANCE_OPTIMIZATION
-        value: false
+        value: true
       - key: LOG_LEVEL
         value: info
       - key: CORS_ORIGIN
