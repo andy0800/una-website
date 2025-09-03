@@ -1,9 +1,21 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/ar/:path*", "destination": "/ar/:path*/index.html" },
-    { "source": "/en/:path*", "destination": "/en/:path*/index.html" },
-    { "source": "/admin/:path*", "destination": "/admin/:path*/index.html" },
-    { "source": "/", "destination": "/ar/index.html" }
+    {
+      "source": "/ar/:slug",
+      "destination": "/ar/:slug.html"
+    },
+    {
+      "source": "/en/:slug",
+      "destination": "/en/:slug.html"
+    },
+    {
+      "source": "/admin/:slug",
+      "destination": "/admin/:slug.html"
+    },
+    {
+      "source": "/",
+      "destination": "/ar/index.html"
+    }
   ]
 }
