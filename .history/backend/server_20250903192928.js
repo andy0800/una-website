@@ -591,6 +591,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // 6. Global middleware
+app.use(cors(corsOptions));
 app.use(securityHeaders);
 app.use(securityLogger);
 app.use(apiRateLimiter);
@@ -683,25 +684,6 @@ app.get('/test', (req, res) => {
       register: '/api/users/register',
       health: '/health'
     }
-  });
-});
-
-// CORS test endpoint
-app.get('/cors-test', (req, res) => {
-  res.json({
-    message: 'CORS is working!',
-    origin: req.headers.origin,
-    timestamp: new Date().toISOString()
-  });
-});
-
-// CORS test endpoint for POST requests
-app.post('/cors-test', (req, res) => {
-  res.json({
-    message: 'CORS POST is working!',
-    origin: req.headers.origin,
-    body: req.body,
-    timestamp: new Date().toISOString()
   });
 });
 

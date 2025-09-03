@@ -591,6 +591,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // 6. Global middleware
+app.use(cors(corsOptions));
 app.use(securityHeaders);
 app.use(securityLogger);
 app.use(apiRateLimiter);
