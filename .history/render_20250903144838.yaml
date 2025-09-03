@@ -19,17 +19,5 @@ services:
         value: true
       - key: LOG_LEVEL
         value: info
-      - key: CORS_ORIGIN
-        value: "*"
-      - key: RATE_LIMIT_WINDOW
-        value: "60000"
-      - key: RATE_LIMIT_MAX
-        value: "100"
-      - key: MAX_FILE_SIZE
-        value: "100MB"
-      - key: ENABLE_MONITORING
-        value: "true"
-      - key: METRICS_PORT
-        value: "9090"
     healthCheckPath: /health
     autoDeploy: true
