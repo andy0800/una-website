@@ -10,12 +10,108 @@
       "destination": "/ar/index.html"
     },
     {
+      "source": "/ar/about",
+      "destination": "/ar/about.html"
+    },
+    {
+      "source": "/ar/register",
+      "destination": "/ar/register.html"
+    },
+    {
+      "source": "/ar/recorded-lectures",
+      "destination": "/ar/recorded-lectures.html"
+    },
+    {
+      "source": "/ar/profile",
+      "destination": "/ar/profile.html"
+    },
+    {
+      "source": "/ar/news",
+      "destination": "/ar/news.html"
+    },
+    {
+      "source": "/ar/login",
+      "destination": "/ar/login.html"
+    },
+    {
+      "source": "/ar/livestream",
+      "destination": "/ar/livestream.html"
+    },
+    {
+      "source": "/ar/header",
+      "destination": "/ar/header.html"
+    },
+    {
+      "source": "/ar/courses",
+      "destination": "/ar/courses.html"
+    },
+    {
+      "source": "/ar/course-details",
+      "destination": "/ar/course-details.html"
+    },
+    {
+      "source": "/ar/contact",
+      "destination": "/ar/contact.html"
+    },
+    {
       "source": "/en",
       "destination": "/en/index.html"
     },
     {
+      "source": "/en/about",
+      "destination": "/en/about.html"
+    },
+    {
+      "source": "/en/register",
+      "destination": "/en/register.html"
+    },
+    {
+      "source": "/en/recorded-lectures",
+      "destination": "/en/recorded-lectures.html"
+    },
+    {
+      "source": "/en/profile",
+      "destination": "/en/profile.html"
+    },
+    {
+      "source": "/en/news",
+      "destination": "/en/news.html"
+    },
+    {
+      "source": "/en/login",
+      "destination": "/en/login.html"
+    },
+    {
+      "source": "/en/livestream",
+      "destination": "/en/livestream.html"
+    },
+    {
+      "source": "/en/header",
+      "destination": "/en/header.html"
+    },
+    {
+      "source": "/en/enroll",
+      "destination": "/en/enroll.html"
+    },
+    {
+      "source": "/en/courses",
+      "destination": "/en/courses.html"
+    },
+    {
+      "source": "/en/course-details",
+      "destination": "/en/course-details.html"
+    },
+    {
+      "source": "/en/contact",
+      "destination": "/en/contact.html"
+    },
+    {
       "source": "/admin",
       "destination": "/admin/login.html"
+    },
+    {
+      "source": "/admin/dashboard",
+      "destination": "/admin/dashboard.html"
     }
   ]
 }
