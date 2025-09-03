@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Add indexes for better performance
-userSchema.index({ phone: 1 });
+// Note: phone index is automatically created by unique: true in schema
 userSchema.index({ civilId: 1 });
 userSchema.index({ courses: 1 });
 userSchema.index({ level: 1 });
