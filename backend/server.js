@@ -707,16 +707,41 @@ app.post('/cors-test', (req, res) => {
 
 // 8.1. API route handlers
 console.log('🔍 DEBUG: Registering API routes...');
-app.use('/api/users',       require('./routes/userRoutes'));
-console.log('🔍 DEBUG: /api/users route registered');
-app.use('/api/courses',     require('./routes/courseRoutes'));
-console.log('🔍 DEBUG: /api/courses route registered');
-app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
-console.log('🔍 DEBUG: /api/enrollments route registered');
-app.use('/api/admin',       require('./routes/adminRoutes'));
-console.log('🔍 DEBUG: /api/admin route registered');
-app.use('/api/lectures',    require('./routes/lectureRoutes')); // NEW: Lecture management routes
-console.log('🔍 DEBUG: /api/lectures route registered');
+try {
+  app.use('/api/users',       require('./routes/userRoutes'));
+  console.log('🔍 DEBUG: /api/users route registered');
+} catch (error) {
+  console.error('🔍 DEBUG: Error registering /api/users route:', error);
+}
+
+try {
+  app.use('/api/courses',     require('./routes/courseRoutes'));
+  console.log('🔍 DEBUG: /api/courses route registered');
+} catch (error) {
+  console.error('🔍 DEBUG: Error registering /api/courses route:', error);
+}
+
+try {
+  app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
+  console.log('🔍 DEBUG: /api/enrollments route registered');
+} catch (error) {
+  console.error('🔍 DEBUG: Error registering /api/enrollments route:', error);
+}
+
+try {
+  app.use('/api/admin',       require('./routes/adminRoutes'));
+  console.log('🔍 DEBUG: /api/admin route registered');
+} catch (error) {
+  console.error('🔍 DEBUG: Error registering /api/admin route:', error);
+}
+
+try {
+  app.use('/api/lectures',    require('./routes/lectureRoutes')); // NEW: Lecture management routes
+  console.log('🔍 DEBUG: /api/lectures route registered');
+} catch (error) {
+  console.error('🔍 DEBUG: Error registering /api/lectures route:', error);
+}
+
 console.log('🔍 DEBUG: All API routes registered successfully');
 
 
