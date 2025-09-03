@@ -289,8 +289,7 @@ app.use(cors({
     'http://localhost:5000',
     'https://cute-churros-f9f049.netlify.app',
     'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
-    'https://una-website.vercel.app',
-    'https://una-backend-c207.onrender.com'
+    'https://una-website.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -656,32 +655,12 @@ app.get('/', (req, res) => {
   });
 });
 
-// Test endpoint to verify server is working
-app.get('/test', (req, res) => {
-  res.json({
-    message: 'Server is working!',
-    timestamp: new Date().toISOString(),
-    routes: {
-      login: '/api/users/login',
-      register: '/api/users/register',
-      health: '/health'
-    }
-  });
-});
-
 // 8.1. API route handlers
-console.log('🔍 DEBUG: Registering API routes...');
 app.use('/api/users',       require('./routes/userRoutes'));
-console.log('🔍 DEBUG: /api/users route registered');
 app.use('/api/courses',     require('./routes/courseRoutes'));
-console.log('🔍 DEBUG: /api/courses route registered');
 app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
-console.log('🔍 DEBUG: /api/enrollments route registered');
 app.use('/api/admin',       require('./routes/adminRoutes'));
-console.log('🔍 DEBUG: /api/admin route registered');
 app.use('/api/lectures',    require('./routes/lectureRoutes')); // NEW: Lecture management routes
-console.log('🔍 DEBUG: /api/lectures route registered');
-console.log('🔍 DEBUG: All API routes registered successfully');
 
 
 // 8.5. Health check endpoint for production monitoring

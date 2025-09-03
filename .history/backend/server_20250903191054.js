@@ -289,8 +289,7 @@ app.use(cors({
     'http://localhost:5000',
     'https://cute-churros-f9f049.netlify.app',
     'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
-    'https://una-website.vercel.app',
-    'https://una-backend-c207.onrender.com'
+    'https://una-website.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -653,19 +652,6 @@ app.get('/', (req, res) => {
       lectures: '/api/lectures'
     },
     documentation: 'Visit /health for server status and /api/* for API endpoints'
-  });
-});
-
-// Test endpoint to verify server is working
-app.get('/test', (req, res) => {
-  res.json({
-    message: 'Server is working!',
-    timestamp: new Date().toISOString(),
-    routes: {
-      login: '/api/users/login',
-      register: '/api/users/register',
-      health: '/health'
-    }
   });
 });
 

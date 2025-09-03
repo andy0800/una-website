@@ -289,8 +289,7 @@ app.use(cors({
     'http://localhost:5000',
     'https://cute-churros-f9f049.netlify.app',
     'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
-    'https://una-website.vercel.app',
-    'https://una-backend-c207.onrender.com'
+    'https://una-website.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
