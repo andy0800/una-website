@@ -411,7 +411,7 @@ class PerformanceOptimizer extends EventEmitter {
   optimizeEventLoop() {
     // Clear any pending timers that might be causing issues
     // This is a basic optimization - in production you'd want more sophisticated logic
-    if (typeof global !== 'undefined' && global.pendingTimers) {
+    if (global.pendingTimers) {
       global.pendingTimers.forEach(timer => clearTimeout(timer));
       global.pendingTimers = [];
     }
@@ -420,7 +420,7 @@ class PerformanceOptimizer extends EventEmitter {
   // Clear heavy computations
   clearHeavyComputations() {
     // Clear any heavy computation caches
-    if (typeof global !== 'undefined' && global.heavyComputationCache) {
+    if (global.heavyComputationCache) {
       global.heavyComputationCache.clear();
     }
   }

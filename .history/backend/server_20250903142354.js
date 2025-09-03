@@ -554,8 +554,9 @@ app.get('/health', (req, res) => {
       }
     };
     
-    // Check if system is healthy (database connection is optional for basic functionality)
-    const isHealthy = healthStatus.memory.heapUsed < 500 * 1024 * 1024 && // Less than 500MB
+    // Check if system is healthy
+    const isHealthy = healthStatus.database === 'connected' && 
+                     healthStatus.memory.heapUsed < 500 * 1024 * 1024 && // Less than 500MB
                      healthStatus.totalErrors < 100; // Less than 100 errors
     
     if (!isHealthy) {
@@ -600,9 +601,9 @@ app.get('/health/detailed', async (req, res) => {
       uptime: 'OK'
     };
     
-    // Check database (optional for basic functionality)
+    // Check database
     if (mongoose.connection.readyState !== 1) {
-      healthChecks.database = 'DISCONNECTED';
+      healthChecks.database = 'FAILED';
     }
     
     // Check memory

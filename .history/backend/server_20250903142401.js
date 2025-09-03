@@ -600,9 +600,9 @@ app.get('/health/detailed', async (req, res) => {
       uptime: 'OK'
     };
     
-    // Check database (optional for basic functionality)
+    // Check database
     if (mongoose.connection.readyState !== 1) {
-      healthChecks.database = 'DISCONNECTED';
+      healthChecks.database = 'FAILED';
     }
     
     // Check memory

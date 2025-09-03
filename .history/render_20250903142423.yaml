@@ -1,0 +1,23 @@
+# Render deployment configuration
+services:
+  - type: web
+    name: una-institute-website
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENABLE_CLUSTERING
+        value: false
+      - key: ENABLE_PERFORMANCE_OPTIMIZATION
+        value: true
+      - key: LOG_LEVEL
+        value: info
+    healthCheckPath: /health
+    autoDeploy: true
