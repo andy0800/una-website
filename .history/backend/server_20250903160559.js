@@ -1079,8 +1079,13 @@ try {
           }
         });
         
-        // Root route - API Information
+        // Root route - Serve Frontend
         app.get('/', (req, res) => {
+          res.sendFile(path.join(__dirname, '../frontend/ar/index.html'));
+        });
+
+        // API Information route (moved to /api/info)
+        app.get('/api/info', (req, res) => {
           res.json({
             message: '🚀 UNA Institute Backend API (Worker)',
             version: '1.0.0',
@@ -1095,7 +1100,8 @@ try {
               courses: '/api/courses',
               enrollments: '/api/enrollments',
               admin: '/api/admin',
-              lectures: '/api/lectures'
+              lectures: '/api/lectures',
+              apiInfo: '/api/info'
             },
             documentation: 'Visit /health for server status and /api/* for API endpoints'
           });
