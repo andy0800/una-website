@@ -112,9 +112,10 @@ const corsOptions = {
       'http://localhost:3001',
       'http://127.0.0.1:3000',
       'http://127.0.0.1:3001',
-      // Production domains
-      'https://yourdomain.com',
-      'https://www.yourdomain.com',
+      // Production domains - Netlify
+      'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
+      'https://una-website.netlify.app',
+      'https://una-institute.netlify.app',
       // 🌐 NETWORK SHARING: Your local network IP
       'http://192.168.187.16:3000',
       'http://192.168.187.16:3001',
