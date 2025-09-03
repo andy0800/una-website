@@ -1,0 +1,27 @@
+[[redirects]]
+  from = "/"
+  to = "/ar/index.html"
+
+[[redirects]]
+  from = "/ar"
+  to = "/ar/index.html"
+
+[[redirects]]
+  from = "/ar/*"
+  to = "/ar/:splat.html"
+
+[[redirects]]
+  from = "/en"
+  to = "/en/index.html"
+
+[[redirects]]
+  from = "/en/*"
+  to = "/en/:splat.html"
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/login.html"
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/:splat.html"

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البث المباشر - مركز التحكيم المصري</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Header and Footer Styles */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 0 20px;
+        }
+        
+        .footer-section h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .footer-section p, .footer-section a {
+            color: #bdc3c7;
+            text-decoration: none;
+            line-height: 1.6;
+        }
+        
+        .footer-section a:hover {
+            color: #3498db;
+        }
+        
+        .viewer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .stream-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .stream-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .stream-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .video-section {
+            background: #1a1a1a;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+        }
+        
+        #viewerVideo {
+            width: 100%;
+            height: auto;
+            min-height: 400px;
+            display: block;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .video-overlay.hidden {
+            display: none;
+        }
+        
+        .stream-status {
+            padding: 15px 20px;
+            background: #2a2a2a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #666;
+        }
+        
+        .status-dot.live {
+            background: #00ff00;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.connected {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+        
+        .status-dot.connecting {
+            background: #ffc107;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-dot.error {
+            background: #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .chat-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .message-time {
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .message-content {
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .chat-input-section {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        
+        .send-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .send-btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .controls-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        .controls-header {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .control-btn.primary:hover {
+            background: #5a6fd8;
+        }
+        
+        .control-btn.secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .control-btn.secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .control-btn.danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .control-btn.danger:hover {
+            background: #c82333;
+        }
+        
+        .user-info {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 auto 15px;
+        }
+        
+        .user-name {
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .user-email {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stream-title {
+                font-size: 2rem;
+            }
+            
+            .video-container {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1><i class="fas fa-broadcast-tower"></i> معهد UNA</h1>
+        <p>عارض البث المباشر - تجربة التعلم في الوقت الفعلي</p>
+    </header>
+    
+    <div class="viewer-container">
+        <!-- Stream Header -->
+        <div class="stream-header">
+            <h1 class="stream-title">البث المباشر - مركز التحكيم المصري</h1>
+            <p class="stream-subtitle">التميز في التدريب المهني - مباشر الآن</p>
+        </div>
+        
+        <!-- Manual Stream Join Section -->
+        <div class="manual-join-section" style="margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: center;">
+            <h3 style="margin-bottom: 15px; color: #fff;"><i class="fas fa-sign-in-alt"></i> انضم إلى البث يدوياً</h3>
+            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+                <input type="text" id="roomIdInput" placeholder="أدخل معرف الغرفة" style="padding: 10px; border: none; border-radius: 5px; min-width: 200px;">
+                <button onclick="joinStreamManually()" class="control-btn primary" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-play"></i> انضم إلى البث
+                </button>
+            </div>
+            <p style="margin: 0; font-size: 0.9rem; opacity: 0.8; color: #fff;">اسأل المدير عن معرف الغرفة للانضمام إلى البث</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Video Section -->
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="viewerVideo" autoplay playsinline></video>
+                    <div id="videoOverlay" class="video-overlay">
+                        <div>
+                            <div class="loading-spinner"></div>
+                            <p>في انتظار بدء البث...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="stream-status">
+                    <div class="status-indicator">
+                        <div id="statusDot" class="status-dot"></div>
+                        <span id="statusText">جاري الاتصال...</span>
+                    </div>
+                    <div id="viewerCount">0 مشاهد</div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- User Info -->
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">م</div>
+                    <div class="user-name" id="userName">جاري التحميل...</div>
+                    <div class="user-email" id="userEmail">جاري التحميل...</div>
+                </div>
+                
+                <!-- Controls -->
+                <div class="controls-section">
+                    <div class="controls-header">أدوات التحكم في البث</div>
+                    <div class="control-buttons">
+                        <button id="requestMicBtn" class="control-btn primary">
+                            <i class="fas fa-microphone"></i>
+                            طلب الميكروفون
+                        </button>
+                        <button id="muteBtn" class="control-btn secondary" style="display: none;">
+                            <i class="fas fa-microphone-slash"></i>
+                            كتم الميكروفون
+                        </button>
+                        <button id="unmuteBtn" class="control-btn secondary" style="display: none;">
+                            <i class="fas fa-microphone"></i>
+                            إلغاء كتم الميكروفون
+                        </button>
+                        <button id="leaveStreamBtn" class="control-btn danger">
+                            <i class="fas fa-sign-out-alt"></i>
+                            مغادرة البث
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Chat Section -->
+                <div class="chat-section">
+                    <div class="chat-header">
+                        <i class="fas fa-comments"></i> المحادثة المباشرة
+                    </div>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="chat-message">
+                            <div class="message-header">
+                                <span class="message-author">النظام</span>
+                                <span class="message-time">الآن</span>
+                            </div>
+                            <div class="message-content">مرحباً بك في البث المباشر! ستكون المحادثة متاحة بمجرد الاتصال.</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-section">
+                        <input type="text" id="chatInput" class="chat-input" placeholder="اكتب رسالتك..." disabled>
+                        <button id="sendBtn" class="send-btn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Messages -->
+        <div id="statusMessages"></div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-university"></i> معهد UNA</h3>
+                <p>تمكين التعليم من خلال التكنولوجيا المبتكرة وتجارب التعلم في الوقت الفعلي.</p>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-video"></i> البث المباشر</h3>
+                <p>بث مباشر عالي الجودة ومنخفض التأخير للتعلم التفاعلي والتعاون.</p>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-headset"></i> الدعم</h3>
+                <p>تحتاج مساعدة؟ اتصل بفريق الدعم الفني للحصول على المساعدة.</p>
+                <a href="mailto:support@unainstitute.com">support@unainstitute.com</a>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-globe"></i> تواصل</h3>
+                <p>ابق على اتصال مع معهد UNA للحصول على أحدث التحديثات والميزات.</p>
+                <a href="https://unainstitute.com">www.unainstitute.com</a>
+            </div>
+        </div>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #34495e;">
+            <p>&copy; 2024 معهد UNA. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+    
+    <!-- Load Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Load Custom WebRTC Viewer -->
+    <script src="/js/custom-webrtc-viewer.js"></script>
+    
+    <!-- Load Viewer Page Scripts -->
+    <script src="/js/viewer-page.js"></script>
+    
+    <!-- Initialize WebRTC Viewer -->
+    <script>
+        // Initialize the viewer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Create viewer instance
+                window.webrtcViewer = new CustomWebRTCViewer();
+                
+                // Set up UI event listeners
+                setupUIEventListeners();
+                
+            } catch (error) {
+                console.error('Failed to initialize WebRTC viewer:', error);
+                showErrorMessage('فشل في تهيئة مشغل WebRTC: ' + error.message);
+            }
+        });
+        
+        function setupUIEventListeners() {
+            // Mic request button
+            const requestMicBtn = document.getElementById('requestMicBtn');
+            if (requestMicBtn) {
+                requestMicBtn.addEventListener('click', () => {
+                    if (window.webrtcViewer) {
+                        window.webrtcViewer.requestMic();
+                    }
+                });
+            }
+            
+            // Mute button
+            const muteBtn = document.getElementById('muteBtn');
+            if (muteBtn) {
+                muteBtn.addEventListener('click', () => {
+                    if (window.webrtcViewer) {
+                        window.webrtcViewer.muteMic();
+                    }
+                });
+            }
+            
+            // Unmute button
+            const unmuteBtn = document.getElementById('unmuteBtn');
+            if (unmuteBtn) {
+                unmuteBtn.addEventListener('click', () => {
+                    if (window.webrtcViewer) {
+                        window.webrtcViewer.unmuteMic();
+                    }
+                });
+            }
+            
+            // Chat send button
+            const sendBtn = document.getElementById('sendBtn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', () => {
+                    const chatInput = document.getElementById('chatInput');
+                    if (chatInput && window.webrtcViewer) {
+                        window.webrtcViewer.sendChatMessage(chatInput.value);
+                    }
+                });
+            }
+            
+            // Chat input enter key
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && window.webrtcViewer) {
+                        window.webrtcViewer.sendChatMessage(chatInput.value);
+                    }
+                });
+            }
+        }
+        
+        function showErrorMessage(message) {
+            const statusMessages = document.getElementById('statusMessages');
+            if (statusMessages) {
+                statusMessages.innerHTML = `
+                    <div class="error-message">
+                        ${message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Manual stream join function
+        function joinStreamManually() {
+            const roomIdInput = document.getElementById('roomIdInput');
+            const roomId = roomIdInput.value.trim();
+            
+            if (!roomId) {
+                showErrorMessage('يرجى إدخال معرف الغرفة');
+                return;
+            }
+            
+            if (window.webrtcViewer) {
+                console.log('🎯 Manually joining stream with room ID:', roomId);
+                window.webrtcViewer.joinStream(roomId);
+                showErrorMessage('جاري الانضمام إلى البث... يرجى الانتظار.');
+            } else {
+                showErrorMessage('مشغل WebRTC غير مهيأ');
+            }
+        }
+    </script>
+</body>
+</html>

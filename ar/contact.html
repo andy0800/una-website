@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>اتصل بنا - معهد UNA</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <script>
+    // Language redirection
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isArabic = userLang.toLowerCase().startsWith('ar');
+      if (!isArabic && window.location.pathname.endsWith('contact.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = '../en/contact.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+</head>
+
+<body class="arabic">
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = '/ar/header.html'; // Path to the Arabic header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+  
+
+  
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">اتصل بنا</h1>
+        <p class="hero-subtitle">نحب أن نسمع منك! تواصل معنا عبر النموذج أدناه أو زر مكتبنا.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section">
+    <div class="container">
+      <div class="grid grid-2">
+        <div class="contact-info">
+          <h2>مكتبنا</h2>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+              <strong>العنوان:</strong><br>
+              الكويت – شرق، قطعة 8، شارع 157،<br>
+              برج العدالة، الطابق الأول
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div>
+              <strong>واتساب:</strong><br>
+              +965 91108981
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <div>
+              <strong>إنستغرام:</strong><br>
+              @una_institute
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div>
+              <strong>ساعات العمل:</strong><br>
+              الأحد - الخميس: 9:00 ص - 5:00 م
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form">
+          <h2>أرسل لنا رسالة</h2>
+          <form id="contactForm" novalidate>
+            <div class="form-group">
+              <label for="name" class="form-label">الاسم الكامل</label>
+              <input type="text" id="name" name="name" class="form-input" placeholder="اسمك الكامل" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">البريد الإلكتروني</label>
+              <input type="email" id="email" name="email" class="form-input" placeholder="عنوان بريدك الإلكتروني" required />
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label">رقم الهاتف</label>
+              <input type="tel" id="phone" name="phone" class="form-input" placeholder="رقم هاتفك" />
+            </div>
+
+            <div class="form-group">
+              <label for="subject" class="form-label">الموضوع</label>
+              <input type="text" id="subject" name="subject" class="form-input" placeholder="ما هو هذا الموضوع؟" required />
+            </div>
+
+            <div class="form-group">
+              <label for="message" class="form-label">الرسالة</label>
+              <textarea id="message" name="message" class="form-textarea" placeholder="رسالتك" rows="5" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane"></i> إرسال الرسالة
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>معهد UNA</h3>
+          <p>تمكين العقول من خلال التعليم الجيد والتطوير المهني.</p>
+        </div>
+        <div class="footer-section">
+          <h4>روابط سريعة</h4>
+          <ul>
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="courses.html">الدورات</a></li>
+            <li><a href="contact.html">اتصل بنا</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>معلومات الاتصال</h4>
+          <p><i class="fas fa-phone"></i> +965 1234 5678</p>
+          <p><i class="fas fa-envelope"></i> info@unainstitute.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 معهد UNA. جميع الحقوق محفوظة.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/contact-form.js"></script>
+</body>
+</html>

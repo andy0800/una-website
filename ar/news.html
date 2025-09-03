@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('news.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'news.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+</head>
+
+<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = '/ar/header.html'; // Path to the Arabic header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+  
+
+
+  <section class="news-hero">
+    آخر الأخبار والمقالات
+  </section>
+
+  <section class="news-grid container animate-on-scroll">
+    <div class="news-article">
+      <img src="images/news1.jpg" alt="صورة خبر" />
+      <h3>انطلاق الدورة الجديدة في التحكيم المؤسسي</h3>
+      <p>تم إطلاق الدورة المتقدمة بمشاركة نخبة من المحاضرين المعتمدين. الدورة تشمل تطبيقات واقعية وتمارين عملية.</p>
+    </div>
+    <div class="news-article">
+      <img src="images/news2.jpg" alt="صورة خبر" />
+      <h3>تجديد اتفاقية الشراكة مع جامعة عربية</h3>
+      <p>تم توقيع مذكرة تفاهم مع إحدى الجامعات الإقليمية لدعم برامج التدريب المشتركة في مجال التحكيم والقانون.</p>
+    </div>
+    <div class="news-article">
+      <img src="images/news3.jpg" alt="صورة خبر" />
+      <h3>مشاركة المركز في مؤتمر التحكيم الدولي</h3>
+      <p>شارك وفد المركز في مؤتمر التحكيم الدولي الذي عقد في دبي، وقدم ورقة بحثية حول التطورات الحديثة في التحكيم المؤسسي.</p>
+    </div>
+  </section>
+
+  <section class="newsletter container animate-on-scroll">
+    <h2>اشترك في النشرة البريدية</h2>
+    <p>كن أول من يعرف عن الدورات والأخبار والعروض الخاصة</p>
+    <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+      <input type="email" id="newsletterEmail" placeholder="ادخل بريدك الإلكتروني" required />
+      <button type="submit">اشترك</button>
+    </form>
+    <div id="newsletterMessage"></div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>جميع الحقوق محفوظة © 2025 مركز التحكيم المصري</p>
+    </div>
+  </footer>
+
+  <script>
+    function subscribeNewsletter(e) {
+      e.preventDefault();
+      const email = document.getElementById('newsletterEmail').value;
+      const message = document.getElementById('newsletterMessage');
+      if (email.includes('@')) {
+        message.textContent = 'تم الاشتراك بنجاح!';
+        message.style.color = 'green';
+      } else {
+        message.textContent = 'يرجى إدخال بريد إلكتروني صالح.';
+        message.style.color = 'red';
+      }
+    }
+  </script>
+  <script src="js/animations.js"></script>
+</body>
+</html>
