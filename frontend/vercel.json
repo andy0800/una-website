@@ -1,140 +1,140 @@
 {
   "version": 2,
   "buildCommand": "echo 'No build required for static site'",
-  "outputDirectory": ".",
+  "outputDirectory": "frontend",
   "installCommand": "echo 'No dependencies to install'",
   "framework": null,
   "rewrites": [
     {
       "source": "/",
-      "destination": "/ar/index.html"
+      "destination": "/frontend/ar/index.html"
     },
     {
       "source": "/ar",
-      "destination": "/ar/index.html"
+      "destination": "/frontend/ar/index.html"
     },
     {
       "source": "/ar/about",
-      "destination": "/ar/about.html"
+      "destination": "/frontend/ar/about.html"
     },
     {
       "source": "/ar/contact",
-      "destination": "/ar/contact.html"
+      "destination": "/frontend/ar/contact.html"
     },
     {
       "source": "/ar/course-details",
-      "destination": "/ar/course-details.html"
+      "destination": "/frontend/ar/course-details.html"
     },
     {
       "source": "/ar/courses",
-      "destination": "/ar/courses.html"
+      "destination": "/frontend/ar/courses.html"
     },
     {
       "source": "/ar/header",
-      "destination": "/ar/header.html"
+      "destination": "/frontend/ar/header.html"
     },
     {
       "source": "/ar/livestream",
-      "destination": "/ar/livestream.html"
+      "destination": "/frontend/ar/livestream.html"
     },
     {
       "source": "/ar/login",
-      "destination": "/ar/login.html"
+      "destination": "/frontend/ar/login.html"
     },
     {
       "source": "/ar/news",
-      "destination": "/ar/news.html"
+      "destination": "/frontend/ar/news.html"
     },
     {
       "source": "/ar/profile",
-      "destination": "/ar/profile.html"
+      "destination": "/frontend/ar/profile.html"
     },
     {
       "source": "/ar/recorded-lectures",
-      "destination": "/ar/recorded-lectures.html"
+      "destination": "/frontend/ar/recorded-lectures.html"
     },
     {
       "source": "/ar/register",
-      "destination": "/ar/register.html"
+      "destination": "/frontend/ar/register.html"
     },
     {
       "source": "/en",
-      "destination": "/en/index.html"
+      "destination": "/frontend/en/index.html"
     },
     {
       "source": "/en/about",
-      "destination": "/en/about.html"
+      "destination": "/frontend/en/about.html"
     },
     {
       "source": "/en/contact",
-      "destination": "/en/contact.html"
+      "destination": "/frontend/en/contact.html"
     },
     {
       "source": "/en/course-details",
-      "destination": "/en/course-details.html"
+      "destination": "/frontend/en/course-details.html"
     },
     {
       "source": "/en/courses",
-      "destination": "/en/courses.html"
+      "destination": "/frontend/en/courses.html"
     },
     {
       "source": "/en/enroll",
-      "destination": "/en/enroll.html"
+      "destination": "/frontend/en/enroll.html"
     },
     {
       "source": "/en/header",
-      "destination": "/en/header.html"
+      "destination": "/frontend/en/header.html"
     },
     {
       "source": "/en/livestream",
-      "destination": "/en/livestream.html"
+      "destination": "/frontend/en/livestream.html"
     },
     {
       "source": "/en/login",
-      "destination": "/en/login.html"
+      "destination": "/frontend/en/login.html"
     },
     {
       "source": "/en/news",
-      "destination": "/en/news.html"
+      "destination": "/frontend/en/news.html"
     },
     {
       "source": "/en/profile",
-      "destination": "/en/profile.html"
+      "destination": "/frontend/en/profile.html"
     },
     {
       "source": "/en/recorded-lectures",
-      "destination": "/en/recorded-lectures.html"
+      "destination": "/frontend/en/recorded-lectures.html"
     },
     {
       "source": "/en/register",
-      "destination": "/en/register.html"
+      "destination": "/frontend/en/register.html"
     },
     {
       "source": "/admin",
-      "destination": "/admin/login.html"
+      "destination": "/frontend/admin/login.html"
     },
     {
       "source": "/admin/dashboard",
-      "destination": "/admin/dashboard.html"
+      "destination": "/frontend/admin/dashboard.html"
     },
     {
       "source": "/admin/login",
-      "destination": "/admin/login.html"
+      "destination": "/frontend/admin/login.html"
     }
   ],
   "redirects": [
     {
-      "source": "/index.html",
+      "source": "/frontend/index.html",
       "destination": "/",
       "permanent": true
     },
     {
-      "source": "/ar/index.html",
+      "source": "/frontend/ar/index.html",
       "destination": "/ar",
       "permanent": true
     },
     {
-      "source": "/en/index.html",
+      "source": "/frontend/en/index.html",
       "destination": "/en",
       "permanent": true
     }
