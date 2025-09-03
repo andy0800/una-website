@@ -282,19 +282,8 @@ app.use(compression());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS configuration
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
-    'http://localhost:3000', 
-    'http://localhost:5000',
-    'https://cute-churros-f9f049.netlify.app',
-    'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
-    'https://una-website.vercel.app'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID']
-}));
+// CORS configuration - Use the centralized corsOptions from security.js
+app.use(cors(corsOptions));
 
 // Static file serving
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -576,7 +565,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // 6. Global middleware
-app.use(cors(corsOptions));
 app.use(securityHeaders);
 app.use(securityLogger);
 app.use(apiRateLimiter);
@@ -1017,16 +1005,8 @@ try {
         app.use(express.json({ limit: '50mb' }));
         app.use(express.urlencoded({ extended: true, limit: '50mb' }));
         
-        // CORS configuration
-        app.use(cors({
-          origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
-            process.env.NODE_ENV === 'production' ? process.env.DOMAIN : 'http://localhost:3000',
-            process.env.NODE_ENV === 'production' ? `https://${process.env.DOMAIN}` : 'http://localhost:5000'
-          ],
-          credentials: true,
-          methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-          allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID']
-        }));
+        // CORS configuration - Use the centralized corsOptions from security.js
+        app.use(cors(corsOptions));
         
         // Static file serving
         app.use(express.static(path.join(__dirname, '../frontend')));

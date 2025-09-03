@@ -284,13 +284,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
-    'http://localhost:3000', 
-    'http://localhost:5000',
-    'https://cute-churros-f9f049.netlify.app',
-    'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
-    'https://una-website.vercel.app'
-  ],
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000', 'http://localhost:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID']

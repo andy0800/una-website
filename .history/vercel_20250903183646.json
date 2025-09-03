@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "buildCommand": "echo 'No build required'",
+  "outputDirectory": "frontend",
+  "installCommand": "echo 'No dependencies'",
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/ar/index.html"
+    }
+  ]
+}

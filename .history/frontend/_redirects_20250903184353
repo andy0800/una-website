@@ -1,0 +1,4 @@
+/ar/*  /ar/:splat.html  200
+/en/*  /en/:splat.html  200
+/admin/*  /admin/:splat.html  200
+/       /ar/index.html   200
