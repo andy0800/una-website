@@ -1079,28 +1079,6 @@ try {
           }
         });
         
-        // Root route - API Information
-        app.get('/', (req, res) => {
-          res.json({
-            message: '🚀 UNA Institute Backend API (Worker)',
-            version: '1.0.0',
-            status: 'online',
-            environment: process.env.NODE_ENV || 'development',
-            worker: process.pid,
-            timestamp: new Date().toISOString(),
-            endpoints: {
-              health: '/health',
-              healthDetailed: '/health/detailed',
-              users: '/api/users',
-              courses: '/api/courses',
-              enrollments: '/api/enrollments',
-              admin: '/api/admin',
-              lectures: '/api/lectures'
-            },
-            documentation: 'Visit /health for server status and /api/* for API endpoints'
-          });
-        });
-
         // Register API routes
         app.use('/api/users', require('./routes/userRoutes'));
         app.use('/api/courses', require('./routes/courseRoutes'));
