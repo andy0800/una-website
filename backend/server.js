@@ -27,7 +27,7 @@ const { Server } = require('socket.io');
 console.log('🔍 DEBUG: Core modules loaded successfully');
 
 console.log('🔍 DEBUG: Loading middleware...');
-const { securityHeaders, corsOptions, apiRateLimiter, securityLogger } = require('./middleware/security');
+const { securityHeaders, apiRateLimiter, securityLogger } = require('./middleware/security');
 console.log('🔍 DEBUG: Middleware loaded successfully');
 
 // NEW: Production monitoring and logging
