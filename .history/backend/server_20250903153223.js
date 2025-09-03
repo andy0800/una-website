@@ -535,30 +535,23 @@ mongoose.connection.on('reconnected', () => {
 console.log('🔍 DEBUG: MongoDB event handlers set up successfully');
 
 // 5.5. Production environment validation
-console.log('🔍 DEBUG: Starting production environment validation...');
 if (process.env.NODE_ENV === 'production') {
-  console.log('🔍 DEBUG: Running in production mode, validating environment...');
   // Validate required environment variables
   const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
   
   if (missingVars.length > 0) {
-    console.log('🔍 DEBUG: Missing environment variables:', missingVars);
     logger.error('❌ Missing required environment variables:', missingVars);
     process.exit(1);
   }
   
   // Validate JWT secret strength
   if (process.env.JWT_SECRET.length < 32) {
-    console.log('🔍 DEBUG: JWT_SECRET too short:', process.env.JWT_SECRET.length);
     logger.error('❌ JWT_SECRET must be at least 32 characters long');
     process.exit(1);
   }
   
-  console.log('🔍 DEBUG: Production environment validation passed');
   logger.info('✅ Production environment validation passed');
-} else {
-  console.log('🔍 DEBUG: Not in production mode, skipping validation');
 }
 
 // 6. Global middleware

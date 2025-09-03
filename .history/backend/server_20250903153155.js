@@ -460,22 +460,17 @@ io.on('connection', (socket) => {
 
 // 5. MongoDB connection with production resilience
 const connectWithRetry = async () => {
-  console.log('🔍 DEBUG: Inside connectWithRetry function');
   const maxRetries = 5;
   let retries = 0;
   
   // Check if MONGO_URI is provided
   if (!process.env.MONGO_URI) {
-    console.log('🔍 DEBUG: MONGO_URI not provided');
     logger.warn('⚠️ MONGO_URI not provided. Server will start without database connection.');
     return;
   }
   
-  console.log('🔍 DEBUG: MONGO_URI provided, attempting connection...');
-  
   while (retries < maxRetries) {
     try {
-      console.log(`🔍 DEBUG: MongoDB connection attempt ${retries + 1}/${maxRetries}`);
       await mongoose.connect(process.env.MONGO_URI, {
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
@@ -483,16 +478,13 @@ const connectWithRetry = async () => {
         minPoolSize: 2
       });
       
-      console.log('🔍 DEBUG: MongoDB connected successfully');
       logger.info('✅ MongoDB connected successfully');
       break;
     } catch (err) {
       retries++;
-      console.log(`🔍 DEBUG: MongoDB connection attempt ${retries} failed:`, err.message);
       logger.error(`❌ MongoDB connection attempt ${retries} failed:`, err.message);
       
       if (retries === maxRetries) {
-        console.log('🔍 DEBUG: Max retries reached, giving up');
         logger.error('❌ Max MongoDB connection attempts reached. Server will continue without database.');
         // Don't exit the process, just log the error and continue
         return;
@@ -500,7 +492,6 @@ const connectWithRetry = async () => {
       
       // Exponential backoff
       const delay = Math.min(1000 * Math.pow(2, retries - 1), 30000);
-      console.log(`🔍 DEBUG: Retrying MongoDB connection in ${delay}ms...`);
       logger.info(`Retrying MongoDB connection in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -514,10 +505,7 @@ connectWithRetry().catch(error => {
   console.log('🔍 DEBUG: Continuing without MongoDB connection...');
 });
 
-console.log('🔍 DEBUG: MongoDB connection attempt initiated, continuing with server setup...');
-
 // NEW: MongoDB connection event handlers
-console.log('🔍 DEBUG: Setting up MongoDB event handlers...');
 mongoose.connection.on('error', (err) => {
   logger.error('MongoDB connection error:', err);
   metrics.errors++;
@@ -532,33 +520,24 @@ mongoose.connection.on('reconnected', () => {
   logger.info('MongoDB reconnected successfully');
 });
 
-console.log('🔍 DEBUG: MongoDB event handlers set up successfully');
-
 // 5.5. Production environment validation
-console.log('🔍 DEBUG: Starting production environment validation...');
 if (process.env.NODE_ENV === 'production') {
-  console.log('🔍 DEBUG: Running in production mode, validating environment...');
   // Validate required environment variables
   const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
   
   if (missingVars.length > 0) {
-    console.log('🔍 DEBUG: Missing environment variables:', missingVars);
     logger.error('❌ Missing required environment variables:', missingVars);
     process.exit(1);
   }
   
   // Validate JWT secret strength
   if (process.env.JWT_SECRET.length < 32) {
-    console.log('🔍 DEBUG: JWT_SECRET too short:', process.env.JWT_SECRET.length);
     logger.error('❌ JWT_SECRET must be at least 32 characters long');
     process.exit(1);
   }
   
-  console.log('🔍 DEBUG: Production environment validation passed');
   logger.info('✅ Production environment validation passed');
-} else {
-  console.log('🔍 DEBUG: Not in production mode, skipping validation');
 }
 
 // 6. Global middleware
