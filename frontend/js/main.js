@@ -21,21 +21,49 @@ function setupMobileNavigation() {
   const mobileNav = document.getElementById('mobileNav');
   const mobileNavClose = document.getElementById('mobileNavClose');
 
+  console.log('🔧 Setting up mobile navigation:', {
+    hamburgerMenu: !!hamburgerMenu,
+    mobileNav: !!mobileNav,
+    mobileNavClose: !!mobileNavClose
+  });
+
   // Hamburger menu toggle
   if (hamburgerMenu && mobileNav) {
-    hamburgerMenu.addEventListener('click', () => {
+    hamburgerMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('🍔 Hamburger menu clicked');
+      
       hamburgerMenu.classList.add('active');
       mobileNav.classList.add('active');
       document.body.style.overflow = 'hidden';
+      
+      // Add a small delay to ensure the display property is set
+      setTimeout(() => {
+        mobileNav.style.display = 'block';
+      }, 10);
     });
   }
 
   // Close mobile nav
   if (mobileNavClose && mobileNav) {
-    mobileNavClose.addEventListener('click', () => {
+    mobileNavClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('❌ Mobile nav close clicked');
+      
       hamburgerMenu.classList.remove('active');
       mobileNav.classList.remove('active');
       document.body.style.overflow = '';
+      
+      // Hide the mobile nav after animation
+      setTimeout(() => {
+        if (!mobileNav.classList.contains('active')) {
+          mobileNav.style.display = 'none';
+        }
+      }, 300);
     });
   }
 
@@ -43,9 +71,18 @@ function setupMobileNavigation() {
   if (mobileNav) {
     mobileNav.addEventListener('click', (e) => {
       if (e.target.tagName === 'A') {
+        console.log('🔗 Mobile nav link clicked:', e.target.href);
+        
         hamburgerMenu.classList.remove('active');
         mobileNav.classList.remove('active');
         document.body.style.overflow = '';
+        
+        // Hide the mobile nav after animation
+        setTimeout(() => {
+          if (!mobileNav.classList.contains('active')) {
+            mobileNav.style.display = 'none';
+          }
+        }, 300);
       }
     });
   }
@@ -55,9 +92,30 @@ function setupMobileNavigation() {
     if (mobileNav && mobileNav.classList.contains('active') && 
         !mobileNav.contains(e.target) && 
         !hamburgerMenu.contains(e.target)) {
+      
+      console.log('👆 Clicked outside mobile nav');
+      
       hamburgerMenu.classList.remove('active');
       mobileNav.classList.remove('active');
       document.body.style.overflow = '';
+      
+      // Hide the mobile nav after animation
+      setTimeout(() => {
+        if (!mobileNav.classList.contains('active')) {
+          mobileNav.style.display = 'none';
+        }
+      }, 300);
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 991) {
+      // Desktop view - hide mobile nav
+      hamburgerMenu.classList.remove('active');
+      mobileNav.classList.remove('active');
+      document.body.style.overflow = '';
+      mobileNav.style.display = 'none';
     }
   });
 }
