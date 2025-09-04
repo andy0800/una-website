@@ -520,6 +520,16 @@ router.get('/admin/lectures/:id/stream', antiDownloadProtection, async (req, res
   }
 });
 
+// Handle preflight requests for video streaming
+router.options('/user/lectures/:id/stream', (req, res) => {
+  console.log('🔍 CORS preflight request for video streaming');
+  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Range, Content-Range, Content-Length, Content-Type, Authorization');
+  res.status(200).end();
+});
+
 // Stream video for user
 router.get('/user/lectures/:id/stream', async (req, res) => {
   try {
@@ -607,8 +617,21 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
     const stat = fs.statSync(videoPath);
     const fileSize = stat.size;
     const range = req.headers.range;
+    
+    // Determine content type based on file extension
+    const ext = path.extname(lecture.filePath).toLowerCase();
+    let contentType = 'video/mp4'; // default
+    if (ext === '.webm') {
+      contentType = 'video/webm';
+    } else if (ext === '.mp4') {
+      contentType = 'video/mp4';
+    } else if (ext === '.avi') {
+      contentType = 'video/avi';
+    } else if (ext === '.mov') {
+      contentType = 'video/quicktime';
+    }
 
-    console.log('📊 File stats:', { fileSize, range });
+    console.log('📊 File stats:', { fileSize, range, contentType, extension: ext });
 
     if (range) {
       // Handle range requests for video streaming
@@ -624,7 +647,14 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
         'Content-Range': `bytes ${start}-${end}/${fileSize}`,
         'Accept-Ranges': 'bytes',
         'Content-Length': chunksize,
-        'Content-Type': 'video/mp4',
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': req.get('Origin') || '*',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Range, Content-Range, Content-Length, Content-Type',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       };
       
       console.log('📤 Sending range response headers:', head);
@@ -634,7 +664,14 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       // Handle full file requests
       const head = {
         'Content-Length': fileSize,
-        'Content-Type': 'video/mp4',
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': req.get('Origin') || '*',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Range, Content-Range, Content-Length, Content-Type',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       };
       
       console.log('📤 Sending full file response headers:', head);

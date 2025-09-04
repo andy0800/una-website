@@ -426,12 +426,41 @@
       video.addEventListener('error', (e) => {
         console.error('❌ Video error event:', e);
         console.error('❌ Video error details:', video.error);
+        console.error('❌ Video error code:', video.error ? video.error.code : 'unknown');
+        console.error('❌ Video error message:', video.error ? video.error.message : 'unknown');
+        console.error('❌ Video src:', video.src);
+        console.error('❌ Video networkState:', video.networkState);
+        console.error('❌ Video readyState:', video.readyState);
+        
         placeholder.style.display = 'flex';
         video.style.display = 'none';
+        
+        let errorMessage = 'Unknown error';
+        if (video.error) {
+          switch (video.error.code) {
+            case 1:
+              errorMessage = 'Video loading aborted';
+              break;
+            case 2:
+              errorMessage = 'Network error - check CORS and authentication';
+              break;
+            case 3:
+              errorMessage = 'Video decoding error - unsupported format';
+              break;
+            case 4:
+              errorMessage = 'Video source not supported';
+              break;
+            default:
+              errorMessage = video.error.message || 'Unknown video error';
+          }
+        }
+        
         placeholder.innerHTML = `
           <i class="fas fa-exclamation-triangle"></i>
           <p>Error loading video</p>
-          <p>Error: ${video.error ? video.error.message : 'Unknown error'}</p>
+          <p>Error: ${errorMessage}</p>
+          <p>Code: ${video.error ? video.error.code : 'unknown'}</p>
+          <p>URL: ${video.src}</p>
           <button onclick="playLecture('${lectureId}')" class="lecture-error-retry">Retry</button>
         `;
       });
