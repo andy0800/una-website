@@ -606,11 +606,14 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
 
     const videoPath = path.join(__dirname, '../../uploads/lectures', lecture.filePath);
     console.log('🔍 Full video path:', videoPath);
+    console.log('🔍 Current working directory:', process.cwd());
+    console.log('🔍 __dirname:', __dirname);
     
     // Check if file exists
     if (!fs.existsSync(videoPath)) {
       console.log('❌ Video file not found on disk:', videoPath);
-      return res.status(404).json({ message: 'Video file not found' });
+      console.log('🔍 Uploads directory contents:', fs.readdirSync(path.join(__dirname, '../../uploads/lectures')));
+      return res.status(404).json({ message: 'Video file not found on disk' });
     }
 
     console.log('✅ Video file exists on disk');
