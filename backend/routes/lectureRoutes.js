@@ -285,14 +285,23 @@ router.post('/admin/lectures/:id/video', verifyAdminToken, upload.single('video'
       return res.status(400).json({ message: 'No video file uploaded' });
     }
 
+    // Read the video file and store as base64 in database
+    const videoBuffer = fs.readFileSync(req.file.path);
+    const videoBase64 = videoBuffer.toString('base64');
+    
     // Update lecture with file information
     lecture.filePath = req.file.filename;
     lecture.fileSize = req.file.size;
+    lecture.videoData = videoBase64; // Store video as base64
+    lecture.videoMimeType = req.file.mimetype;
     
     // Generate thumbnail path (you can implement thumbnail generation later)
     lecture.thumbnail = `thumbnail-${req.file.filename.replace(path.extname(req.file.filename), '.jpg')}`;
     
     await lecture.save();
+    
+    // Clean up the temporary file
+    fs.unlinkSync(req.file.path);
     
     res.json({ 
       message: 'Video uploaded successfully', 
@@ -596,61 +605,51 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    if (!lecture.filePath) {
-      console.log('❌ No video file for lecture:', lecture.title);
-      return res.status(404).json({ message: 'Video file not found' });
+    // Check if video data exists in database
+    if (!lecture.videoData) {
+      console.log('❌ No video data for lecture:', lecture.title);
+      return res.status(404).json({ message: 'Video data not found' });
     }
 
     console.log('✅ Streaming video for user:', decoded.id, 'Lecture:', lecture.title);
-    console.log('📁 Video file:', lecture.filePath);
+    console.log('📁 Video data size:', lecture.videoData.length, 'characters');
+    console.log('📁 Video MIME type:', lecture.videoMimeType);
 
-    const videoPath = path.join(__dirname, '../../uploads/lectures', lecture.filePath);
-    console.log('🔍 Full video path:', videoPath);
-    console.log('🔍 Current working directory:', process.cwd());
-    console.log('🔍 __dirname:', __dirname);
-    
-    // Check if file exists
-    if (!fs.existsSync(videoPath)) {
-      console.log('❌ Video file not found on disk:', videoPath);
-      console.log('🔍 Uploads directory contents:', fs.readdirSync(path.join(__dirname, '../../uploads/lectures')));
-      return res.status(404).json({ message: 'Video file not found on disk' });
-    }
-
-    console.log('✅ Video file exists on disk');
-
-    // Get file stats
-    const stat = fs.statSync(videoPath);
-    const fileSize = stat.size;
+    // Convert base64 to buffer
+    const videoBuffer = Buffer.from(lecture.videoData, 'base64');
+    const fileSize = videoBuffer.length;
     const range = req.headers.range;
     
-    // Determine content type based on file extension
-    const ext = path.extname(lecture.filePath).toLowerCase();
-    let contentType = 'video/mp4'; // default
-    if (ext === '.webm') {
-      contentType = 'video/webm';
-    } else if (ext === '.mp4') {
-      contentType = 'video/mp4';
-    } else if (ext === '.avi') {
-      contentType = 'video/avi';
-    } else if (ext === '.mov') {
-      contentType = 'video/quicktime';
+    // Determine content type
+    let contentType = lecture.videoMimeType || 'video/mp4';
+    if (!contentType.startsWith('video/')) {
+      // Fallback based on file extension if MIME type is not set
+      const ext = path.extname(lecture.filePath || '').toLowerCase();
+      if (ext === '.webm') {
+        contentType = 'video/webm';
+      } else if (ext === '.mp4') {
+        contentType = 'video/mp4';
+      } else if (ext === '.avi') {
+        contentType = 'video/avi';
+      } else if (ext === '.mov') {
+        contentType = 'video/quicktime';
+      }
     }
 
-    console.log('📊 File stats:', { 
+    console.log('📊 Video stats:', { 
       fileSize, 
       range, 
-      contentType, 
-      extension: ext,
-      filePath: lecture.filePath,
-      fullPath: videoPath,
-      fileExists: fs.existsSync(videoPath)
+      contentType,
+      hasVideoData: !!lecture.videoData
     });
 
-    // Additional validation - check if file is actually a video
+    // Additional validation - check if video data is not empty
     if (fileSize === 0) {
-      console.log('❌ Video file is empty');
-      return res.status(404).json({ message: 'Video file is empty' });
+      console.log('❌ Video data is empty');
+      return res.status(404).json({ message: 'Video data is empty' });
     }
+
+    console.log('✅ Video data loaded from database');
 
     if (range) {
       // Handle range requests for video streaming
@@ -658,7 +657,6 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       const start = parseInt(parts[0], 10);
       const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
       const chunksize = (end - start) + 1;
-      const file = fs.createReadStream(videoPath, { start, end });
       
       console.log('📡 Streaming range:', { start, end, chunksize });
       
@@ -681,14 +679,10 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       console.log('📤 Sending range response headers:', head);
       res.writeHead(206, head);
       
-      file.on('error', (err) => {
-        console.error('❌ Error streaming file:', err);
-        if (!res.headersSent) {
-          res.status(500).json({ message: 'Error streaming video' });
-        }
-      });
-      
-      file.pipe(res);
+      // Send the requested range from the buffer
+      const chunk = videoBuffer.slice(start, end + 1);
+      res.write(chunk);
+      res.end();
     } else {
       // Handle full file requests
       const head = {
@@ -708,16 +702,9 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       console.log('📤 Sending full file response headers:', head);
       res.writeHead(200, head);
       
-      const fileStream = fs.createReadStream(videoPath);
-      
-      fileStream.on('error', (err) => {
-        console.error('❌ Error streaming file:', err);
-        if (!res.headersSent) {
-          res.status(500).json({ message: 'Error streaming video' });
-        }
-      });
-      
-      fileStream.pipe(res);
+      // Send the entire video buffer
+      res.write(videoBuffer);
+      res.end();
     }
   } catch (err) {
     console.error('❌ Error streaming video:', err);

@@ -38,6 +38,9 @@ const recordedLectureSchema = new mongoose.Schema({
     enum: ['720p', '1080p', '4K'],
     default: '1080p'
   },
+  // Store video data directly in database for cloud deployment
+  videoData: String, // base64 encoded video data
+  videoMimeType: String, // MIME type of the video
   
   // 🚀 LIVESTREAM METADATA
   originalStreamId: String,
