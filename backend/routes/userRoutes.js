@@ -25,19 +25,42 @@ router.get('/test', (req, res) => {
   res.json({ message: 'User routes are working!', timestamp: new Date().toISOString() });
 });
 
+// Test registration endpoint (GET method for testing)
+router.get('/register', (req, res) => {
+  res.json({ 
+    message: 'Registration endpoint is accessible',
+    method: 'POST /register',
+    requiredFields: ['name', 'phone', 'password'],
+    optionalFields: ['civilId', 'passportNumber', 'dateOfBirth'],
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Test route for login (GET method for testing) - REMOVED (issue resolved)
 
 // Register
 router.post('/register', validateUserRegistration, async (req, res) => {
+  console.log('🔍 DEBUG: Registration request received');
+  console.log('🔍 DEBUG: Body:', req.body);
+  console.log('🔍 DEBUG: Headers:', req.headers);
+  
   const { name, phone, civilId, passportNumber, dateOfBirth, password } = req.body;
 
   try {
+    // Check if user already exists
     const exists = await User.findOne({ phone });
-    if (exists) return res.status(400).json({ msg: 'User already exists' });
+    if (exists) {
+      console.log('🔍 DEBUG: User already exists for phone:', phone);
+      return res.status(400).json({ 
+        message: 'User already exists',
+        type: 'USER_EXISTS_ERROR'
+      });
+    }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-
+    // Create new user
     const newUser = new User({
       name,
       phone,
@@ -50,12 +73,26 @@ router.post('/register', validateUserRegistration, async (req, res) => {
       certificates: []
     });
 
+    // Save user to database
     await newUser.save();
+    console.log('🔍 DEBUG: User registered successfully:', phone);
 
-    res.status(201).json({ message: 'Registration successful!' });
+    res.status(201).json({ 
+      message: 'Registration successful!',
+      type: 'SUCCESS',
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        phone: newUser.phone
+      }
+    });
   } catch (err) {
-    console.error('Registration error:', err);
-    res.status(500).json({ message: 'Server error during registration.' });
+    console.error('🔍 DEBUG: Registration error:', err);
+    res.status(500).json({ 
+      message: 'Server error during registration.',
+      type: 'SERVER_ERROR',
+      error: err.message
+    });
   }
 });
 
