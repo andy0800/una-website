@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dateOfBirth) formData.dateOfBirth = dateOfBirth;
 
     try {
+      console.log('🔍 DEBUG: Config object:', window.config);
+      console.log('🔍 DEBUG: Register URL:', window.config.USER_API.REGISTER);
+      console.log('🔍 DEBUG: Form data:', formData);
+      
       const res = await fetch(window.config.USER_API.REGISTER, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
