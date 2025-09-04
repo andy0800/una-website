@@ -648,11 +648,27 @@ app.get('/api/health-check', (req, res) => {
 });
 console.log('🔍 DEBUG: Health check route registered');
 
+// Direct test route for login debugging
+app.get('/api/users/login-direct', (req, res) => {
+  res.json({ 
+    message: 'Direct login route works!', 
+    timestamp: new Date().toISOString() 
+  });
+});
+console.log('🔍 DEBUG: Direct login test route registered');
+
 try {
-  app.use('/api/users',       require('./routes/userRoutes'));
-  console.log('🔍 DEBUG: /api/users route registered');
+  console.log('🔍 DEBUG: Loading userRoutes module...');
+  const userRoutes = require('./routes/userRoutes');
+  console.log('🔍 DEBUG: userRoutes module loaded successfully');
+  console.log('🔍 DEBUG: userRoutes type:', typeof userRoutes);
+  console.log('🔍 DEBUG: userRoutes methods:', Object.keys(userRoutes));
+  
+  app.use('/api/users', userRoutes);
+  console.log('🔍 DEBUG: /api/users route registered successfully');
 } catch (error) {
   console.error('🔍 DEBUG: Error registering /api/users route:', error);
+  console.error('🔍 DEBUG: Error stack:', error.stack);
 }
 
 try {
