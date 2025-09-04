@@ -166,6 +166,15 @@ if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
     res.sendFile(path.join(__dirname, '../frontend/admin/dashboard.html'));
   });
 
+  // Redirect common pages to Arabic version (default language)
+  app.get('/register.html', (req, res) => {
+    res.redirect('/ar/register.html');
+  });
+
+  app.get('/login.html', (req, res) => {
+    res.redirect('/ar/login.html');
+  });
+
   // Serve all other frontend pages using catch-all route
   app.get('/en/:filename', (req, res) => {
     const filePath = path.join(__dirname, '../frontend/en', req.params.filename);
