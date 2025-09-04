@@ -5,7 +5,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
   const password = document.getElementById('password').value.trim();
 
   try {
-    const res = await fetch('/api/admin/login', {
+    const res = await fetch(window.config.ADMIN_API.LOGIN, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })

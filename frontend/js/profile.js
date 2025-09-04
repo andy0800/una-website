@@ -12,7 +12,7 @@
 
     try {
       // Fetch user data
-      const response = await fetch('/api/users/me', {
+      const response = await fetch(window.config.USER_API.PROFILE, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -130,7 +130,7 @@
 
     try {
       // Fetch course details from public endpoint
-      const response = await fetch('/api/courses');
+      const response = await fetch(window.config.USER_API.COURSES);
 
       if (!response.ok) {
         throw new Error('Failed to fetch courses');

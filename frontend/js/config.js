@@ -19,18 +19,18 @@ const config = {
   },
   
   ADMIN_API: {
-    LOGIN: '/api/admin/login',
-    USERS: '/api/admin/users',
-    COURSES: '/api/admin/courses',
-    STATS: '/api/admin/stats',
-    FORMS: '/api/admin/forms'
+    LOGIN: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/admin/login' : 'https://una-backend-c207.onrender.com/api/admin/login',
+    USERS: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/admin/users' : 'https://una-backend-c207.onrender.com/api/admin/users',
+    COURSES: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/admin/courses' : 'https://una-backend-c207.onrender.com/api/admin/courses',
+    STATS: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/admin/stats' : 'https://una-backend-c207.onrender.com/api/admin/stats',
+    FORMS: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/admin/forms' : 'https://una-backend-c207.onrender.com/api/admin/forms'
   },
   
   LECTURE_API: {
-    USER_LECTURES: '/api/lectures/user/lectures',
-    ADMIN_LECTURES: '/api/lectures/admin/lectures',
-    UPLOAD_VIDEO: '/api/lectures/admin/lectures',
-    STREAM_VIDEO: '/api/lectures/user/lectures'
+    USER_LECTURES: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/lectures/user/lectures' : 'https://una-backend-c207.onrender.com/api/lectures/user/lectures',
+    ADMIN_LECTURES: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/lectures/admin/lectures' : 'https://una-backend-c207.onrender.com/api/lectures/admin/lectures',
+    UPLOAD_VIDEO: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/lectures/admin/lectures' : 'https://una-backend-c207.onrender.com/api/lectures/admin/lectures',
+    STREAM_VIDEO: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/lectures/user/lectures' : 'https://una-backend-c207.onrender.com/api/lectures/user/lectures'
   },
   
   // File paths

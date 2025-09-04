@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      console.log('🔍 DEBUG: Making POST request to:', config.USER_API.LOGIN);
-      const res = await fetch(config.USER_API.LOGIN, {
+      console.log('🔍 DEBUG: Making POST request to:', window.config.USER_API.LOGIN);
+      const res = await fetch(window.config.USER_API.LOGIN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password })
