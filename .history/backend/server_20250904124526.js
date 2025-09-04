@@ -681,15 +681,6 @@ app._router.stack.forEach((middleware, index) => {
   }
 });
 
-// Test route to verify basic routing works
-app.get('/test-routing', (req, res) => {
-  res.json({ 
-    message: 'Basic routing works!', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
-  });
-});
-
 // 8.5. Static file serving - MOVED HERE TO AVOID INTERCEPTING API ROUTES
 app.use(express.static(path.join(__dirname, '../frontend')));
 
