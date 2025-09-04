@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
 
     const name = document.getElementById('name')?.value.trim();
-    const email = document.getElementById('email')?.value.trim();
     const phone = document.getElementById('phone')?.value.trim();
     const civilId = document.getElementById('civilId')?.value.trim();
     const passportNumber = document.getElementById('passportNumber')?.value.trim();
@@ -19,19 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Only include fields that have values
+    const formData = {
+      name,
+      phone,
+      password
+    };
+
+    if (civilId) formData.civilId = civilId;
+    if (passportNumber) formData.passportNumber = passportNumber;
+    if (dateOfBirth) formData.dateOfBirth = dateOfBirth;
+
     try {
       const res = await fetch('/api/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          civilId,
-          passportNumber,
-          dateOfBirth,
-          password
-        })
+        body: JSON.stringify(formData)
       });
 
       const data = await res.json();
