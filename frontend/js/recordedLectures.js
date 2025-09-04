@@ -580,9 +580,8 @@
       videoElement.removeAttribute('download');
       
       // Remove any download-related properties
-      if (videoElement.download !== undefined) {
-        delete videoElement.download;
-      }
+      // Note: download property cannot be deleted in modern browsers
+      // We handle this through event prevention and attribute removal
     });
     
     // Additional protection: monitor for blob URL creation
@@ -614,11 +613,8 @@
     };
     
     // Disable video element download capabilities
-    Object.defineProperty(videoElement, 'download', {
-      get: () => undefined,
-      set: () => {},
-      configurable: false
-    });
+    // Note: download property is non-configurable in modern browsers
+    // We handle this through event prevention and attribute removal
     
     // Block video element methods that could be used for downloading
     const originalPause = videoElement.pause;
