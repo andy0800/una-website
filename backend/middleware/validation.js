@@ -29,8 +29,10 @@ const validateUserRegistration = [
   
   body('phone')
     .trim()
-    .isMobilePhone()
-    .withMessage('Please provide a valid phone number'),
+    .isLength({ min: 8, max: 15 })
+    .withMessage('Phone number must be between 8 and 15 characters')
+    .matches(/^[\d\s\-\+\(\)]+$/)
+    .withMessage('Phone number can only contain digits, spaces, hyphens, plus signs, and parentheses'),
   
   body('password')
     .isLength({ min: 6 })

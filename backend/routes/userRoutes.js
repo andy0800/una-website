@@ -43,6 +43,8 @@ router.post('/register', validateUserRegistration, async (req, res) => {
   console.log('🔍 DEBUG: Registration request received');
   console.log('🔍 DEBUG: Body:', req.body);
   console.log('🔍 DEBUG: Headers:', req.headers);
+  console.log('🔍 DEBUG: Phone value:', req.body.phone);
+  console.log('🔍 DEBUG: Phone type:', typeof req.body.phone);
   
   const { name, phone, civilId, passportNumber, dateOfBirth, password } = req.body;
 
