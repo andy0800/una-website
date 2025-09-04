@@ -995,7 +995,9 @@ try {
         // Compression middleware
         app.use(compression());
         
-        // Body parsing middleware - REMOVED (already registered in main section)
+        // Body parsing middleware
+        app.use(express.json({ limit: '50mb' }));
+        app.use(express.urlencoded({ extended: true, limit: '50mb' }));
         
         // CORS configuration - REMOVED (using the main CORS config above)
         

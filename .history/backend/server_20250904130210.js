@@ -520,11 +520,12 @@ if (process.env.NODE_ENV === 'production') {
   console.log('🔍 DEBUG: Not in production mode, skipping validation');
 }
 
-// 6. Global middleware - REMOVED DUPLICATE MIDDLEWARE (already registered above)
+// 6. Global middleware
 app.use(securityHeaders);
 app.use(securityLogger);
 app.use(apiRateLimiter);
-// express.json and express.urlencoded already registered above
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // NEW: Request logging middleware with request ID tracking
 app.use((req, res, next) => {
@@ -995,7 +996,9 @@ try {
         // Compression middleware
         app.use(compression());
         
-        // Body parsing middleware - REMOVED (already registered in main section)
+        // Body parsing middleware
+        app.use(express.json({ limit: '50mb' }));
+        app.use(express.urlencoded({ extended: true, limit: '50mb' }));
         
         // CORS configuration - REMOVED (using the main CORS config above)
         
