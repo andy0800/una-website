@@ -271,6 +271,16 @@ try {
   // Handle preflight requests explicitly
   app.options('*', cors(corsOptions));
   
+  // Additional CORS middleware to ensure headers are set
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    next();
+  });
+  
   console.log('🔍 DEBUG: CORS setup successful');
 } catch (error) {
   console.error('🔍 DEBUG: CORS setup error:', error);
