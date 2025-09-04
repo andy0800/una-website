@@ -166,19 +166,19 @@ if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
     res.sendFile(path.join(__dirname, '../frontend/admin/dashboard.html'));
   });
 
-  // Serve all other frontend pages
-  app.get('/en/*', (req, res) => {
-    const filePath = path.join(__dirname, '../frontend/en', req.params[0]);
+  // Serve all other frontend pages using catch-all route
+  app.get('/en/:filename', (req, res) => {
+    const filePath = path.join(__dirname, '../frontend/en', req.params.filename);
     res.sendFile(filePath);
   });
 
-  app.get('/ar/*', (req, res) => {
-    const filePath = path.join(__dirname, '../frontend/ar', req.params[0]);
+  app.get('/ar/:filename', (req, res) => {
+    const filePath = path.join(__dirname, '../frontend/ar', req.params.filename);
     res.sendFile(filePath);
   });
 
-  app.get('/admin/*', (req, res) => {
-    const filePath = path.join(__dirname, '../frontend/admin', req.params[0]);
+  app.get('/admin/:filename', (req, res) => {
+    const filePath = path.join(__dirname, '../frontend/admin', req.params.filename);
     res.sendFile(filePath);
   });
 } else {
