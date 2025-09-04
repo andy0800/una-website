@@ -1015,7 +1015,8 @@ try {
         
         // CORS configuration - REMOVED (using the main CORS config above)
         
-        // Static file serving - REMOVED (using the main static file serving above)
+        // Static file serving
+        app.use(express.static(path.join(__dirname, '../frontend')));
         
         // Health check endpoint for load balancer
         app.get('/health', (req, res) => {
