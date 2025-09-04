@@ -135,7 +135,7 @@ app.get('/api/health', (req, res) => {
 // 18. API Root Endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: '🚀 UNA Institute Backend API - Updated',
+    message: '🚀 UNA Institute Backend API',
     version: '1.0.0',
     status: 'online',
     environment: NODE_ENV,

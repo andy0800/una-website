@@ -1361,3 +1361,20 @@
 {"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-09-04T09:40:03.184Z"}
 {"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-09-04T09:40:03.199Z"}
 {"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-09-04T09:44:56.447Z"}
+{"level":"info","message":"✅ HTTP server running on port 3000","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.750Z"}
+{"level":"info","message":"🌐 Network accessible at: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.753Z"}
+{"level":"info","message":"🏠 Server listening on port 3000","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.754Z"}
+{"level":"info","message":"🔗 Local access: http://localhost:3000","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.754Z"}
+{"level":"info","message":"🌐 Network access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.755Z"}
+{"level":"info","message":"📱 Other devices can access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.755Z"}
+{"level":"info","message":"🔧 Browser detection enabled - microphone access guidance provided","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.755Z"}
+{"level":"info","message":"📊 Health check available at /health","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.756Z"}
+{"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.756Z"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-09-04T10:08:52.780Z"}
+{"duration":6,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756980550275_4vgpuj8zm","service":"una-institute-server","status":304,"timestamp":"2025-09-04T10:09:10.282Z","url":"/ar/login.html","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":34752}
+{"duration":3,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756980550320_7yyeubm7i","service":"una-institute-server","status":304,"timestamp":"2025-09-04T10:09:10.324Z","url":"/css/style.css","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":34752}
+{"duration":5,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756980550322_0s2eumwda","service":"una-institute-server","status":304,"timestamp":"2025-09-04T10:09:10.327Z","url":"/js/config.js","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":34752}
+{"duration":5,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756980550325_fxje7tzsl","service":"una-institute-server","status":304,"timestamp":"2025-09-04T10:09:10.330Z","url":"/js/login.js","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":34752}
+{"duration":1,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756980550336_adyqa69cr","service":"una-institute-server","status":304,"timestamp":"2025-09-04T10:09:10.337Z","url":"/ar/header.html","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":34752}
+{"duration":3,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756980550461_ar8sqjrck","service":"una-institute-server","status":304,"timestamp":"2025-09-04T10:09:10.465Z","url":"/images/logo.png","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":34752}
+{"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-09-04T10:16:57.769Z"}

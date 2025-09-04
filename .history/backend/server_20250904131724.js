@@ -101,8 +101,13 @@ app.use(securityLogger);
 // 14. Rate Limiting
 app.use('/api/', apiRateLimiter);
 
-// 15. Static File Serving (API assets only)
+// 15. Static File Serving
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/certs', express.static(path.join(__dirname, '../frontend/certs')));
+app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
+app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
+app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
+app.use('/socket.io', express.static(path.join(__dirname, '../frontend/socket.io')));
 
 // 16. API Routes
 app.use('/api/users', userRoutes);
@@ -132,26 +137,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 18. API Root Endpoint
+// 18. Frontend Routes (Static HTML)
 app.get('/', (req, res) => {
-  res.json({
-    message: '🚀 UNA Institute Backend API - Updated',
-    version: '1.0.0',
-    status: 'online',
-    environment: NODE_ENV,
-    worker: process.env.WORKER_ID || 'main',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      health: '/health',
-      healthDetailed: '/health/detailed',
-      users: '/api/users',
-      courses: '/api/courses',
-      enrollments: '/api/enrollments',
-      admin: '/api/admin',
-      lectures: '/api/lectures'
-    },
-    documentation: 'Visit /health for server status and /api/* for API endpoints'
-  });
+  res.sendFile(path.join(__dirname, '../frontend/ar/index.html'));
+});
+
+app.get('/en', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/en/index.html'));
+});
+
+app.get('/ar', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/ar/index.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/admin/login.html'));
 });
 
 // 19. Socket.IO Events
@@ -177,7 +177,7 @@ io.on('connection', (socket) => {
 app.use(errorHandler);
 
 // 21. 404 Handler
-app.use((req, res) => {
+app.use('*', (req, res) => {
   res.status(404).json({
     error: 'Not Found',
     message: 'The requested resource was not found',
@@ -249,15 +249,14 @@ const startServer = async () => {
     
     // Start server
     server.listen(PORT, '0.0.0.0', () => {
-      console.log('🚀 UNA Institute Backend API Started');
+      console.log('🚀 UNA Institute Server Started');
       console.log(`📍 Environment: ${NODE_ENV}`);
-      console.log(`🌐 API Server: http://0.0.0.0:${PORT}`);
+      console.log(`🌐 Server: http://0.0.0.0:${PORT}`);
       console.log(`🏥 Health: http://0.0.0.0:${PORT}/health`);
       console.log(`📊 API Health: http://0.0.0.0:${PORT}/api/health`);
       console.log(`🔌 Socket.IO: Enabled`);
-      console.log(`📁 Static Files: Uploads only`);
+      console.log(`📁 Static Files: Served from frontend/`);
       console.log(`🗄️ Database: ${MONGO_URI.split('@')[1] || 'localhost'}`);
-      console.log(`🌍 Frontend: https://cute-churros-f9f049.netlify.app`);
     });
       } catch (error) {
     console.error('❌ Server startup failed:', error);
