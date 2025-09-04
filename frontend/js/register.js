@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch(window.config.USER_API.REGISTER, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for cross-domain
         body: JSON.stringify(formData)
       });
 

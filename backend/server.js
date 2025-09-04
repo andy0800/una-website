@@ -72,10 +72,25 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS ?
 console.log('🔍 DEBUG: CORS Allowed Origins:', allowedOrigins);
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    console.log('🔍 DEBUG: CORS Origin Check - Request Origin:', origin);
+    console.log('🔍 DEBUG: CORS Origin Check - Allowed Origins:', allowedOrigins);
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ DEBUG: CORS Origin Allowed:', origin);
+      return callback(null, true);
+    } else {
+      console.log('❌ DEBUG: CORS Origin Blocked:', origin);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID', 'Cookie'],
+  exposedHeaders: ['Set-Cookie'],
   optionsSuccessStatus: 200
 };
 
@@ -247,12 +262,30 @@ if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
 
   // CORS Test Endpoint
   app.get('/cors-test', (req, res) => {
+    const origin = req.get('Origin');
+    const isAllowed = allowedOrigins.includes(origin);
+    
     res.json({
       message: 'CORS Test Endpoint',
-      origin: req.get('Origin') || 'No Origin Header',
+      origin: origin || 'No Origin Header',
       allowedOrigins: allowedOrigins,
+      isOriginAllowed: isAllowed,
+      headers: {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Credentials': 'true'
+      },
       timestamp: new Date().toISOString()
     });
+  });
+
+  // CORS Preflight Test
+  app.options('/cors-test', (req, res) => {
+    console.log('🔍 DEBUG: CORS Preflight OPTIONS request');
+    console.log('🔍 DEBUG: Origin:', req.get('Origin'));
+    console.log('🔍 DEBUG: Access-Control-Request-Method:', req.get('Access-Control-Request-Method'));
+    console.log('🔍 DEBUG: Access-Control-Request-Headers:', req.get('Access-Control-Request-Headers'));
+    
+    res.status(200).end();
   });
 }
 

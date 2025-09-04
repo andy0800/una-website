@@ -129,8 +129,24 @@ router.post('/login', validateUserLogin, async (req, res) => {
       expiresIn: '24h'
     });
 
+    // Set secure cookie for cross-domain support
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none', // Allow cross-site cookies
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
     console.log('🔍 DEBUG: Login successful for user:', phone);
-    res.json({ token });
+    res.json({ 
+      token,
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        name: user.name,
+        phone: user.phone
+      }
+    });
   } catch (error) {
     console.error('🔍 DEBUG: Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
