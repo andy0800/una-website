@@ -311,10 +311,10 @@ const startServer = async () => {
       console.log(`🔌 Socket.IO: Enabled`);
       
       if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
-        console.log(`🌍 Frontend: http://localhost:3000`);
-        console.log(`🔧 Backend API: http://localhost:${PORT}`);
+        console.log(`🌍 Frontend + Backend: http://localhost:${PORT}`);
+        console.log(`🔧 API Endpoints: http://localhost:${PORT}/api/*`);
         console.log(`📁 Static Files: Frontend + Uploads`);
-        console.log(`🔧 Mode: Development (Frontend + Backend)`);
+        console.log(`🔧 Mode: Development (Combined Frontend + Backend)`);
       } else {
         console.log(`📁 Static Files: Uploads only`);
         console.log(`🔧 Mode: Production (Backend API only)`);

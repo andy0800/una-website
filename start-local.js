@@ -19,9 +19,9 @@ if (!process.env.JWT_SECRET) {
 
 console.log('🚀 Starting UNA Institute Server locally...');
 console.log('📍 Environment: development');
-console.log('🌐 Backend API: http://localhost:4000');
-console.log('🌍 Frontend: http://localhost:3000');
-console.log('🔧 Mode: Frontend + Backend (Testing)');
+console.log('🌐 Combined Server: http://localhost:4000');
+console.log('🌍 Frontend + Backend: Both served from port 4000');
+console.log('🔧 Mode: Development (Combined Frontend + Backend)');
 console.log('');
 
 // Start the server
