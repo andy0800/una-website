@@ -59,15 +59,31 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/una_websit
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // 11. CORS Configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+  'http://localhost:3000',
+  'http://localhost:4000',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:4000',
+  'https://cute-churros-f9f049.netlify.app',
+  'https://una-website.vercel.app'
+];
+
+console.log('🔍 DEBUG: CORS Allowed Origins:', allowedOrigins);
+
 const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
-    'http://localhost:3000',
-    'http://localhost:4000',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:4000',
-    'https://cute-churros-f9f049.netlify.app',
-    'https://una-website.vercel.app'
-  ],
+  origin: (origin, callback) => {
+    console.log('🔍 DEBUG: CORS Request from origin:', origin);
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ DEBUG: CORS Origin allowed:', origin);
+      return callback(null, true);
+    } else {
+      console.log('❌ DEBUG: CORS Origin blocked:', origin);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID']
@@ -200,18 +216,32 @@ if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
       environment: NODE_ENV,
       worker: process.env.WORKER_ID || 'main',
       timestamp: new Date().toISOString(),
-    endpoints: {
-      health: '/health',
-      healthDetailed: '/health/detailed',
-      users: '/api/users',
-      courses: '/api/courses',
-      enrollments: '/api/enrollments',
-      admin: '/api/admin',
-      lectures: '/api/lectures'
-    },
+      cors: {
+        allowedOrigins: allowedOrigins,
+        currentOrigin: req.get('Origin') || 'No Origin Header'
+      },
+      endpoints: {
+        health: '/health',
+        healthDetailed: '/health/detailed',
+        users: '/api/users',
+        courses: '/api/courses',
+        enrollments: '/api/enrollments',
+        admin: '/api/admin',
+        lectures: '/api/lectures'
+      },
       documentation: 'Visit /health for server status and /api/* for API endpoints'
+    });
   });
-});
+
+  // CORS Test Endpoint
+  app.get('/cors-test', (req, res) => {
+    res.json({
+      message: 'CORS Test Endpoint',
+      origin: req.get('Origin') || 'No Origin Header',
+      allowedOrigins: allowedOrigins,
+      timestamp: new Date().toISOString()
+    });
+  });
 }
 
 // 19. Socket.IO Events
