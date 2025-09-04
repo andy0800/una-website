@@ -1013,16 +1013,7 @@ try {
         app.use(express.json({ limit: '50mb' }));
         app.use(express.urlencoded({ extended: true, limit: '50mb' }));
         
-        // CORS configuration
-        app.use(cors({
-          origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
-            process.env.NODE_ENV === 'production' ? process.env.DOMAIN : 'http://localhost:3000',
-            process.env.NODE_ENV === 'production' ? `https://${process.env.DOMAIN}` : 'http://localhost:5000'
-          ],
-          credentials: true,
-          methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-          allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID']
-        }));
+        // CORS configuration - REMOVED (using the main CORS config above)
         
         // Static file serving
         app.use(express.static(path.join(__dirname, '../frontend')));
