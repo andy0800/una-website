@@ -59,7 +59,8 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/una_websit
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // 11. CORS Configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
+  process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim().replace(/^["']|["']$/g, '')) : [
   'http://localhost:3000',
   'http://localhost:4000',
   'http://127.0.0.1:3000',
