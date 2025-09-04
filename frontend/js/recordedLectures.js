@@ -859,7 +859,7 @@
       if (qualityFilter) params.append('quality', qualityFilter);
       
       const token = localStorage.getItem('userToken');
-      const response = await fetch(`/api/lectures/search?${params.toString()}`, {
+      const response = await fetch(`${window.config.API_BASE_URL}/lectures/search?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

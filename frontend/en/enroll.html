@@ -133,7 +133,7 @@
       const courseName = form.courseName.value;
 
       try {
-        const res = await fetch('https://una-backend-c207.onrender.com/api/enrollments', {
+        const res = await fetch(window.config.API_BASE_URL + '/enrollments', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

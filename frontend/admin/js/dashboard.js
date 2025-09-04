@@ -1,7 +1,7 @@
             const token = localStorage.getItem('adminToken');
-const apiBase = 'https://una-backend-c207.onrender.com/api';
-const adminApiBase = 'https://una-backend-c207.onrender.com/api/admin';
-const lectureApiBase = 'https://una-backend-c207.onrender.com/api/lectures';
+const apiBase = window.config.API_BASE_URL;
+const adminApiBase = window.config.API_BASE_URL + '/admin';
+const lectureApiBase = window.config.API_BASE_URL + '/lectures';
 let allUsers = []; // global to store users
 
 const headers = {
