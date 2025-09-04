@@ -97,7 +97,29 @@ app.use(helmet({
 
 app.use(compression());
 app.use(morgan('combined'));
+
+// CORS middleware with debugging
+app.use((req, res, next) => {
+  console.log('🔍 DEBUG: CORS Middleware - Origin:', req.get('Origin'));
+  console.log('🔍 DEBUG: CORS Middleware - Method:', req.method);
+  console.log('🔍 DEBUG: CORS Middleware - URL:', req.url);
+  next();
+});
+
 app.use(cors(corsOptions));
+
+// Additional CORS headers as fallback
+app.use((req, res, next) => {
+  const origin = req.get('Origin');
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Worker-ID');
+  }
+  next();
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
