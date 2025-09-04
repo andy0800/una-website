@@ -177,7 +177,7 @@ io.on('connection', (socket) => {
 app.use(errorHandler);
 
 // 21. 404 Handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
     message: 'The requested resource was not found',
