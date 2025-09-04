@@ -648,14 +648,7 @@ app.get('/api/health-check', (req, res) => {
 });
 console.log('🔍 DEBUG: Health check route registered');
 
-// Direct test route for login debugging
-app.get('/api/users/login-direct', (req, res) => {
-  res.json({ 
-    message: 'Direct login route works!', 
-    timestamp: new Date().toISOString() 
-  });
-});
-console.log('🔍 DEBUG: Direct login test route registered');
+// Direct test route for login debugging - REMOVED (issue resolved)
 
 try {
   console.log('🔍 DEBUG: Loading userRoutes module...');

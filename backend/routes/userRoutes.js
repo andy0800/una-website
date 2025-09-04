@@ -11,15 +11,7 @@ router.get('/test', (req, res) => {
   res.json({ message: 'User routes are working!', timestamp: new Date().toISOString() });
 });
 
-// Test route for login (GET method for testing)
-router.get('/login', (req, res) => {
-  res.json({ 
-    message: 'Login route is accessible!', 
-    method: 'GET',
-    note: 'This is a test route. Use POST for actual login.',
-    timestamp: new Date().toISOString() 
-  });
-});
+// Test route for login (GET method for testing) - REMOVED (issue resolved)
 
 // Register
 router.post('/register', validateUserRegistration, async (req, res) => {
