@@ -181,7 +181,14 @@ const envConfigs = {
 
   production: {
     server: {
-      // CORS configuration moved to server.js for centralized management
+      cors: {
+        origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+          'https://cute-churros-f9f049.netlify.app',
+          'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
+          'https://una-website.vercel.app',
+          'https://una-backend-c207.onrender.com'
+        ]
+      }
     },
     security: {
       jwtSecret: process.env.JWT_SECRET,
@@ -201,7 +208,9 @@ const envConfigs = {
   test: {
     server: {
       port: 0, // Random port for testing
-      // CORS configuration moved to server.js for centralized management
+      cors: {
+        origin: ['http://localhost:3000']
+      }
     },
     database: {
       uri: process.env.TEST_MONGO_URI || 'mongodb://localhost:27017/una_website_test'

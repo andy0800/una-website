@@ -201,7 +201,9 @@ const envConfigs = {
   test: {
     server: {
       port: 0, // Random port for testing
-      // CORS configuration moved to server.js for centralized management
+      cors: {
+        origin: ['http://localhost:3000']
+      }
     },
     database: {
       uri: process.env.TEST_MONGO_URI || 'mongodb://localhost:27017/una_website_test'
