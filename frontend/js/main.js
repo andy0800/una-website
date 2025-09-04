@@ -1,7 +1,29 @@
 // ===== HEADER INITIALIZATION AND AUTHENTICATION HANDLING =====
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Page loaded, initializing...');
   // Initialize header functionality
   initializeHeader();
+  
+  // Additional authentication check after a short delay to ensure all elements are loaded
+  setTimeout(() => {
+    console.log('🔄 Running delayed authentication check...');
+    setupAuthentication();
+  }, 500);
+});
+
+// ===== AUTHENTICATION STATE MONITORING =====
+// Check authentication state when window gains focus (user returns to tab)
+window.addEventListener('focus', () => {
+  console.log('👁️ Window focused, checking authentication state');
+  setupAuthentication();
+});
+
+// Check authentication state when page becomes visible (user switches back to tab)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    console.log('👁️ Page visible, checking authentication state');
+    setupAuthentication();
+  }
 });
 
 // Function to initialize header functionality
@@ -13,6 +35,9 @@ function initializeHeader() {
     setupActiveNavigation();
     setupLanguageSwitchers();
   }, 200); // Increased timeout to ensure header is fully loaded
+  
+  // Also run authentication check immediately for faster page loads
+  setupAuthentication();
 }
 
 // ===== MOBILE NAVIGATION FUNCTIONALITY =====
@@ -122,6 +147,8 @@ function setupMobileNavigation() {
 
 // ===== AUTHENTICATION HANDLING =====
 function setupAuthentication() {
+  console.log('🔐 Setting up authentication...');
+  
   const profileNavItem = document.getElementById('profileNavItem');
   const lecturesNavItem = document.getElementById('lecturesNavItem');
   const liveNavItem = document.getElementById('liveNavItem');
@@ -132,9 +159,17 @@ function setupAuthentication() {
   const registerBtn = document.getElementById('registerBtn');
   const loginBtn = document.getElementById('loginBtn');
 
-  const isLoggedIn = localStorage.getItem('userToken');
+  // Get token from localStorage
+  const userToken = localStorage.getItem('userToken');
+  console.log('🔐 Token found:', !!userToken);
+
+  // Check if token exists and is valid
+  const isLoggedIn = userToken && isTokenValid(userToken);
+  console.log('🔐 User logged in:', isLoggedIn);
 
   if (isLoggedIn) {
+    console.log('✅ User is authenticated, showing authenticated UI');
+    // Show authenticated elements
     if (profileNavItem) profileNavItem.style.display = 'inline-block';
     if (lecturesNavItem) lecturesNavItem.style.display = 'inline-block';
     if (liveNavItem) liveNavItem.style.display = 'inline-block';
@@ -144,15 +179,86 @@ function setupAuthentication() {
     if (logoutBtn) logoutBtn.style.display = 'inline-block';
     if (registerBtn) registerBtn.style.display = 'none';
     if (loginBtn) loginBtn.style.display = 'none';
+  } else {
+    console.log('❌ User not authenticated, showing public UI');
+    // Show public elements
+    if (profileNavItem) profileNavItem.style.display = 'none';
+    if (lecturesNavItem) lecturesNavItem.style.display = 'none';
+    if (liveNavItem) liveNavItem.style.display = 'none';
+    if (mobileProfileNavItem) mobileProfileNavItem.style.display = 'none';
+    if (mobileLecturesNavItem) mobileLecturesNavItem.style.display = 'none';
+    if (mobileLiveNavItem) mobileLiveNavItem.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'none';
+    if (registerBtn) registerBtn.style.display = 'inline-block';
+    if (loginBtn) loginBtn.style.display = 'inline-block';
+    
+    // Clear invalid token
+    if (userToken && !isTokenValid(userToken)) {
+      console.log('🗑️ Clearing invalid token');
+      localStorage.removeItem('userToken');
+    }
   }
 
+  // Setup logout functionality
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
+      console.log('🚪 User logging out');
       localStorage.removeItem('userToken');
-      window.location.href = 'index.html';
+      localStorage.removeItem('adminToken');
+      // Force page reload to update UI
+      window.location.reload();
     });
   }
 }
+
+// ===== TOKEN VALIDATION =====
+function isTokenValid(token) {
+  if (!token) return false;
+  
+  try {
+    // Decode JWT token (basic validation)
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    
+    // Check if token is expired
+    if (payload.exp && payload.exp < currentTime) {
+      console.log('⏰ Token expired');
+      return false;
+    }
+    
+    console.log('✅ Token is valid');
+    return true;
+  } catch (error) {
+    console.log('❌ Token validation error:', error);
+    return false;
+  }
+}
+
+// ===== GLOBAL AUTHENTICATION UTILITIES =====
+// Make authentication functions available globally
+window.authUtils = {
+  isLoggedIn: () => {
+    const token = localStorage.getItem('userToken');
+    return token && isTokenValid(token);
+  },
+  
+  getToken: () => {
+    return localStorage.getItem('userToken');
+  },
+  
+  logout: () => {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('adminToken');
+    window.location.reload();
+  },
+  
+  checkAuth: () => {
+    setupAuthentication();
+  }
+};
 
 // ===== ACTIVE NAVIGATION HANDLING =====
 function setupActiveNavigation() {

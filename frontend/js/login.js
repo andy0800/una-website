@@ -38,8 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error(data.message);
 
       // ✅ Store the token and redirect
+      console.log('🔍 DEBUG: Storing token:', data.token ? 'Token received' : 'No token');
       localStorage.setItem('userToken', data.token);
-      window.location.href = '/../en/index.html'; // or your homepage
+      
+      // Verify token was stored
+      const storedToken = localStorage.getItem('userToken');
+      console.log('🔍 DEBUG: Token stored successfully:', !!storedToken);
+      
+      // Show success message
+      alert('Login successful! Redirecting...');
+      
+      // Redirect to appropriate page
+      window.location.href = '/../en/index.html';
     } catch (err) {
       console.error('❌ Login error:', err);
       alert(err.message);
