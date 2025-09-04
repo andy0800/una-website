@@ -633,7 +633,21 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       contentType = 'video/quicktime';
     }
 
-    console.log('📊 File stats:', { fileSize, range, contentType, extension: ext });
+    console.log('📊 File stats:', { 
+      fileSize, 
+      range, 
+      contentType, 
+      extension: ext,
+      filePath: lecture.filePath,
+      fullPath: videoPath,
+      fileExists: fs.existsSync(videoPath)
+    });
+
+    // Additional validation - check if file is actually a video
+    if (fileSize === 0) {
+      console.log('❌ Video file is empty');
+      return res.status(404).json({ message: 'Video file is empty' });
+    }
 
     if (range) {
       // Handle range requests for video streaming
@@ -663,6 +677,14 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       
       console.log('📤 Sending range response headers:', head);
       res.writeHead(206, head);
+      
+      file.on('error', (err) => {
+        console.error('❌ Error streaming file:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ message: 'Error streaming video' });
+        }
+      });
+      
       file.pipe(res);
     } else {
       // Handle full file requests
@@ -682,7 +704,17 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       
       console.log('📤 Sending full file response headers:', head);
       res.writeHead(200, head);
-      fs.createReadStream(videoPath).pipe(res);
+      
+      const fileStream = fs.createReadStream(videoPath);
+      
+      fileStream.on('error', (err) => {
+        console.error('❌ Error streaming file:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ message: 'Error streaming video' });
+        }
+      });
+      
+      fileStream.pipe(res);
     }
   } catch (err) {
     console.error('❌ Error streaming video:', err);

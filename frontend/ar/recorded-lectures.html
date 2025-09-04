@@ -111,7 +111,9 @@
       
       <div class="lecture-popup-content">
         <div class="lecture-video-section">
-          <video id="lectureVideoPlayer" class="lecture-video-player" controls crossorigin="anonymous">
+          <video id="lectureVideoPlayer" class="lecture-video-player" controls crossorigin="anonymous" preload="metadata">
+            <source type="video/mp4">
+            <source type="video/webm">
             متصفحك لا يدعم علامة الفيديو.
           </video>
           <div id="lectureVideoPlaceholder" class="lecture-video-placeholder" style="display: none;">
