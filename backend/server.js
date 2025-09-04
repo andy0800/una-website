@@ -192,14 +192,14 @@ if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
       worker: process.env.WORKER_ID || 'main',
       timestamp: new Date().toISOString(),
     endpoints: {
-        health: '/health',
-        healthDetailed: '/health/detailed',
+      health: '/health',
+      healthDetailed: '/health/detailed',
       users: '/api/users',
       courses: '/api/courses',
       enrollments: '/api/enrollments',
       admin: '/api/admin',
       lectures: '/api/lectures'
-      },
+    },
       documentation: 'Visit /health for server status and /api/* for API endpoints'
   });
 });
@@ -265,9 +265,12 @@ const connectDB = async () => {
           server.close(() => {
     console.log('✅ HTTP server closed');
             
-    mongoose.connection.close(false, () => {
+    mongoose.connection.close().then(() => {
       console.log('✅ MongoDB connection closed');
               process.exit(0);
+    }).catch((err) => {
+      console.error('❌ Error closing MongoDB connection:', err);
+      process.exit(1);
             });
           });
           
