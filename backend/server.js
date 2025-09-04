@@ -281,17 +281,7 @@ try {
   console.error('🔍 DEBUG: CORS setup error:', error);
 }
 
-// Static file serving
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-// Serve root-level test files
-app.use(express.static(path.join(__dirname, '..'), {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Content-Type', 'text/html');
-    }
-  }
-}));
+// Static file serving - MOVED TO AFTER API ROUTES
 
 // Health check endpoint for load balancer
 app.get('/health', (req, res) => {
@@ -594,29 +584,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 7. Serve frontend static files with proper MIME types
-app.use(express.static(path.join(__dirname, '../frontend'), {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    } else if (path.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    } else if (path.endsWith('.svg')) {
-      res.setHeader('Content-Type', 'image/svg+xml');
-    }
-  }
-}));
-
-// 7.1. Serve root-level files
-app.use(express.static(path.join(__dirname, '..'), {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Content-Type', 'text/html');
-    }
-  }
-}));
-
-app.use('/certs', express.static(path.join(__dirname, '../frontend/certs')));
+// 7. Serve frontend static files - REMOVED (moved to after API routes)
 
 // 8. Root route - API Information
 app.get('/', (req, res) => {
@@ -717,53 +685,19 @@ try {
 
 console.log('🔍 DEBUG: All API routes registered successfully');
 
+// 8.5. Static file serving - MOVED HERE TO AVOID INTERCEPTING API ROUTES
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-// 8.5. Health check endpoint for production monitoring
-app.get('/health', (req, res) => {
-  try {
-    const healthStatus = {
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development',
-      version: '1.0.0',
-      requestId: req.requestId,
-      workerId: process.pid,
-      // NEW: Enhanced health metrics
-      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-      memory: process.memoryUsage(),
-      activeConnections: metrics.activeConnections,
-      totalRequests: metrics.requests,
-      totalErrors: metrics.errors,
-      // NEW: Performance metrics
-      performance: {
-        optimizationEnabled: performanceOptimizer ? true : false,
-        lastOptimization: performanceOptimizer ? performanceOptimizer.getOptimizationStats().lastOptimization : null,
-        optimizationCount: performanceOptimizer ? performanceOptimizer.getOptimizationStats().optimizationCount : 0
-      }
-    };
-    
-    // Check if system is healthy (database connection is optional for basic functionality)
-    const isHealthy = healthStatus.memory.heapUsed < 500 * 1024 * 1024 && // Less than 500MB
-                     healthStatus.totalErrors < 100; // Less than 100 errors
-    
-    if (!isHealthy) {
-      healthStatus.status = 'DEGRADED';
-      res.status(503);
+// Serve root-level test files
+app.use(express.static(path.join(__dirname, '..'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html');
     }
-    
-    res.json(healthStatus);
-    
-  } catch (error) {
-    logger.error('Health check failed', { error: error.message, requestId: req.requestId });
-    res.status(500).json({
-      status: 'FAILED',
-      error: 'Health check failed',
-      timestamp: new Date().toISOString(),
-      requestId: req.requestId
-    });
   }
-});
+}));
+
+// 8.6. Health check endpoint for production monitoring - REMOVED (duplicate of line 297)
 
 // NEW: Metrics endpoint for monitoring
 app.get('/metrics', (req, res) => {
@@ -833,10 +767,7 @@ app.get('/admin', (req, res) => {
   res.redirect('/admin/dashboard.html');
 });
 
-// 8.7. Root route handler
-app.get('/', (req, res) => {
-  res.redirect('/index.html');
-});
+// 8.7. Root route handler - REMOVED (duplicate of line 622)
 
 // 8.8. API documentation route
 app.get('/api', (req, res) => {
