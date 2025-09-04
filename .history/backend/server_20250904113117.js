@@ -241,16 +241,50 @@ app.use(compression());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS configuration - SIMPLIFIED AND FIXED
+// CORS configuration
 console.log('🔍 DEBUG: Setting up CORS...');
-app.use(cors({
-  origin: "https://cute-churros-f9f049.netlify.app",
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200
-}));
-console.log('🔍 DEBUG: CORS setup successful');
+try {
+  // Get allowed origins from environment or use defaults
+  const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+    'http://localhost:3000', 
+    'http://localhost:5000',
+    'https://cute-churros-f9f049.netlify.app',
+    'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
+    'https://una-website.vercel.app',
+    'https://una-backend-c207.onrender.com'
+  ];
+  
+  console.log('🔍 DEBUG: Allowed CORS origins:', allowedOrigins);
+
+  const corsOptions = {
+    origin: allowedOrigins, // Use array directly instead of function
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID'],
+    optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    exposedHeaders: ['Content-Length', 'X-Request-ID'],
+    preflightContinue: false
+  };
+
+  app.use(cors(corsOptions));
+
+  // Handle preflight requests explicitly
+  app.options('*', cors(corsOptions));
+  
+  // Additional CORS middleware to ensure headers are set
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    next();
+  });
+  
+  console.log('🔍 DEBUG: CORS setup successful');
+} catch (error) {
+  console.error('🔍 DEBUG: CORS setup error:', error);
+}
 
 // Static file serving - MOVED TO AFTER API ROUTES
 
@@ -979,7 +1013,16 @@ try {
         app.use(express.json({ limit: '50mb' }));
         app.use(express.urlencoded({ extended: true, limit: '50mb' }));
         
-        // CORS configuration - REMOVED (using the main CORS config above)
+        // CORS configuration
+        app.use(cors({
+          origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+            process.env.NODE_ENV === 'production' ? process.env.DOMAIN : 'http://localhost:3000',
+            process.env.NODE_ENV === 'production' ? `https://${process.env.DOMAIN}` : 'http://localhost:5000'
+          ],
+          credentials: true,
+          methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+          allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID']
+        }));
         
         // Static file serving
         app.use(express.static(path.join(__dirname, '../frontend')));
@@ -1060,7 +1103,12 @@ try {
           });
         });
 
-        // API routes already registered above - REMOVED DUPLICATE
+        // Register API routes
+        app.use('/api/users', require('./routes/userRoutes'));
+        app.use('/api/courses', require('./routes/courseRoutes'));
+        app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
+        app.use('/api/admin', require('./routes/adminRoutes'));
+        app.use('/api/lectures', require('./routes/lectureRoutes'));
         
         // Error handling middleware
         app.use((err, req, res, next) => {

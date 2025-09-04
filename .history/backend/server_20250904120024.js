@@ -1060,7 +1060,12 @@ try {
           });
         });
 
-        // API routes already registered above - REMOVED DUPLICATE
+        // Register API routes
+        app.use('/api/users', require('./routes/userRoutes'));
+        app.use('/api/courses', require('./routes/courseRoutes'));
+        app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
+        app.use('/api/admin', require('./routes/adminRoutes'));
+        app.use('/api/lectures', require('./routes/lectureRoutes'));
         
         // Error handling middleware
         app.use((err, req, res, next) => {

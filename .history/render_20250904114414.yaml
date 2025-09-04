@@ -1,0 +1,39 @@
+# Render deployment configuration
+services:
+  - type: web
+    name: una-institute-website
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        value: 7b3bb2580b321e6428615d88dae6973f8a25195ac207732082735cd9416abe35
+      - key: MONGO_URI
+        value: mongodb+srv://andydaddy080:OdRGpk03NcDSuQH0@unainstitutedb.zcpbbs0.mongodb.net/?retryWrites=true&w=majority&appName=UNAinstituteDB
+      - key: ENABLE_CLUSTERING
+        value: false
+      - key: ENABLE_PERFORMANCE_OPTIMIZATION
+        value: false
+      - key: LOG_LEVEL
+        value: info
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: ALLOWED_ORIGINS
+        value: "https://cute-churros-f9f049.netlify.app,https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app,https://una-website.vercel.app,https://una-backend-c207.onrender.com"
+      - key: RATE_LIMIT_WINDOW
+        value: "60000"
+      - key: RATE_LIMIT_MAX
+        value: "100"
+      - key: MAX_FILE_SIZE
+        value: "100MB"
+      - key: ENABLE_MONITORING
+        value: "true"
+      - key: METRICS_PORT
+        value: "9090"
+    healthCheckPath: /health
+    autoDeploy: true
