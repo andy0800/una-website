@@ -54,7 +54,7 @@ const io = new Server(server, {
 });
 
 // 10. Environment Variables
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/una_website';
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -62,9 +62,9 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const corsOptions = {
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
     'http://localhost:3000',
-    'http://localhost:4000',
+    'http://localhost:5000',
     'http://127.0.0.1:3000',
-    'http://127.0.0.1:4000',
+    'http://127.0.0.1:5000',
     'https://cute-churros-f9f049.netlify.app',
     'https://una-website.vercel.app'
   ],
@@ -300,25 +300,15 @@ const startServer = async () => {
     
     // Start server
     server.listen(PORT, '0.0.0.0', () => {
-      console.log('🚀 UNA Institute Server Started');
+      console.log('🚀 UNA Institute Backend API Started');
       console.log(`📍 Environment: ${NODE_ENV}`);
-      console.log(`🌐 Server: http://0.0.0.0:${PORT}`);
+      console.log(`🌐 API Server: http://0.0.0.0:${PORT}`);
       console.log(`🏥 Health: http://0.0.0.0:${PORT}/health`);
       console.log(`📊 API Health: http://0.0.0.0:${PORT}/api/health`);
       console.log(`🔌 Socket.IO: Enabled`);
-      
-      if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
-        console.log(`🌍 Frontend: http://localhost:3000`);
-        console.log(`🔧 Backend API: http://localhost:${PORT}`);
-        console.log(`📁 Static Files: Frontend + Uploads`);
-        console.log(`🔧 Mode: Development (Frontend + Backend)`);
-      } else {
-        console.log(`📁 Static Files: Uploads only`);
-        console.log(`🔧 Mode: Production (Backend API only)`);
-        console.log(`🌍 Frontend: https://cute-churros-f9f049.netlify.app`);
-      }
-      
+      console.log(`📁 Static Files: Uploads only`);
       console.log(`🗄️ Database: ${MONGO_URI.split('@')[1] || 'localhost'}`);
+      console.log(`🌍 Frontend: https://cute-churros-f9f049.netlify.app`);
     });
       } catch (error) {
     console.error('❌ Server startup failed:', error);

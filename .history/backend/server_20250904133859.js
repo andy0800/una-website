@@ -54,7 +54,7 @@ const io = new Server(server, {
 });
 
 // 10. Environment Variables
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/una_website';
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -62,9 +62,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const corsOptions = {
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
     'http://localhost:3000',
-    'http://localhost:4000',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:4000',
+    'http://localhost:5000',
     'https://cute-churros-f9f049.netlify.app',
     'https://una-website.vercel.app'
   ],
@@ -139,71 +137,27 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 18. Frontend Routes (for localhost testing)
-if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
-  // Serve Arabic homepage as default
-  app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/ar/index.html'));
-  });
-
-  // Serve English homepage
-  app.get('/en', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/en/index.html'));
-  });
-
-  // Serve Arabic homepage
-  app.get('/ar', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/ar/index.html'));
-  });
-
-  // Serve admin login
-  app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/admin/login.html'));
-  });
-
-  // Serve admin dashboard
-  app.get('/admin/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/admin/dashboard.html'));
-  });
-
-  // Serve all other frontend pages
-  app.get('/en/*', (req, res) => {
-    const filePath = path.join(__dirname, '../frontend/en', req.params[0]);
-    res.sendFile(filePath);
-  });
-
-  app.get('/ar/*', (req, res) => {
-    const filePath = path.join(__dirname, '../frontend/ar', req.params[0]);
-    res.sendFile(filePath);
-  });
-
-  app.get('/admin/*', (req, res) => {
-    const filePath = path.join(__dirname, '../frontend/admin', req.params[0]);
-    res.sendFile(filePath);
-  });
-} else {
-  // Production: API Root Endpoint only
-  app.get('/', (req, res) => {
-    res.json({
-      message: '🚀 UNA Institute Backend API - Updated',
-      version: '1.0.0',
-      status: 'online',
-      environment: NODE_ENV,
-      worker: process.env.WORKER_ID || 'main',
-      timestamp: new Date().toISOString(),
+// 18. API Root Endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: '🚀 UNA Institute Backend API - Updated',
+    version: '1.0.0',
+    status: 'online',
+    environment: NODE_ENV,
+    worker: process.env.WORKER_ID || 'main',
+    timestamp: new Date().toISOString(),
     endpoints: {
-        health: '/health',
-        healthDetailed: '/health/detailed',
+      health: '/health',
+      healthDetailed: '/health/detailed',
       users: '/api/users',
       courses: '/api/courses',
       enrollments: '/api/enrollments',
       admin: '/api/admin',
       lectures: '/api/lectures'
-      },
-      documentation: 'Visit /health for server status and /api/* for API endpoints'
+    },
+    documentation: 'Visit /health for server status and /api/* for API endpoints'
   });
 });
-}
 
 // 19. Socket.IO Events
 io.on('connection', (socket) => {
@@ -300,25 +254,15 @@ const startServer = async () => {
     
     // Start server
     server.listen(PORT, '0.0.0.0', () => {
-      console.log('🚀 UNA Institute Server Started');
+      console.log('🚀 UNA Institute Backend API Started');
       console.log(`📍 Environment: ${NODE_ENV}`);
-      console.log(`🌐 Server: http://0.0.0.0:${PORT}`);
+      console.log(`🌐 API Server: http://0.0.0.0:${PORT}`);
       console.log(`🏥 Health: http://0.0.0.0:${PORT}/health`);
       console.log(`📊 API Health: http://0.0.0.0:${PORT}/api/health`);
       console.log(`🔌 Socket.IO: Enabled`);
-      
-      if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
-        console.log(`🌍 Frontend: http://localhost:3000`);
-        console.log(`🔧 Backend API: http://localhost:${PORT}`);
-        console.log(`📁 Static Files: Frontend + Uploads`);
-        console.log(`🔧 Mode: Development (Frontend + Backend)`);
-      } else {
-        console.log(`📁 Static Files: Uploads only`);
-        console.log(`🔧 Mode: Production (Backend API only)`);
-        console.log(`🌍 Frontend: https://cute-churros-f9f049.netlify.app`);
-      }
-      
+      console.log(`📁 Static Files: Uploads only`);
       console.log(`🗄️ Database: ${MONGO_URI.split('@')[1] || 'localhost'}`);
+      console.log(`🌍 Frontend: https://cute-churros-f9f049.netlify.app`);
     });
       } catch (error) {
     console.error('❌ Server startup failed:', error);

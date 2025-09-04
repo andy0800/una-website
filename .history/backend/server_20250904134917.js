@@ -308,8 +308,7 @@ const startServer = async () => {
       console.log(`🔌 Socket.IO: Enabled`);
       
       if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
-        console.log(`🌍 Frontend: http://localhost:3000`);
-        console.log(`🔧 Backend API: http://localhost:${PORT}`);
+        console.log(`🌍 Frontend: http://localhost:${PORT}`);
         console.log(`📁 Static Files: Frontend + Uploads`);
         console.log(`🔧 Mode: Development (Frontend + Backend)`);
       } else {

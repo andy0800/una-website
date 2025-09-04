@@ -62,9 +62,9 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const corsOptions = {
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
     'http://localhost:3000',
-    'http://localhost:4000',
+    'http://localhost:5000',
     'http://127.0.0.1:3000',
-    'http://127.0.0.1:4000',
+    'http://127.0.0.1:5000',
     'https://cute-churros-f9f049.netlify.app',
     'https://una-website.vercel.app'
   ],
@@ -308,8 +308,7 @@ const startServer = async () => {
       console.log(`🔌 Socket.IO: Enabled`);
       
       if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
-        console.log(`🌍 Frontend: http://localhost:3000`);
-        console.log(`🔧 Backend API: http://localhost:${PORT}`);
+        console.log(`🌍 Frontend: http://localhost:${PORT}`);
         console.log(`📁 Static Files: Frontend + Uploads`);
         console.log(`🔧 Mode: Development (Frontend + Backend)`);
       } else {

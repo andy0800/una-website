@@ -7,8 +7,6 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
     "local": "node start-local.js",
-    "frontend": "node start-frontend.js",
-    "backend": "node start-local.js",
     "start:prod": "NODE_ENV=production node backend/server.js",
     "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "npm run clean:frontend && npm run minify:frontend",
