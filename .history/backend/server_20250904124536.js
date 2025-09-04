@@ -627,12 +627,12 @@ console.log('🔍 DEBUG: Health check route registered');
 
 // Direct test route for login debugging - REMOVED (issue resolved)
 
-// Simplified route registration for debugging
-console.log('🔍 DEBUG: Loading userRoutes module...');
 try {
+  console.log('🔍 DEBUG: Loading userRoutes module...');
   const userRoutes = require('./routes/userRoutes');
   console.log('🔍 DEBUG: userRoutes module loaded successfully');
   console.log('🔍 DEBUG: userRoutes type:', typeof userRoutes);
+  console.log('🔍 DEBUG: userRoutes methods:', Object.keys(userRoutes));
   
   app.use('/api/users', userRoutes);
   console.log('🔍 DEBUG: /api/users route registered successfully');
@@ -685,15 +685,6 @@ app._router.stack.forEach((middleware, index) => {
 app.get('/test-routing', (req, res) => {
   res.json({ 
     message: 'Basic routing works!', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
-  });
-});
-
-// Direct test route for API debugging
-app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'API routing works!', 
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
   });

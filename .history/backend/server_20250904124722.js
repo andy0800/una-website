@@ -690,15 +690,6 @@ app.get('/test-routing', (req, res) => {
   });
 });
 
-// Direct test route for API debugging
-app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'API routing works!', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
-  });
-});
-
 // 8.5. Static file serving - MOVED HERE TO AVOID INTERCEPTING API ROUTES
 app.use(express.static(path.join(__dirname, '../frontend')));
 
