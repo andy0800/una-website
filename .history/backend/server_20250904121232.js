@@ -241,11 +241,25 @@ app.use(compression());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS configuration - SIMPLIFIED AND RELIABLE
+// CORS configuration - FIXED (multi-origin + preflight)
 console.log('🔍 DEBUG: Setting up CORS...');
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://cute-churros-f9f049.netlify.app", // Netlify preview
+  "https://una-website.netlify.app",         // your production frontend
+  "https://una-backend-c207.onrender.com"    // backend itself
+];
+
 const corsOptions = {
-  origin: "https://cute-churros-f9f049.netlify.app",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn("CORS blocked origin:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -253,6 +267,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // ✅ handle all preflight requests
 
 console.log('🔍 DEBUG: CORS setup successful');
 
