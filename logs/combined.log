@@ -1263,3 +1263,43 @@
 {"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-09-02T17:34:01.859Z"}
 {"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-09-02T17:34:02.541Z"}
 {"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-09-02T17:38:11.665Z"}
+{"level":"info","message":"✅ HTTP server running on port 3000","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.011Z"}
+{"level":"info","message":"🌐 Network accessible at: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.013Z"}
+{"level":"info","message":"🏠 Server listening on port 3000","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.014Z"}
+{"level":"info","message":"🔗 Local access: http://localhost:3000","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.014Z"}
+{"level":"info","message":"🌐 Network access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.014Z"}
+{"level":"info","message":"📱 Other devices can access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.015Z"}
+{"level":"info","message":"🔧 Browser detection enabled - microphone access guidance provided","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.015Z"}
+{"level":"info","message":"📊 Health check available at /health","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.015Z"}
+{"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.015Z"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-09-04T09:28:31.046Z"}
+{"duration":7,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756978269892_4n4bs5lg8","service":"una-institute-server","status":404,"timestamp":"2025-09-04T09:31:09.900Z","url":"/api/users/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":11376}
+{"duration":4,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756978323321_9wx01fg0s","service":"una-institute-server","status":204,"timestamp":"2025-09-04T09:32:03.325Z","url":"/favicon.ico","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":11376}
+{"duration":2,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756978334143_0p1roxsa8","service":"una-institute-server","status":404,"timestamp":"2025-09-04T09:32:14.145Z","url":"/api/users/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":11376}
+{"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-09-04T09:32:36.888Z"}
+{"level":"info","message":"✅ HTTP server running on port 3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.632Z"}
+{"level":"info","message":"🌐 Network accessible at: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.635Z"}
+{"level":"info","message":"🏠 Server listening on port 3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.636Z"}
+{"level":"info","message":"🔗 Local access: http://localhost:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.637Z"}
+{"level":"info","message":"🌐 Network access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.637Z"}
+{"level":"info","message":"📱 Other devices can access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.637Z"}
+{"level":"info","message":"🔧 Browser detection enabled - microphone access guidance provided","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.638Z"}
+{"level":"info","message":"📊 Health check available at /health","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.638Z"}
+{"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.638Z"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-09-04T09:33:34.663Z"}
+{"duration":10,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756978417589_knci9lke4","service":"una-institute-server","status":404,"timestamp":"2025-09-04T09:33:37.599Z","url":"/api/users/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":28112}
+{"duration":3,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756978418582_2c0x5pvdb","service":"una-institute-server","status":404,"timestamp":"2025-09-04T09:33:38.585Z","url":"/api/users/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":28112}
+{"duration":2,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756978421495_9fr4ktmln","service":"una-institute-server","status":404,"timestamp":"2025-09-04T09:33:41.498Z","url":"/api/users/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":28112}
+{"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-09-04T09:33:55.105Z"}
+{"level":"info","message":"✅ HTTP server running on port 3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.632Z"}
+{"level":"info","message":"🌐 Network accessible at: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.635Z"}
+{"level":"info","message":"🏠 Server listening on port 3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.636Z"}
+{"level":"info","message":"🔗 Local access: http://localhost:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.636Z"}
+{"level":"info","message":"🌐 Network access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.636Z"}
+{"level":"info","message":"📱 Other devices can access: http://192.168.187.16:3000","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.637Z"}
+{"level":"info","message":"🔧 Browser detection enabled - microphone access guidance provided","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.637Z"}
+{"level":"info","message":"📊 Health check available at /health","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.638Z"}
+{"level":"info","message":"📈 Metrics available at /metrics","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.638Z"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"una-institute-server","timestamp":"2025-09-04T09:33:59.658Z"}
+{"duration":9,"ip":"127.0.0.1","level":"info","message":"HTTP Request","method":"GET","requestId":"req_1756978442236_vzakckfpi","service":"una-institute-server","status":404,"timestamp":"2025-09-04T09:34:02.246Z","url":"/api/users/login","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0","workerId":39908}
+{"level":"info","message":"🔄 SIGINT received, shutting down gracefully...","service":"una-institute-server","timestamp":"2025-09-04T09:34:31.446Z"}

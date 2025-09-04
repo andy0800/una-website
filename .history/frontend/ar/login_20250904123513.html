@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تسجيل الدخول - معهد UNA</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script>
@@ -23,51 +23,27 @@
   </script>
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <h2>معهد UNA</h2>
-      </div>
-      <nav class="nav-menu">
-        <a href="index.html">الرئيسية</a>
-        <a href="about.html">من نحن</a>
-        <a href="courses.html">الدورات</a>
-        <a href="contact.html">اتصل بنا</a>
-        <a href="livestream.html">البث المباشر</a>
-      </nav>
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = '/ar/header.html'; // Path to the Arabic header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+  
 
-      <!-- Hamburger Menu Button -->
-      <button class="hamburger-menu" id="hamburgerMenu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <div class="header-actions">
-        <div class="lang-toggle">
-          <a href="../en/login.html" class="lang-link">EN</a> /
-          <span>ع</span>
-        </div>
-        <a href="register.html" class="btn btn-outline">تسجيل</a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Mobile Navigation Overlay -->
-  <div class="mobile-nav" id="mobileNav">
-    <button class="mobile-nav-close" id="mobileNavClose">
-      <i class="fas fa-times"></i>
-    </button>
-    <div class="mobile-nav-content">
-      <ul>
-        <li><a href="index.html">الرئيسية</a></li>
-        <li><a href="about.html">من نحن</a></li>
-        <li><a href="courses.html">الدورات</a></li>
-        <li><a href="contact.html">اتصل بنا</a></li>
-        <li><a href="livestream.html">البث المباشر</a></li>
-      </ul>
-    </div>
-  </div>
+  
 
   <!-- Hero Section -->
   <section class="hero-section login-hero">
@@ -88,7 +64,7 @@
           <p>أدخل بياناتك للوصول إلى حسابك</p>
         </div>
         
-        <form id="loginForm" class="login-form">
+        <form id="loginForm" class="login-form" method="post" action="javascript:void(0);">
           <div class="form-group">
             <label for="phone">
               <i class="fas fa-phone"></i> رقم الهاتف
@@ -144,6 +120,7 @@
     </div>
   </footer>
 
-  <script src="../js/login.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/login.js"></script>
 </body>
 </html>
