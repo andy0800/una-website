@@ -267,7 +267,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // ✅ handle all preflight requests
 
 console.log('🔍 DEBUG: CORS setup successful');
 
