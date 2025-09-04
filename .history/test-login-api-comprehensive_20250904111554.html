@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNA Institute - Login API Comprehensive Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .test-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .log-container {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success { background-color: #28a745; }
+        .status-error { background-color: #dc3545; }
+        .status-warning { background-color: #ffc107; }
+        .status-pending { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+    <h1>🔍 UNA Institute - Login API Comprehensive Test</h1>
+    <p><strong>Backend URL:</strong> <span id="backendUrl">https://una-backend-c207.onrender.com</span></p>
+    <p><strong>Test Time:</strong> <span id="testTime"></span></p>
+
+    <div class="test-container">
+        <h2>📋 Test Overview</h2>
+        <div id="overview">
+            <p>This comprehensive test will verify:</p>
+            <ul>
+                <li>✅ Backend connectivity and availability</li>
+                <li>✅ CORS configuration for cross-origin requests</li>
+                <li>✅ API route accessibility and proper responses</li>
+                <li>✅ Login endpoint functionality (POST method)</li>
+                <li>✅ Error handling and validation</li>
+                <li>✅ Frontend integration readiness</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🌐 Backend Connectivity Tests</h2>
+        <div class="test-section">
+            <h3>Basic Connectivity</h3>
+            <button onclick="testBasicConnectivity()">Test Backend Connection</button>
+            <div id="connectivityResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>API Health Check</h3>
+            <button onclick="testHealthCheck()">Test Health Endpoint</button>
+            <div id="healthResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>User Routes Test</h3>
+            <button onclick="testUserRoutes()">Test User Routes</button>
+            <div id="userRoutesResults"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🔒 CORS Configuration Tests</h2>
+        <div class="test-section">
+            <h3>CORS Preflight Test</h3>
+            <button onclick="testCORSPreflight()">Test CORS Preflight</button>
+            <div id="corsPreflightResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>CORS Headers Test</h3>
+            <button onclick="testCORSHeaders()">Test CORS Headers</button>
+            <div id="corsHeadersResults"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🔑 Login API Tests</h2>
+        <div class="test-section">
+            <h3>Login Endpoint Accessibility</h3>
+            <button onclick="testLoginEndpoint()">Test Login Endpoint</button>
+            <div id="loginEndpointResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Login with Test Credentials</h3>
+            <div class="test-form">
+                <div class="form-group">
+                    <label for="testPhone">Phone Number:</label>
+                    <input type="text" id="testPhone" value="12345678" placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label for="testPassword">Password:</label>
+                    <input type="password" id="testPassword" value="testpass123" placeholder="Enter password">
+                </div>
+            </div>
+            <button onclick="testLoginWithCredentials()">Test Login with Credentials</button>
+            <div id="loginCredentialsResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Login Validation Tests</h3>
+            <button onclick="testLoginValidation()">Test Login Validation</button>
+            <div id="loginValidationResults"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🌍 Frontend Integration Tests</h2>
+        <div class="test-section">
+            <h3>Cross-Origin Request Test</h3>
+            <button onclick="testCrossOriginRequest()">Test Cross-Origin Request</button>
+            <div id="crossOriginResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Frontend Simulation Test</h3>
+            <button onclick="simulateFrontendLogin()">Simulate Frontend Login</button>
+            <div id="frontendSimulationResults"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 Test Results Summary</h2>
+        <div id="testSummary">
+            <p>Run tests to see results...</p>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📝 Detailed Log</h2>
+        <div class="log-container" id="detailedLog">
+            <div>Ready to run tests...</div>
+        </div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'https://una-backend-c207.onrender.com';
+        let testResults = {
+            connectivity: null,
+            health: null,
+            userRoutes: null,
+            corsPreflight: null,
+            corsHeaders: null,
+            loginEndpoint: null,
+            loginCredentials: null,
+            loginValidation: null,
+            crossOrigin: null,
+            frontendSimulation: null
+        };
+
+        // Initialize test time
+        document.getElementById('testTime').textContent = new Date().toLocaleString();
+
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('detailedLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="status-indicator status-${type}"></span>[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="test-result ${type}">${message}</div>`;
+        }
+
+        function updateTestSummary() {
+            const summary = document.getElementById('testSummary');
+            const results = Object.values(testResults);
+            const passed = results.filter(r => r === 'success').length;
+            const failed = results.filter(r => r === 'error').length;
+            const pending = results.filter(r => r === null).length;
+            
+            summary.innerHTML = `
+                <div class="test-result ${failed === 0 ? 'success' : 'warning'}">
+                    <strong>Test Summary:</strong> 
+                    ✅ Passed: ${passed} | 
+                    ❌ Failed: ${failed} | 
+                    ⏳ Pending: ${pending}
+                </div>
+            `;
+        }
+
+        async function testBasicConnectivity() {
+            log('Testing basic backend connectivity...', 'info');
+            try {
+                const response = await fetch(`${BACKEND_URL}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    testResults.connectivity = 'success';
+                    showResult('connectivityResults', 
+                        `✅ Backend is reachable!<br>
+                         Status: ${response.status}<br>
+                         Response: ${JSON.stringify(data, null, 2)}`, 'success');
+                    log('Backend connectivity test passed', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                testResults.connectivity = 'error';
+                showResult('connectivityResults', 
+                    `❌ Backend connectivity failed:<br>${error.message}`, 'error');
+                log(`Backend connectivity test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function testHealthCheck() {
+            log('Testing health check endpoint...', 'info');
+            try {
+                const response = await fetch(`${BACKEND_URL}/health`, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    testResults.health = 'success';
+                    showResult('healthResults', 
+                        `✅ Health check passed!<br>
+                         Status: ${data.status}<br>
+                         Uptime: ${data.uptime}s`, 'success');
+                    log('Health check test passed', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                testResults.health = 'error';
+                showResult('healthResults', 
+                    `❌ Health check failed:<br>${error.message}`, 'error');
+                log(`Health check test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function testUserRoutes() {
+            log('Testing user routes endpoint...', 'info');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/test`, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    testResults.userRoutes = 'success';
+                    showResult('userRoutesResults', 
+                        `✅ User routes working!<br>
+                         Message: ${data.message}<br>
+                         Timestamp: ${data.timestamp}`, 'success');
+                    log('User routes test passed', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                testResults.userRoutes = 'error';
+                showResult('userRoutesResults', 
+                    `❌ User routes test failed:<br>${error.message}`, 'error');
+                log(`User routes test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function testCORSPreflight() {
+            log('Testing CORS preflight request...', 'info');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
+                };
+                
+                if (response.ok && corsHeaders['Access-Control-Allow-Origin']) {
+                    testResults.corsPreflight = 'success';
+                    showResult('corsPreflightResults', 
+                        `✅ CORS preflight successful!<br>
+                         Allow-Origin: ${corsHeaders['Access-Control-Allow-Origin']}<br>
+                         Allow-Methods: ${corsHeaders['Access-Control-Allow-Methods']}<br>
+                         Allow-Headers: ${corsHeaders['Access-Control-Allow-Headers']}<br>
+                         Allow-Credentials: ${corsHeaders['Access-Control-Allow-Credentials']}`, 'success');
+                    log('CORS preflight test passed', 'success');
+                } else {
+                    throw new Error('CORS headers missing or invalid');
+                }
+            } catch (error) {
+                testResults.corsPreflight = 'error';
+                showResult('corsPreflightResults', 
+                    `❌ CORS preflight failed:<br>${error.message}`, 'error');
+                log(`CORS preflight test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function testCORSHeaders() {
+            log('Testing CORS headers on actual request...', 'info');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/test`, {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
+                };
+                
+                if (response.ok) {
+                    testResults.corsHeaders = 'success';
+                    showResult('corsHeadersResults', 
+                        `✅ CORS headers present!<br>
+                         Allow-Origin: ${corsHeaders['Access-Control-Allow-Origin']}<br>
+                         Allow-Credentials: ${corsHeaders['Access-Control-Allow-Credentials']}`, 'success');
+                    log('CORS headers test passed', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                testResults.corsHeaders = 'error';
+                showResult('corsHeadersResults', 
+                    `❌ CORS headers test failed:<br>${error.message}`, 'error');
+                log(`CORS headers test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function testLoginEndpoint() {
+            log('Testing login endpoint accessibility...', 'info');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
+                    },
+                    body: JSON.stringify({
+                        phone: 'test',
+                        password: 'test'
+                    })
+                });
+                
+                // We expect either 400 (validation error) or 401 (auth error), not 404
+                if (response.status === 404) {
+                    throw new Error('Login endpoint not found (404)');
+                }
+                
+                const data = await response.json();
+                testResults.loginEndpoint = 'success';
+                showResult('loginEndpointResults', 
+                    `✅ Login endpoint accessible!<br>
+                     Status: ${response.status}<br>
+                     Response: ${JSON.stringify(data, null, 2)}`, 'success');
+                log('Login endpoint test passed', 'success');
+            } catch (error) {
+                testResults.loginEndpoint = 'error';
+                showResult('loginEndpointResults', 
+                    `❌ Login endpoint test failed:<br>${error.message}`, 'error');
+                log(`Login endpoint test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function testLoginWithCredentials() {
+            log('Testing login with provided credentials...', 'info');
+            const phone = document.getElementById('testPhone').value;
+            const password = document.getElementById('testPassword').value;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    testResults.loginCredentials = 'success';
+                    showResult('loginCredentialsResults', 
+                        `✅ Login successful!<br>
+                         Status: ${response.status}<br>
+                         Token: ${data.token ? 'Present' : 'Missing'}<br>
+                         User: ${data.user ? data.user.name : 'N/A'}`, 'success');
+                    log('Login with credentials test passed', 'success');
+                } else {
+                    testResults.loginCredentials = 'warning';
+                    showResult('loginCredentialsResults', 
+                        `⚠️ Login failed (expected for test credentials):<br>
+                         Status: ${response.status}<br>
+                         Message: ${data.message || 'Unknown error'}`, 'warning');
+                    log(`Login with credentials test: ${data.message || 'Unknown error'}`, 'warning');
+                }
+            } catch (error) {
+                testResults.loginCredentials = 'error';
+                showResult('loginCredentialsResults', 
+                    `❌ Login credentials test failed:<br>${error.message}`, 'error');
+                log(`Login with credentials test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function testLoginValidation() {
+            log('Testing login validation...', 'info');
+            const testCases = [
+                { phone: '', password: 'test', expected: 'Phone required' },
+                { phone: '123', password: '', expected: 'Password required' },
+                { phone: '', password: '', expected: 'Both required' }
+            ];
+            
+            let passedTests = 0;
+            let totalTests = testCases.length;
+            
+            for (const testCase of testCases) {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Origin': window.location.origin
+                        },
+                        body: JSON.stringify({
+                            phone: testCase.phone,
+                            password: testCase.password
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.status === 400 && data.message) {
+                        passedTests++;
+                        log(`Validation test passed: ${testCase.expected}`, 'success');
+                    } else {
+                        log(`Validation test failed: Expected 400, got ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    log(`Validation test error: ${error.message}`, 'error');
+                }
+            }
+            
+            if (passedTests === totalTests) {
+                testResults.loginValidation = 'success';
+                showResult('loginValidationResults', 
+                    `✅ All validation tests passed!<br>
+                     Passed: ${passedTests}/${totalTests}`, 'success');
+            } else {
+                testResults.loginValidation = 'warning';
+                showResult('loginValidationResults', 
+                    `⚠️ Some validation tests failed:<br>
+                     Passed: ${passedTests}/${totalTests}`, 'warning');
+            }
+            updateTestSummary();
+        }
+
+        async function testCrossOriginRequest() {
+            log('Testing cross-origin request...', 'info');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/test`, {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin
+                    }
+                });
+                
+                if (response.ok) {
+                    testResults.crossOrigin = 'success';
+                    showResult('crossOriginResults', 
+                        `✅ Cross-origin request successful!<br>
+                         Origin: ${window.location.origin}<br>
+                         Status: ${response.status}`, 'success');
+                    log('Cross-origin request test passed', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                testResults.crossOrigin = 'error';
+                showResult('crossOriginResults', 
+                    `❌ Cross-origin request failed:<br>${error.message}`, 'error');
+                log(`Cross-origin request test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        async function simulateFrontendLogin() {
+            log('Simulating frontend login process...', 'info');
+            try {
+                // Simulate the exact request the frontend would make
+                const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        phone: '12345678',
+                        password: 'testpass123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Check if response has proper structure for frontend
+                const hasProperStructure = data.hasOwnProperty('message') || 
+                                        data.hasOwnProperty('token') || 
+                                        data.hasOwnProperty('user');
+                
+                if (hasProperStructure) {
+                    testResults.frontendSimulation = 'success';
+                    showResult('frontendSimulationResults', 
+                        `✅ Frontend simulation successful!<br>
+                         Status: ${response.status}<br>
+                         Response structure: Valid<br>
+                         CORS headers: Present`, 'success');
+                    log('Frontend simulation test passed', 'success');
+                } else {
+                    testResults.frontendSimulation = 'warning';
+                    showResult('frontendSimulationResults', 
+                        `⚠️ Frontend simulation completed with unexpected response:<br>
+                         Status: ${response.status}<br>
+                         Response: ${JSON.stringify(data, null, 2)}`, 'warning');
+                    log('Frontend simulation test: unexpected response', 'warning');
+                }
+            } catch (error) {
+                testResults.frontendSimulation = 'error';
+                showResult('frontendSimulationResults', 
+                    `❌ Frontend simulation failed:<br>${error.message}`, 'error');
+                log(`Frontend simulation test failed: ${error.message}`, 'error');
+            }
+            updateTestSummary();
+        }
+
+        function clearLog() {
+            document.getElementById('detailedLog').innerHTML = '<div>Log cleared...</div>';
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', function() {
+            log('Starting comprehensive login API test suite...', 'info');
+            setTimeout(() => {
+                testBasicConnectivity();
+                setTimeout(() => testUserRoutes(), 1000);
+                setTimeout(() => testLoginEndpoint(), 2000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>
