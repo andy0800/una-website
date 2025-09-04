@@ -71,22 +71,11 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS
 console.log('🔍 DEBUG: CORS Allowed Origins:', allowedOrigins);
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    console.log('🔍 DEBUG: CORS Request from origin:', origin);
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      console.log('✅ DEBUG: CORS Origin allowed:', origin);
-      return callback(null, true);
-    } else {
-      console.log('❌ DEBUG: CORS Origin blocked:', origin);
-      return callback(new Error('Not allowed by CORS'), false);
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID'],
+  optionsSuccessStatus: 200
 };
 
 // 12. Middleware Setup
