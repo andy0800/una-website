@@ -244,32 +244,26 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // CORS configuration
 console.log('🔍 DEBUG: Setting up CORS...');
 try {
+  // Get allowed origins from environment or use defaults
+  const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+    'http://localhost:3000', 
+    'http://localhost:5000',
+    'https://cute-churros-f9f049.netlify.app',
+    'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
+    'https://una-website.vercel.app',
+    'https://una-backend-c207.onrender.com'
+  ];
+  
+  console.log('🔍 DEBUG: Allowed CORS origins:', allowedOrigins);
+
   const corsOptions = {
-    origin: function (origin, callback) {
-      const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
-        'http://localhost:3000', 
-        'http://localhost:5000',
-        'https://cute-churros-f9f049.netlify.app',
-        'https://una-website-hz2f6q1gr-unas-projects-6283d97d.vercel.app',
-        'https://una-website.vercel.app',
-        'https://una-backend-c207.onrender.com'
-      ];
-      
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        console.log(`✅ CORS allowing origin: ${origin}`);
-        callback(null, true);
-      } else {
-        console.log(`❌ CORS blocked origin: ${origin}`);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: allowedOrigins, // Use array directly instead of function
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Worker-ID'],
-    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    exposedHeaders: ['Content-Length', 'X-Request-ID'],
+    preflightContinue: false
   };
 
   app.use(cors(corsOptions));
