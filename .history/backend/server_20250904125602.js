@@ -668,6 +668,16 @@ try {
 
 console.log('🔍 DEBUG: All API routes registered successfully');
 
+// Debug: List all registered routes
+console.log('🔍 DEBUG: Registered routes:');
+app._router.stack.forEach((middleware, index) => {
+  if (middleware.route) {
+    console.log(`  ${middleware.route.methods} ${middleware.route.path}`);
+  } else if (middleware.name === 'router') {
+    console.log(`  Router: ${middleware.regexp}`);
+  }
+});
+
 // Test route to verify basic routing works
 app.get('/test-routing', (req, res) => {
   res.json({ 
