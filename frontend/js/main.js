@@ -48,6 +48,25 @@ function initializeHeader() {
 // Make initializeHeader globally available
 window.initializeHeader = initializeHeader;
 
+// Debug function to test close button
+window.testCloseButton = function() {
+  console.log('🧪 Testing close button...');
+  const closeBtn = document.getElementById('mobileNavClose');
+  if (closeBtn) {
+    console.log('✅ Close button found:', closeBtn);
+    console.log('✅ Close button visible:', closeBtn.offsetWidth > 0 && closeBtn.offsetHeight > 0);
+    console.log('✅ Close button clickable:', closeBtn.style.pointerEvents);
+    console.log('✅ Close button z-index:', window.getComputedStyle(closeBtn).zIndex);
+    console.log('✅ Close button parent:', closeBtn.parentElement);
+    
+    // Test click
+    console.log('🧪 Simulating click...');
+    closeBtn.click();
+  } else {
+    console.log('❌ Close button not found');
+  }
+};
+
 // ===== MOBILE NAVIGATION FUNCTIONALITY =====
 // Global variables to prevent duplicate event listeners
 let mobileNavInitialized = false;
@@ -93,19 +112,28 @@ function setupMobileNavigation() {
   // Close mobile nav when clicking on a link
   mobileNavElements.mobileNav.addEventListener('click', handleMobileNavLinkClick);
 
-  // Close mobile nav when clicking outside
-  document.addEventListener('click', handleOutsideClick);
+  // Close mobile nav when clicking outside - only add once
+  if (!window.outsideClickHandlerAdded) {
+    document.addEventListener('click', handleOutsideClick);
+    window.outsideClickHandlerAdded = true;
+  }
   
-  // Global click handler for close button (backup)
-  document.addEventListener('click', function(e) {
-    if (e.target && e.target.id === 'mobileNavClose') {
-      console.log('🔧 Global close button click detected');
-      handleMobileNavClose(e);
-    }
-  });
+  // Global click handler for close button (backup) - only add once
+  if (!window.globalCloseHandlerAdded) {
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'mobileNavClose') {
+        console.log('🔧 Global close button click detected');
+        handleMobileNavClose(e);
+      }
+    });
+    window.globalCloseHandlerAdded = true;
+  }
 
-  // Handle window resize
-  window.addEventListener('resize', handleWindowResize);
+  // Handle window resize - only add once
+  if (!window.resizeHandlerAdded) {
+    window.addEventListener('resize', handleWindowResize);
+    window.resizeHandlerAdded = true;
+  }
 
   mobileNavInitialized = true;
 }
@@ -158,6 +186,9 @@ function setupMobileNavCloseButton() {
   const closeBtn = document.getElementById('mobileNavClose');
   if (closeBtn) {
     console.log('🔧 Setting up mobile nav close button');
+    console.log('🔧 Close button element:', closeBtn);
+    console.log('🔧 Close button parent:', closeBtn.parentElement);
+    console.log('🔧 Close button visible:', closeBtn.offsetWidth > 0 && closeBtn.offsetHeight > 0);
     
     // Remove any existing event listeners to prevent duplicates
     closeBtn.removeEventListener('click', handleMobileNavClose);
@@ -169,6 +200,10 @@ function setupMobileNavCloseButton() {
     
     // Also add a direct onclick as backup
     closeBtn.onclick = handleMobileNavClose;
+    
+    // Test if the button is clickable
+    console.log('🔧 Close button clickable test:', closeBtn.style.pointerEvents);
+    console.log('🔧 Close button z-index:', window.getComputedStyle(closeBtn).zIndex);
     
     console.log('✅ Mobile nav close button setup complete');
   } else {

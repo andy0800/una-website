@@ -156,11 +156,15 @@
   backdrop-filter: blur(10px);
   z-index: 1001;
   /* Ensure button is clickable */
-  pointer-events: auto;
+  pointer-events: auto !important;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  /* Force clickability */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-nav-close:hover {
