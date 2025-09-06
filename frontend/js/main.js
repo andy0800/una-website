@@ -38,6 +38,11 @@ function initializeHeader() {
   setupAuthentication();
   setupActiveNavigation();
   setupLanguageSwitchers();
+  
+  // Ensure close button is set up after dynamic loading
+  setTimeout(() => {
+    setupMobileNavCloseButton();
+  }, 200);
 }
 
 // Make initializeHeader globally available
@@ -82,13 +87,7 @@ function setupMobileNavigation() {
   mobileNavElements.hamburgerMenu.addEventListener('click', handleHamburgerClick);
   mobileNavElements.hamburgerMenu.addEventListener('touchend', handleHamburgerClick);
 
-  // Close mobile nav - support both click and touch
-  if (mobileNavElements.mobileNavClose) {
-    mobileNavElements.mobileNavClose.addEventListener('click', handleMobileNavClose);
-    mobileNavElements.mobileNavClose.addEventListener('touchend', handleMobileNavClose);
-  }
-  
-  // Also setup close button directly
+  // Setup close button with robust detection
   setupMobileNavCloseButton();
 
   // Close mobile nav when clicking on a link
@@ -96,6 +95,14 @@ function setupMobileNavigation() {
 
   // Close mobile nav when clicking outside
   document.addEventListener('click', handleOutsideClick);
+  
+  // Global click handler for close button (backup)
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'mobileNavClose') {
+      console.log('🔧 Global close button click detected');
+      handleMobileNavClose(e);
+    }
+  });
 
   // Handle window resize
   window.addEventListener('resize', handleWindowResize);
@@ -127,21 +134,58 @@ function handleHamburgerClick(e) {
 }
 
 function handleMobileNavClose(e) {
+  console.log('❌ Mobile nav close clicked!', e);
   e.preventDefault();
   e.stopPropagation();
-  console.log('❌ Mobile nav close clicked!');
+  
+  // Force close the mobile nav
   closeMobileNav();
+  
+  // Additional safety: ensure it's closed
+  setTimeout(() => {
+    const mobileNav = document.getElementById('mobileNav');
+    if (mobileNav && mobileNav.classList.contains('active')) {
+      console.log('🔧 Force closing mobile nav (safety check)');
+      mobileNav.classList.remove('active');
+      mobileNav.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }, 50);
 }
 
-// Also add a direct click handler for the close button
+// Robust close button setup with retry mechanism
 function setupMobileNavCloseButton() {
   const closeBtn = document.getElementById('mobileNavClose');
   if (closeBtn) {
     console.log('🔧 Setting up mobile nav close button');
+    
+    // Remove any existing event listeners to prevent duplicates
+    closeBtn.removeEventListener('click', handleMobileNavClose);
+    closeBtn.removeEventListener('touchend', handleMobileNavClose);
+    
+    // Add new event listeners
     closeBtn.addEventListener('click', handleMobileNavClose);
     closeBtn.addEventListener('touchend', handleMobileNavClose);
+    
+    // Also add a direct onclick as backup
+    closeBtn.onclick = handleMobileNavClose;
+    
+    console.log('✅ Mobile nav close button setup complete');
   } else {
-    console.log('❌ Mobile nav close button not found');
+    console.log('❌ Mobile nav close button not found, will retry...');
+    // Retry after a short delay in case the element is still loading
+    setTimeout(() => {
+      const retryCloseBtn = document.getElementById('mobileNavClose');
+      if (retryCloseBtn) {
+        console.log('🔧 Retry: Setting up mobile nav close button');
+        retryCloseBtn.addEventListener('click', handleMobileNavClose);
+        retryCloseBtn.addEventListener('touchend', handleMobileNavClose);
+        retryCloseBtn.onclick = handleMobileNavClose;
+        console.log('✅ Mobile nav close button setup complete (retry)');
+      } else {
+        console.log('❌ Mobile nav close button still not found after retry');
+      }
+    }, 100);
   }
 }
 
