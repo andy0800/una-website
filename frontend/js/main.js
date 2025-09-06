@@ -287,7 +287,17 @@ function handleMobileNavClose(e) {
 function setupMobileNavCloseButton() {
   console.log('🔧 SUPER-SIMPLE: Setting up mobile nav close button');
   
-  const closeBtn = document.getElementById('mobileNavClose');
+  // Use the same language detection logic as setupMobileNavigation
+  const isArabic = document.documentElement.lang === 'ar' || 
+                   window.location.pathname.includes('/ar/') ||
+                   document.querySelector('.arabic');
+  
+  const elementSuffix = isArabic ? 'Ar' : 'En';
+  const closeBtnId = `mobileNavClose${elementSuffix}`;
+  
+  console.log(`🔧 Looking for close button: ${closeBtnId}`);
+  
+  const closeBtn = document.getElementById(closeBtnId);
   if (closeBtn) {
     console.log('🔧 Close button found!', closeBtn);
     
@@ -304,7 +314,11 @@ function setupMobileNavCloseButton() {
     
     console.log('✅ SUPER-SIMPLE: Close button setup complete!');
   } else {
-    console.log('❌ Close button not found');
+    console.log(`❌ Close button not found: ${closeBtnId}`);
+    console.log('🔍 Available close buttons:', {
+      en: !!document.getElementById('mobileNavCloseEn'),
+      ar: !!document.getElementById('mobileNavCloseAr')
+    });
   }
 }
 
@@ -314,8 +328,14 @@ function handleCloseClick(e) {
   e.preventDefault();
   e.stopPropagation();
   
-  const mobileNav = document.getElementById('mobileNav');
-  const hamburgerMenu = document.getElementById('hamburgerMenu');
+  // Detect which language version was clicked
+  const isArabic = e.target.id === 'mobileNavCloseAr';
+  const elementSuffix = isArabic ? 'Ar' : 'En';
+  
+  const mobileNav = document.getElementById(`mobileNav${elementSuffix}`);
+  const hamburgerMenu = document.getElementById(`hamburgerMenu${elementSuffix}`);
+  
+  console.log(`🔧 Closing ${isArabic ? 'Arabic' : 'English'} mobile nav`);
   
   if (mobileNav) {
     mobileNav.classList.remove('active');
@@ -361,19 +381,32 @@ function handleWindowResize() {
 
 function closeMobileNav() {
   console.log('🚪 Closing mobile nav...');
-  const { hamburgerMenu, mobileNav } = mobileNavElements;
   
-  hamburgerMenu.classList.remove('active');
-  mobileNav.classList.remove('active');
-  document.body.style.overflow = '';
+  // Use language detection to get correct elements
+  const isArabic = document.documentElement.lang === 'ar' || 
+                   window.location.pathname.includes('/ar/') ||
+                   document.querySelector('.arabic');
   
-  // Hide mobile nav after transition
-  setTimeout(() => {
-    if (!mobileNav.classList.contains('active')) {
-      mobileNav.style.display = 'none';
-      console.log('🚪 Mobile nav hidden');
-    }
-  }, 300);
+  const elementSuffix = isArabic ? 'Ar' : 'En';
+  const mobileNav = document.getElementById(`mobileNav${elementSuffix}`);
+  const hamburgerMenu = document.getElementById(`hamburgerMenu${elementSuffix}`);
+  
+  if (hamburgerMenu) {
+    hamburgerMenu.classList.remove('active');
+  }
+  
+  if (mobileNav) {
+    mobileNav.classList.remove('active');
+    document.body.style.overflow = '';
+    
+    // Hide mobile nav after transition
+    setTimeout(() => {
+      if (!mobileNav.classList.contains('active')) {
+        mobileNav.style.display = 'none';
+        console.log('🚪 Mobile nav hidden');
+      }
+    }, 300);
+  }
   
   console.log('🚪 Mobile nav closed');
 }
