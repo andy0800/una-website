@@ -11,9 +11,11 @@
   background: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 8px;
-  z-index: 1000;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1002;
+  transition: background 0.2s ease, transform 0.2s ease;
   backdrop-filter: blur(10px);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger-menu:hover {
@@ -26,9 +28,10 @@
   height: 3px;
   background: var(--white);
   margin: 3px 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   border-radius: 2px;
   transform-origin: center;
+  pointer-events: none;
 }
 
 .hamburger-menu.active span:nth-child(1) {
@@ -60,17 +63,19 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.95);
-  z-index: 999;
+  z-index: 1001;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.3s ease, visibility 0.3s ease;
   backdrop-filter: blur(10px);
+  pointer-events: none;
 }
 
 .mobile-nav.active {
   opacity: 1;
   visibility: visible;
   display: block;
+  pointer-events: auto;
 }
 
 .mobile-nav-content {
@@ -102,11 +107,13 @@
   font-weight: 600;
   padding: 1rem 2rem;
   display: block;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   border-radius: var(--border-radius);
   margin: 0.5rem 0;
   position: relative;
   overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-nav a::before {

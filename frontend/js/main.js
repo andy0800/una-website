@@ -1,154 +1,129 @@
 // ===== HEADER INITIALIZATION AND AUTHENTICATION HANDLING =====
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Page loaded, initializing...');
-  // Initialize header functionality
+  // Initialize header functionality once
   initializeHeader();
-  
-  // Additional authentication check after a short delay to ensure all elements are loaded
-  setTimeout(() => {
-    console.log('🔄 Running delayed authentication check...');
-    setupAuthentication();
-  }, 500);
 });
 
 // ===== AUTHENTICATION STATE MONITORING =====
 // Check authentication state when window gains focus (user returns to tab)
 window.addEventListener('focus', () => {
-  console.log('👁️ Window focused, checking authentication state');
   setupAuthentication();
 });
 
 // Check authentication state when page becomes visible (user switches back to tab)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    console.log('👁️ Page visible, checking authentication state');
     setupAuthentication();
   }
 });
 
 // Function to initialize header functionality
 function initializeHeader() {
-  // Wait a bit for the header to be loaded if it's dynamic
-  setTimeout(() => {
-    setupMobileNavigation();
-    setupAuthentication();
-    setupActiveNavigation();
-    setupLanguageSwitchers();
-  }, 200); // Increased timeout to ensure header is fully loaded
-  
-  // Also run authentication check immediately for faster page loads
+  // Initialize all components immediately
+  setupMobileNavigation();
   setupAuthentication();
+  setupActiveNavigation();
+  setupLanguageSwitchers();
 }
 
 // ===== MOBILE NAVIGATION FUNCTIONALITY =====
+// Global variables to prevent duplicate event listeners
+let mobileNavInitialized = false;
+let mobileNavElements = {};
+
 function setupMobileNavigation() {
-  const hamburgerMenu = document.getElementById('hamburgerMenu');
-  const mobileNav = document.getElementById('mobileNav');
-  const mobileNavClose = document.getElementById('mobileNavClose');
+  // Prevent duplicate initialization
+  if (mobileNavInitialized) return;
+  
+  mobileNavElements = {
+    hamburgerMenu: document.getElementById('hamburgerMenu'),
+    mobileNav: document.getElementById('mobileNav'),
+    mobileNavClose: document.getElementById('mobileNavClose')
+  };
 
-  console.log('🔧 Setting up mobile navigation:', {
-    hamburgerMenu: !!hamburgerMenu,
-    mobileNav: !!mobileNav,
-    mobileNavClose: !!mobileNavClose
-  });
-
-  // Hamburger menu toggle
-  if (hamburgerMenu && mobileNav) {
-    hamburgerMenu.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      console.log('🍔 Hamburger menu clicked');
-      
-      hamburgerMenu.classList.add('active');
-      mobileNav.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      
-      // Add a small delay to ensure the display property is set
-      setTimeout(() => {
-        mobileNav.style.display = 'block';
-      }, 10);
-    });
+  // Check if elements exist
+  if (!mobileNavElements.hamburgerMenu || !mobileNavElements.mobileNav) {
+    return;
   }
 
+  // Hamburger menu toggle
+  mobileNavElements.hamburgerMenu.addEventListener('click', handleHamburgerClick);
+
   // Close mobile nav
-  if (mobileNavClose && mobileNav) {
-    mobileNavClose.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      console.log('❌ Mobile nav close clicked');
-      
-      hamburgerMenu.classList.remove('active');
-      mobileNav.classList.remove('active');
-      document.body.style.overflow = '';
-      
-      // Hide the mobile nav after animation
-      setTimeout(() => {
-        if (!mobileNav.classList.contains('active')) {
-          mobileNav.style.display = 'none';
-        }
-      }, 300);
-    });
+  if (mobileNavElements.mobileNavClose) {
+    mobileNavElements.mobileNavClose.addEventListener('click', handleMobileNavClose);
   }
 
   // Close mobile nav when clicking on a link
-  if (mobileNav) {
-    mobileNav.addEventListener('click', (e) => {
-      if (e.target.tagName === 'A') {
-        console.log('🔗 Mobile nav link clicked:', e.target.href);
-        
-        hamburgerMenu.classList.remove('active');
-        mobileNav.classList.remove('active');
-        document.body.style.overflow = '';
-        
-        // Hide the mobile nav after animation
-        setTimeout(() => {
-          if (!mobileNav.classList.contains('active')) {
-            mobileNav.style.display = 'none';
-          }
-        }, 300);
-      }
-    });
-  }
+  mobileNavElements.mobileNav.addEventListener('click', handleMobileNavLinkClick);
 
   // Close mobile nav when clicking outside
-  document.addEventListener('click', (e) => {
-    if (mobileNav && mobileNav.classList.contains('active') && 
-        !mobileNav.contains(e.target) && 
-        !hamburgerMenu.contains(e.target)) {
-      
-      console.log('👆 Clicked outside mobile nav');
-      
-      hamburgerMenu.classList.remove('active');
-      mobileNav.classList.remove('active');
-      document.body.style.overflow = '';
-      
-      // Hide the mobile nav after animation
-      setTimeout(() => {
-        if (!mobileNav.classList.contains('active')) {
-          mobileNav.style.display = 'none';
-        }
-      }, 300);
-    }
-  });
+  document.addEventListener('click', handleOutsideClick);
 
   // Handle window resize
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 991) {
-      // Desktop view - hide mobile nav
-      hamburgerMenu.classList.remove('active');
-      mobileNav.classList.remove('active');
-      document.body.style.overflow = '';
+  window.addEventListener('resize', handleWindowResize);
+
+  mobileNavInitialized = true;
+}
+
+// Event handlers
+function handleHamburgerClick(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const { hamburgerMenu, mobileNav } = mobileNavElements;
+  
+  hamburgerMenu.classList.add('active');
+  mobileNav.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  mobileNav.style.display = 'block';
+}
+
+function handleMobileNavClose(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  closeMobileNav();
+}
+
+function handleMobileNavLinkClick(e) {
+  if (e.target.tagName === 'A') {
+    closeMobileNav();
+  }
+}
+
+function handleOutsideClick(e) {
+  const { hamburgerMenu, mobileNav } = mobileNavElements;
+  
+  if (mobileNav && mobileNav.classList.contains('active') && 
+      !mobileNav.contains(e.target) && 
+      !hamburgerMenu.contains(e.target)) {
+    closeMobileNav();
+  }
+}
+
+function handleWindowResize() {
+  if (window.innerWidth > 991) {
+    closeMobileNav();
+  }
+}
+
+function closeMobileNav() {
+  const { hamburgerMenu, mobileNav } = mobileNavElements;
+  
+  hamburgerMenu.classList.remove('active');
+  mobileNav.classList.remove('active');
+  document.body.style.overflow = '';
+  
+  // Hide the mobile nav after animation
+  setTimeout(() => {
+    if (!mobileNav.classList.contains('active')) {
       mobileNav.style.display = 'none';
     }
-  });
+  }, 300);
 }
 
 // ===== AUTHENTICATION HANDLING =====
 function setupAuthentication() {
-  console.log('🔐 Setting up authentication...');
-  
   const profileNavItem = document.getElementById('profileNavItem');
   const lecturesNavItem = document.getElementById('lecturesNavItem');
   const liveNavItem = document.getElementById('liveNavItem');
@@ -161,14 +136,11 @@ function setupAuthentication() {
 
   // Get token from localStorage
   const userToken = localStorage.getItem('userToken');
-  console.log('🔐 Token found:', !!userToken);
 
   // Check if token exists and is valid
   const isLoggedIn = userToken && isTokenValid(userToken);
-  console.log('🔐 User logged in:', isLoggedIn);
 
   if (isLoggedIn) {
-    console.log('✅ User is authenticated, showing authenticated UI');
     // Show authenticated elements
     if (profileNavItem) profileNavItem.style.display = 'inline-block';
     if (lecturesNavItem) lecturesNavItem.style.display = 'inline-block';
@@ -180,7 +152,6 @@ function setupAuthentication() {
     if (registerBtn) registerBtn.style.display = 'none';
     if (loginBtn) loginBtn.style.display = 'none';
   } else {
-    console.log('❌ User not authenticated, showing public UI');
     // Show public elements
     if (profileNavItem) profileNavItem.style.display = 'none';
     if (lecturesNavItem) lecturesNavItem.style.display = 'none';
@@ -194,7 +165,6 @@ function setupAuthentication() {
     
     // Clear invalid token
     if (userToken && !isTokenValid(userToken)) {
-      console.log('🗑️ Clearing invalid token');
       localStorage.removeItem('userToken');
     }
   }
@@ -202,7 +172,6 @@ function setupAuthentication() {
   // Setup logout functionality
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      console.log('🚪 User logging out');
       localStorage.removeItem('userToken');
       localStorage.removeItem('adminToken');
       // Force page reload to update UI
@@ -225,14 +194,11 @@ function isTokenValid(token) {
     
     // Check if token is expired
     if (payload.exp && payload.exp < currentTime) {
-      console.log('⏰ Token expired');
       return false;
     }
     
-    console.log('✅ Token is valid');
     return true;
   } catch (error) {
-    console.log('❌ Token validation error:', error);
     return false;
   }
 }
