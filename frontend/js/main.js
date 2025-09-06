@@ -1,18 +1,27 @@
 // ===== HEADER INITIALIZATION AND AUTHENTICATION HANDLING =====
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize header functionality once
+  console.log('🚀 Page loaded, initializing...');
+  // Initialize header functionality
   initializeHeader();
+  
+  // Additional authentication check after a short delay to ensure all elements are loaded
+  setTimeout(() => {
+    console.log('🔄 Running delayed authentication check...');
+    setupAuthentication();
+  }, 500);
 });
 
 // ===== AUTHENTICATION STATE MONITORING =====
 // Check authentication state when window gains focus (user returns to tab)
 window.addEventListener('focus', () => {
+  console.log('👁️ Window focused, checking authentication state');
   setupAuthentication();
 });
 
 // Check authentication state when page becomes visible (user switches back to tab)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
+    console.log('👁️ Page visible, checking authentication state');
     setupAuthentication();
   }
 });
@@ -46,12 +55,14 @@ function setupMobileNavigation() {
     return;
   }
 
-  // Hamburger menu toggle
+  // Hamburger menu toggle - support both click and touch
   mobileNavElements.hamburgerMenu.addEventListener('click', handleHamburgerClick);
+  mobileNavElements.hamburgerMenu.addEventListener('touchend', handleHamburgerClick);
 
-  // Close mobile nav
+  // Close mobile nav - support both click and touch
   if (mobileNavElements.mobileNavClose) {
     mobileNavElements.mobileNavClose.addEventListener('click', handleMobileNavClose);
+    mobileNavElements.mobileNavClose.addEventListener('touchend', handleMobileNavClose);
   }
 
   // Close mobile nav when clicking on a link
@@ -101,10 +112,15 @@ function handleOutsideClick(e) {
   }
 }
 
+// Debounced resize handler
+let resizeTimeout;
 function handleWindowResize() {
-  if (window.innerWidth > 991) {
-    closeMobileNav();
-  }
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (window.innerWidth > 991) {
+      closeMobileNav();
+    }
+  }, 100);
 }
 
 function closeMobileNav() {
@@ -124,6 +140,8 @@ function closeMobileNav() {
 
 // ===== AUTHENTICATION HANDLING =====
 function setupAuthentication() {
+  console.log('🔐 Setting up authentication...');
+  
   const profileNavItem = document.getElementById('profileNavItem');
   const lecturesNavItem = document.getElementById('lecturesNavItem');
   const liveNavItem = document.getElementById('liveNavItem');
@@ -136,11 +154,14 @@ function setupAuthentication() {
 
   // Get token from localStorage
   const userToken = localStorage.getItem('userToken');
+  console.log('🔐 Token found:', !!userToken);
 
   // Check if token exists and is valid
   const isLoggedIn = userToken && isTokenValid(userToken);
+  console.log('🔐 User logged in:', isLoggedIn);
 
   if (isLoggedIn) {
+    console.log('✅ User is authenticated, showing authenticated UI');
     // Show authenticated elements
     if (profileNavItem) profileNavItem.style.display = 'inline-block';
     if (lecturesNavItem) lecturesNavItem.style.display = 'inline-block';
@@ -152,6 +173,7 @@ function setupAuthentication() {
     if (registerBtn) registerBtn.style.display = 'none';
     if (loginBtn) loginBtn.style.display = 'none';
   } else {
+    console.log('❌ User not authenticated, showing public UI');
     // Show public elements
     if (profileNavItem) profileNavItem.style.display = 'none';
     if (lecturesNavItem) lecturesNavItem.style.display = 'none';
@@ -165,6 +187,7 @@ function setupAuthentication() {
     
     // Clear invalid token
     if (userToken && !isTokenValid(userToken)) {
+      console.log('🗑️ Clearing invalid token');
       localStorage.removeItem('userToken');
     }
   }
@@ -172,6 +195,7 @@ function setupAuthentication() {
   // Setup logout functionality
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
+      console.log('🚪 User logging out');
       localStorage.removeItem('userToken');
       localStorage.removeItem('adminToken');
       // Force page reload to update UI
@@ -194,11 +218,14 @@ function isTokenValid(token) {
     
     // Check if token is expired
     if (payload.exp && payload.exp < currentTime) {
+      console.log('⏰ Token expired');
       return false;
     }
     
+    console.log('✅ Token is valid');
     return true;
   } catch (error) {
+    console.log('❌ Token validation error:', error);
     return false;
   }
 }

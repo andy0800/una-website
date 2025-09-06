@@ -11,11 +11,14 @@
   background: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 8px;
-  z-index: 1002;
-  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  /* Performance optimizations */
+  will-change: transform, background-color;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .hamburger-menu:hover {
@@ -28,10 +31,9 @@
   height: 3px;
   background: var(--white);
   margin: 3px 0;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 2px;
   transform-origin: center;
-  pointer-events: none;
 }
 
 .hamburger-menu.active span:nth-child(1) {
@@ -63,19 +65,21 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.95);
-  z-index: 1001;
+  z-index: 999;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
-  pointer-events: none;
+  /* Performance optimizations */
+  will-change: opacity, visibility;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .mobile-nav.active {
   opacity: 1;
   visibility: visible;
-  display: block;
-  pointer-events: auto;
 }
 
 .mobile-nav-content {
@@ -107,13 +111,11 @@
   font-weight: 600;
   padding: 1rem 2rem;
   display: block;
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: var(--border-radius);
   margin: 0.5rem 0;
   position: relative;
   overflow: hidden;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-nav a::before {
@@ -179,6 +181,16 @@
   
   .hamburger-menu {
     display: flex !important;
+  }
+  
+  /* Ensure mobile nav is properly positioned */
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
   }
 }
 
@@ -612,78 +624,7 @@ body {
   }
 }
 
-/* Tablet (768px to 991px) */
-@media (max-width: 991px) and (min-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .hero-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .main-nav {
-    display: none !important;
-  }
-  
-  .hamburger-menu {
-    display: flex !important;
-  }
-  
-  .mobile-nav {
-    display: block;
-  }
-  
-  .banner-slider {
-    height: 350px;
-  }
-  
-  .banner-title {
-    font-size: 2.2rem;
-  }
-  
-  .section {
-    padding: 60px 0;
-  }
-  
-  .grid-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .grid-3 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .profile-grid {
-    grid-template-columns: 1fr 1.5fr;
-    gap: 2rem;
-  }
-  
-  .profile-stats {
-    gap: 2rem;
-  }
-  
-  .profile-info-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .profile-courses {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-  
-  .profile-certificates {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-}
+/* Tablet (768px to 991px) - DUPLICATE REMOVED */
 
 /* Mobile Large (576px to 767px) */
 @media (max-width: 767px) and (min-width: 576px) {
@@ -2457,78 +2398,7 @@ a:hover {
   }
 }
 
-/* Tablet (768px to 991px) */
-@media (max-width: 991px) and (min-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .hero-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .main-nav {
-    display: none !important;
-  }
-  
-  .hamburger-menu {
-    display: flex !important;
-  }
-  
-  .mobile-nav {
-    display: block;
-  }
-  
-  .banner-slider {
-    height: 350px;
-  }
-  
-  .banner-title {
-    font-size: 2.2rem;
-  }
-  
-  .section {
-    padding: 60px 0;
-  }
-  
-  .grid-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .grid-3 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .profile-grid {
-    grid-template-columns: 1fr 1.5fr;
-    gap: 2rem;
-  }
-  
-  .profile-stats {
-    gap: 2rem;
-  }
-  
-  .profile-info-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .profile-courses {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-  
-  .profile-certificates {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-}
+/* Tablet (768px to 991px) - DUPLICATE REMOVED */
 
 /* Mobile Large (576px to 767px) */
 @media (max-width: 767px) and (min-width: 576px) {
