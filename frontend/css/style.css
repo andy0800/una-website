@@ -58,7 +58,7 @@
 
 /* Mobile Navigation */
 .mobile-nav {
-  display: none;
+  display: none; /* Hidden on desktop by default */
   position: fixed;
   top: 0;
   left: 0;

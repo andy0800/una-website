@@ -69,6 +69,14 @@ function setupMobileNavigation() {
     console.log('❌ Mobile nav elements not found, skipping setup');
     return;
   }
+  
+  // Ensure mobile nav is properly configured based on screen size
+  if (window.innerWidth > 991) {
+    mobileNavElements.mobileNav.style.display = 'none';
+  } else {
+    // On mobile, ensure it's available but hidden with opacity
+    mobileNavElements.mobileNav.style.display = 'block';
+  }
 
   // Hamburger menu toggle - support both click and touch
   mobileNavElements.hamburgerMenu.addEventListener('click', handleHamburgerClick);
@@ -104,10 +112,16 @@ function handleHamburgerClick(e) {
   
   const { hamburgerMenu, mobileNav } = mobileNavElements;
   
+  // Show mobile nav first
+  mobileNav.style.display = 'block';
+  
+  // Force reflow to ensure display change is applied
+  mobileNav.offsetHeight;
+  
+  // Then add active class for transition
   hamburgerMenu.classList.add('active');
   mobileNav.classList.add('active');
   document.body.style.overflow = 'hidden';
-  mobileNav.style.display = 'block';
   
   console.log('🍔 Mobile nav should be visible now');
 }
@@ -166,13 +180,15 @@ function closeMobileNav() {
   mobileNav.classList.remove('active');
   document.body.style.overflow = '';
   
-  // Hide the mobile nav after animation
+  // Hide mobile nav after transition
   setTimeout(() => {
     if (!mobileNav.classList.contains('active')) {
       mobileNav.style.display = 'none';
       console.log('🚪 Mobile nav hidden');
     }
   }, 300);
+  
+  console.log('🚪 Mobile nav closed');
 }
 
 // ===== AUTHENTICATION HANDLING =====
