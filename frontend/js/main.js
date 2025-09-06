@@ -51,42 +51,68 @@ window.initializeHeader = initializeHeader;
 // SUPER-SIMPLE test function
 window.testCloseButton = function() {
   console.log('🧪 SUPER-SIMPLE: Testing close button...');
-  const closeBtn = document.getElementById('mobileNavClose');
-  const mobileNav = document.getElementById('mobileNav');
-  const hamburgerMenu = document.getElementById('hamburgerMenu');
+  
+  // Test both language versions
+  const closeBtnEn = document.getElementById('mobileNavCloseEn');
+  const closeBtnAr = document.getElementById('mobileNavCloseAr');
+  const mobileNavEn = document.getElementById('mobileNavEn');
+  const mobileNavAr = document.getElementById('mobileNavAr');
+  const hamburgerMenuEn = document.getElementById('hamburgerMenuEn');
+  const hamburgerMenuAr = document.getElementById('hamburgerMenuAr');
   
   console.log('🔍 Elements found:');
-  console.log('  - Close button:', !!closeBtn);
-  console.log('  - Mobile nav:', !!mobileNav);
-  console.log('  - Hamburger menu:', !!hamburgerMenu);
+  console.log('  - Close button (EN):', !!closeBtnEn);
+  console.log('  - Close button (AR):', !!closeBtnAr);
+  console.log('  - Mobile nav (EN):', !!mobileNavEn);
+  console.log('  - Mobile nav (AR):', !!mobileNavAr);
+  console.log('  - Hamburger menu (EN):', !!hamburgerMenuEn);
+  console.log('  - Hamburger menu (AR):', !!hamburgerMenuAr);
   
-  if (closeBtn) {
-    console.log('🔍 Close button details:');
-    console.log('  - Visible:', closeBtn.offsetWidth > 0 && closeBtn.offsetHeight > 0);
-    console.log('  - Display:', window.getComputedStyle(closeBtn).display);
-    console.log('  - Pointer events:', window.getComputedStyle(closeBtn).pointerEvents);
-    console.log('  - Z-index:', window.getComputedStyle(closeBtn).zIndex);
-    console.log('  - Position:', window.getComputedStyle(closeBtn).position);
-    console.log('  - Clickable area:', closeBtn.getBoundingClientRect());
-    
-    // Test if button is actually clickable
-    console.log('🧪 Testing if button is clickable...');
-    const rect = closeBtn.getBoundingClientRect();
-    console.log('  - Button position:', rect);
-    console.log('  - Button size:', rect.width, 'x', rect.height);
-    console.log('  - Button center:', rect.left + rect.width/2, rect.top + rect.height/2);
+  // Test English version
+  if (closeBtnEn) {
+    console.log('🔍 Close button (EN) details:');
+    console.log('  - Visible:', closeBtnEn.offsetWidth > 0 && closeBtnEn.offsetHeight > 0);
+    console.log('  - Display:', window.getComputedStyle(closeBtnEn).display);
+    console.log('  - Pointer events:', window.getComputedStyle(closeBtnEn).pointerEvents);
+    console.log('  - Z-index:', window.getComputedStyle(closeBtnEn).zIndex);
+    console.log('  - Position:', window.getComputedStyle(closeBtnEn).position);
+    console.log('  - Clickable area:', closeBtnEn.getBoundingClientRect());
     
     // Test direct click
-    console.log('🧪 Testing direct click...');
-    closeBtn.click();
+    console.log('🧪 Testing direct click (EN)...');
+    closeBtnEn.click();
   }
   
-  if (mobileNav) {
-    console.log('🔍 Mobile nav details:');
-    console.log('  - Display:', window.getComputedStyle(mobileNav).display);
-    console.log('  - Opacity:', window.getComputedStyle(mobileNav).opacity);
-    console.log('  - Visibility:', window.getComputedStyle(mobileNav).visibility);
-    console.log('  - Has active class:', mobileNav.classList.contains('active'));
+  // Test Arabic version
+  if (closeBtnAr) {
+    console.log('🔍 Close button (AR) details:');
+    console.log('  - Visible:', closeBtnAr.offsetWidth > 0 && closeBtnAr.offsetHeight > 0);
+    console.log('  - Display:', window.getComputedStyle(closeBtnAr).display);
+    console.log('  - Pointer events:', window.getComputedStyle(closeBtnAr).pointerEvents);
+    console.log('  - Z-index:', window.getComputedStyle(closeBtnAr).zIndex);
+    console.log('  - Position:', window.getComputedStyle(closeBtnAr).position);
+    console.log('  - Clickable area:', closeBtnAr.getBoundingClientRect());
+    
+    // Test direct click
+    console.log('🧪 Testing direct click (AR)...');
+    closeBtnAr.click();
+  }
+  
+  // Test mobile nav visibility
+  if (mobileNavEn) {
+    console.log('🔍 Mobile nav (EN) details:');
+    console.log('  - Display:', window.getComputedStyle(mobileNavEn).display);
+    console.log('  - Opacity:', window.getComputedStyle(mobileNavEn).opacity);
+    console.log('  - Visibility:', window.getComputedStyle(mobileNavEn).visibility);
+    console.log('  - Has active class:', mobileNavEn.classList.contains('active'));
+  }
+  
+  if (mobileNavAr) {
+    console.log('🔍 Mobile nav (AR) details:');
+    console.log('  - Display:', window.getComputedStyle(mobileNavAr).display);
+    console.log('  - Opacity:', window.getComputedStyle(mobileNavAr).opacity);
+    console.log('  - Visibility:', window.getComputedStyle(mobileNavAr).visibility);
+    console.log('  - Has active class:', mobileNavAr.classList.contains('active'));
   }
 };
 
@@ -120,16 +146,24 @@ function setupMobileNavigation() {
   // Prevent duplicate initialization
   if (mobileNavInitialized) return;
   
+  // Detect current language and get appropriate elements
+  const isArabic = document.documentElement.lang === 'ar' || 
+                   window.location.pathname.includes('/ar/') ||
+                   document.querySelector('.arabic');
+  
+  const elementSuffix = isArabic ? 'Ar' : 'En';
+  
   mobileNavElements = {
-    hamburgerMenu: document.getElementById('hamburgerMenu'),
-    mobileNav: document.getElementById('mobileNav'),
-    mobileNavClose: document.getElementById('mobileNavClose')
+    hamburgerMenu: document.getElementById(`hamburgerMenu${elementSuffix}`),
+    mobileNav: document.getElementById(`mobileNav${elementSuffix}`),
+    mobileNavClose: document.getElementById(`mobileNavClose${elementSuffix}`)
   };
 
-  console.log('🔧 Mobile nav elements found:', {
+  console.log(`🔧 Mobile nav elements found (${isArabic ? 'Arabic' : 'English'}):`, {
     hamburgerMenu: !!mobileNavElements.hamburgerMenu,
     mobileNav: !!mobileNavElements.mobileNav,
-    mobileNavClose: !!mobileNavElements.mobileNavClose
+    mobileNavClose: !!mobileNavElements.mobileNavClose,
+    elementSuffix: elementSuffix
   });
 
   // Check if elements exist
@@ -165,23 +199,27 @@ function setupMobileNavigation() {
   // ULTRA-SIMPLE global click handler - only add once
   if (!window.globalCloseHandlerAdded) {
     document.addEventListener('click', function(e) {
-      if (e.target && e.target.id === 'mobileNavClose') {
-        console.log('🎯 GLOBAL: Close button click detected!');
+      if (e.target && (e.target.id === 'mobileNavCloseEn' || e.target.id === 'mobileNavCloseAr')) {
+        console.log('🎯 GLOBAL: Close button click detected!', e.target.id);
         e.preventDefault();
         e.stopPropagation();
         
-        const mobileNav = document.getElementById('mobileNav');
-        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        // Detect which language version was clicked
+        const isArabic = e.target.id === 'mobileNavCloseAr';
+        const elementSuffix = isArabic ? 'Ar' : 'En';
+        
+        const mobileNav = document.getElementById(`mobileNav${elementSuffix}`);
+        const hamburgerMenu = document.getElementById(`hamburgerMenu${elementSuffix}`);
         
         if (mobileNav) {
           mobileNav.classList.remove('active');
           mobileNav.style.display = 'none';
-          console.log('✅ GLOBAL: Mobile nav closed');
+          console.log(`✅ GLOBAL: Mobile nav closed (${isArabic ? 'Arabic' : 'English'})`);
         }
         
         if (hamburgerMenu) {
           hamburgerMenu.classList.remove('active');
-          console.log('✅ GLOBAL: Hamburger menu closed');
+          console.log(`✅ GLOBAL: Hamburger menu closed (${isArabic ? 'Arabic' : 'English'})`);
         }
         
         document.body.style.overflow = '';
