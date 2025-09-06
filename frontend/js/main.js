@@ -48,23 +48,59 @@ function initializeHeader() {
 // Make initializeHeader globally available
 window.initializeHeader = initializeHeader;
 
-// Debug function to test close button
+// ULTRA-SIMPLE test function
 window.testCloseButton = function() {
-  console.log('🧪 Testing close button...');
+  console.log('🧪 ULTRA-SIMPLE: Testing close button...');
   const closeBtn = document.getElementById('mobileNavClose');
+  const mobileNav = document.getElementById('mobileNav');
+  const hamburgerMenu = document.getElementById('hamburgerMenu');
+  
+  console.log('🔍 Elements found:');
+  console.log('  - Close button:', !!closeBtn);
+  console.log('  - Mobile nav:', !!mobileNav);
+  console.log('  - Hamburger menu:', !!hamburgerMenu);
+  
   if (closeBtn) {
-    console.log('✅ Close button found:', closeBtn);
-    console.log('✅ Close button visible:', closeBtn.offsetWidth > 0 && closeBtn.offsetHeight > 0);
-    console.log('✅ Close button clickable:', closeBtn.style.pointerEvents);
-    console.log('✅ Close button z-index:', window.getComputedStyle(closeBtn).zIndex);
-    console.log('✅ Close button parent:', closeBtn.parentElement);
+    console.log('🔍 Close button details:');
+    console.log('  - Visible:', closeBtn.offsetWidth > 0 && closeBtn.offsetHeight > 0);
+    console.log('  - Display:', window.getComputedStyle(closeBtn).display);
+    console.log('  - Pointer events:', window.getComputedStyle(closeBtn).pointerEvents);
+    console.log('  - Z-index:', window.getComputedStyle(closeBtn).zIndex);
+    console.log('  - Position:', window.getComputedStyle(closeBtn).position);
     
-    // Test click
-    console.log('🧪 Simulating click...');
+    // Test direct click
+    console.log('🧪 Testing direct click...');
     closeBtn.click();
-  } else {
-    console.log('❌ Close button not found');
   }
+  
+  if (mobileNav) {
+    console.log('🔍 Mobile nav details:');
+    console.log('  - Display:', window.getComputedStyle(mobileNav).display);
+    console.log('  - Opacity:', window.getComputedStyle(mobileNav).opacity);
+    console.log('  - Visibility:', window.getComputedStyle(mobileNav).visibility);
+    console.log('  - Has active class:', mobileNav.classList.contains('active'));
+  }
+};
+
+// ULTRA-SIMPLE force close function
+window.forceCloseMobileNav = function() {
+  console.log('🚨 ULTRA-SIMPLE: Force closing mobile nav...');
+  const mobileNav = document.getElementById('mobileNav');
+  const hamburgerMenu = document.getElementById('hamburgerMenu');
+  
+  if (mobileNav) {
+    mobileNav.classList.remove('active');
+    mobileNav.style.display = 'none';
+    console.log('✅ Force closed mobile nav');
+  }
+  
+  if (hamburgerMenu) {
+    hamburgerMenu.classList.remove('active');
+    console.log('✅ Force closed hamburger menu');
+  }
+  
+  document.body.style.overflow = '';
+  console.log('✅ Force close complete');
 };
 
 // ===== MOBILE NAVIGATION FUNCTIONALITY =====
@@ -118,15 +154,33 @@ function setupMobileNavigation() {
     window.outsideClickHandlerAdded = true;
   }
   
-  // Global click handler for close button (backup) - only add once
+  // ULTRA-SIMPLE global click handler - only add once
   if (!window.globalCloseHandlerAdded) {
     document.addEventListener('click', function(e) {
       if (e.target && e.target.id === 'mobileNavClose') {
-        console.log('🔧 Global close button click detected');
-        handleMobileNavClose(e);
+        console.log('🎯 GLOBAL: Close button click detected!');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const mobileNav = document.getElementById('mobileNav');
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        
+        if (mobileNav) {
+          mobileNav.classList.remove('active');
+          mobileNav.style.display = 'none';
+          console.log('✅ GLOBAL: Mobile nav closed');
+        }
+        
+        if (hamburgerMenu) {
+          hamburgerMenu.classList.remove('active');
+          console.log('✅ GLOBAL: Hamburger menu closed');
+        }
+        
+        document.body.style.overflow = '';
       }
     });
     window.globalCloseHandlerAdded = true;
+    console.log('✅ ULTRA-SIMPLE: Global click handler added');
   }
 
   // Handle window resize - only add once
@@ -138,27 +192,31 @@ function setupMobileNavigation() {
   mobileNavInitialized = true;
 }
 
-// Event handlers
+// ULTRA-SIMPLE hamburger click handler
 function handleHamburgerClick(e) {
+  console.log('🍔 ULTRA-SIMPLE: Hamburger clicked!');
   e.preventDefault();
   e.stopPropagation();
   
-  console.log('🍔 Hamburger clicked!');
+  const hamburgerMenu = document.getElementById('hamburgerMenu');
+  const mobileNav = document.getElementById('mobileNav');
   
-  const { hamburgerMenu, mobileNav } = mobileNavElements;
-  
-  // Show mobile nav first
-  mobileNav.style.display = 'block';
-  
-  // Force reflow to ensure display change is applied
-  mobileNav.offsetHeight;
-  
-  // Then add active class for transition
-  hamburgerMenu.classList.add('active');
-  mobileNav.classList.add('active');
-  document.body.style.overflow = 'hidden';
-  
-  console.log('🍔 Mobile nav should be visible now');
+  if (mobileNav && hamburgerMenu) {
+    // Simple show logic
+    mobileNav.style.display = 'block';
+    mobileNav.classList.add('active');
+    hamburgerMenu.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    console.log('✅ Mobile nav shown');
+    
+    // Re-setup close button after showing
+    setTimeout(() => {
+      setupMobileNavCloseButton();
+    }, 100);
+  } else {
+    console.log('❌ Mobile nav or hamburger not found');
+  }
 }
 
 function handleMobileNavClose(e) {
@@ -181,47 +239,98 @@ function handleMobileNavClose(e) {
   }, 50);
 }
 
-// Robust close button setup with retry mechanism
+// ULTRA-SIMPLE close button setup - no complex logic
 function setupMobileNavCloseButton() {
-  const closeBtn = document.getElementById('mobileNavClose');
-  if (closeBtn) {
-    console.log('🔧 Setting up mobile nav close button');
-    console.log('🔧 Close button element:', closeBtn);
-    console.log('🔧 Close button parent:', closeBtn.parentElement);
-    console.log('🔧 Close button visible:', closeBtn.offsetWidth > 0 && closeBtn.offsetHeight > 0);
-    
-    // Remove any existing event listeners to prevent duplicates
-    closeBtn.removeEventListener('click', handleMobileNavClose);
-    closeBtn.removeEventListener('touchend', handleMobileNavClose);
-    
-    // Add new event listeners
-    closeBtn.addEventListener('click', handleMobileNavClose);
-    closeBtn.addEventListener('touchend', handleMobileNavClose);
-    
-    // Also add a direct onclick as backup
-    closeBtn.onclick = handleMobileNavClose;
-    
-    // Test if the button is clickable
-    console.log('🔧 Close button clickable test:', closeBtn.style.pointerEvents);
-    console.log('🔧 Close button z-index:', window.getComputedStyle(closeBtn).zIndex);
-    
-    console.log('✅ Mobile nav close button setup complete');
-  } else {
-    console.log('❌ Mobile nav close button not found, will retry...');
-    // Retry after a short delay in case the element is still loading
+  console.log('🔧 ULTRA-SIMPLE: Setting up mobile nav close button');
+  
+  // Try multiple times with different approaches
+  const attempts = [0, 100, 300, 500, 1000];
+  
+  attempts.forEach((delay, index) => {
     setTimeout(() => {
-      const retryCloseBtn = document.getElementById('mobileNavClose');
-      if (retryCloseBtn) {
-        console.log('🔧 Retry: Setting up mobile nav close button');
-        retryCloseBtn.addEventListener('click', handleMobileNavClose);
-        retryCloseBtn.addEventListener('touchend', handleMobileNavClose);
-        retryCloseBtn.onclick = handleMobileNavClose;
-        console.log('✅ Mobile nav close button setup complete (retry)');
+      const closeBtn = document.getElementById('mobileNavClose');
+      if (closeBtn) {
+        console.log(`🔧 Attempt ${index + 1}: Close button found!`, closeBtn);
+        
+        // Remove ALL existing event listeners
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        // Add the simplest possible event listener
+        newCloseBtn.addEventListener('click', function(e) {
+          console.log('🎯 CLOSE BUTTON CLICKED!', e);
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Simple close logic
+          const mobileNav = document.getElementById('mobileNav');
+          const hamburgerMenu = document.getElementById('hamburgerMenu');
+          
+          if (mobileNav) {
+            mobileNav.classList.remove('active');
+            mobileNav.style.display = 'none';
+            console.log('✅ Mobile nav closed');
+          }
+          
+          if (hamburgerMenu) {
+            hamburgerMenu.classList.remove('active');
+            console.log('✅ Hamburger menu closed');
+          }
+          
+          document.body.style.overflow = '';
+        });
+        
+        // Also add touchend for mobile
+        newCloseBtn.addEventListener('touchend', function(e) {
+          console.log('🎯 CLOSE BUTTON TOUCHED!', e);
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Simple close logic
+          const mobileNav = document.getElementById('mobileNav');
+          const hamburgerMenu = document.getElementById('hamburgerMenu');
+          
+          if (mobileNav) {
+            mobileNav.classList.remove('active');
+            mobileNav.style.display = 'none';
+            console.log('✅ Mobile nav closed (touch)');
+          }
+          
+          if (hamburgerMenu) {
+            hamburgerMenu.classList.remove('active');
+            console.log('✅ Hamburger menu closed (touch)');
+          }
+          
+          document.body.style.overflow = '';
+        });
+        
+        // Direct onclick as ultimate backup
+        newCloseBtn.onclick = function(e) {
+          console.log('🎯 CLOSE BUTTON ONCLICK!', e);
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const mobileNav = document.getElementById('mobileNav');
+          const hamburgerMenu = document.getElementById('hamburgerMenu');
+          
+          if (mobileNav) {
+            mobileNav.classList.remove('active');
+            mobileNav.style.display = 'none';
+          }
+          
+          if (hamburgerMenu) {
+            hamburgerMenu.classList.remove('active');
+          }
+          
+          document.body.style.overflow = '';
+        };
+        
+        console.log('✅ ULTRA-SIMPLE: Close button setup complete!');
       } else {
-        console.log('❌ Mobile nav close button still not found after retry');
+        console.log(`❌ Attempt ${index + 1}: Close button not found`);
       }
-    }, 100);
-  }
+    }, delay);
+  });
 }
 
 function handleMobileNavLinkClick(e) {
