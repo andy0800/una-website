@@ -28,12 +28,20 @@ document.addEventListener('visibilitychange', () => {
 
 // Function to initialize header functionality
 function initializeHeader() {
+  console.log('🔄 Initializing header functionality...');
+  
+  // Reset mobile nav initialization flag to allow re-initialization
+  mobileNavInitialized = false;
+  
   // Initialize all components immediately
   setupMobileNavigation();
   setupAuthentication();
   setupActiveNavigation();
   setupLanguageSwitchers();
 }
+
+// Make initializeHeader globally available
+window.initializeHeader = initializeHeader;
 
 // ===== MOBILE NAVIGATION FUNCTIONALITY =====
 // Global variables to prevent duplicate event listeners
@@ -327,7 +335,7 @@ function setupLanguageSwitchers() {
       'login.html': `${baseUrl}/ar/login.html`,
       'register.html': `${baseUrl}/ar/register.html`,
       'course-details.html': `${baseUrl}/ar/course-details.html`,
-      'enroll.html': `${baseUrl}/ar/enroll.html`,
+      'enroll.html': `${baseUrl}/ar/index.html`, // Redirect to home since enroll.html doesn't exist in Arabic
       'recorded-lectures.html': `${baseUrl}/ar/recorded-lectures.html`
     };
     

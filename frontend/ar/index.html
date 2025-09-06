@@ -23,8 +23,11 @@
         .then(response => response.text())
         .then(html => {
           headerPlaceholder.innerHTML = html;
-          // The main.js script (linked at the end of the body) will then handle
-          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+          // Trigger header initialization after header is loaded
+          if (window.initializeHeader) {
+            console.log('🔄 Re-initializing header after dynamic load...');
+            window.initializeHeader();
+          }
         })
         .catch(error => console.error('Error loading header:', error));
     })();
