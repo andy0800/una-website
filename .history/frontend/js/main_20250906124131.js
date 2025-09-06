@@ -79,9 +79,6 @@ function setupMobileNavigation() {
     mobileNavElements.mobileNavClose.addEventListener('click', handleMobileNavClose);
     mobileNavElements.mobileNavClose.addEventListener('touchend', handleMobileNavClose);
   }
-  
-  // Also setup close button directly
-  setupMobileNavCloseButton();
 
   // Close mobile nav when clicking on a link
   mobileNavElements.mobileNav.addEventListener('click', handleMobileNavLinkClick);

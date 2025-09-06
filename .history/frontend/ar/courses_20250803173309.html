@@ -1,196 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <script>
-    (function() {
-      const userLang = navigator.language || navigator.userLanguage;
-      const isEnglish = userLang.toLowerCase().startsWith('en');
-      if (isEnglish && window.location.pathname.endsWith('courses.html')) {
-        if (!localStorage.getItem('langRedirected')) {
-          localStorage.setItem('langRedirected', 'true');
-          window.location.href = 'courses.html';
-        }
-      } else {
-        localStorage.removeItem('langRedirected');
-      }
-    })();
-  </script>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
-</head>
-
-<body dir="rtl" lang="ar" style="font-family: 'Cairo', sans-serif;">
-  <header class="site-header">
-    <div class="container" style="display:flex; align-items:center; justify-content: flex-end;">
-      <a class="logo" href="courses.html"><img src="images/logo.png" alt="شعار المعهد" /></a>
-
-      <nav class="main-nav" style="margin-right: 20px;">
-        <ul>
-          <li><a href="index.html" class="active">الرئيسية</a></li>
-          <li><a href="about.html">من نحن</a></li>
-          <li><a href="courses.html">الدورات</a></li>
-          <li><a href="news.html">الأخبار</a></li>
-          <li><a href="contact.html">تواصل معنا</a></li>
-          <li id="profileNavItem" style="display: none;">
-            <a href="profile.html">صفحتي الشخصية</a>
-          </li>
-                  <li id="liveNavItem" style="display: none;">
-    <a href="livestream.html">البث المباشر</a>
-  </li>
-        </ul>
-      </nav>
-
-<div class="lang-toggle" style="margin-right:auto; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.9rem;">
-  <a href="../en/courses.html" class="lang-link" lang="en" hreflang="en" title="English" style="color:white; text-decoration:none; padding: 2px 6px; border-radius: 4px;">EN</a> /
-  <span style="color:#ffcc00;">ع</span>
-</div>
-    
-<div class="auth-buttons" id="authButtons">
-  <a href="register.html" id="registerBtn">سجل الأن</a>
-  <a href="login.html" id="loginBtn">تسجيل الدخول</a>
-  <button id="logoutBtn" style="display: none;">تسجيل الخروج</button>
-</div>
-</div>
-  </header>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const profileNavItem = document.getElementById('profileNavItem');
-    if (localStorage.getItem('userToken') && profileNavItem) {
-      profileNavItem.style.display = 'inline-block';
-    }
-  });
-</script>
-<script>
- document.addEventListener('DOMContentLoaded', () => {
-  const profileNavItem = document.getElementById('profileNavItem');
-  const liveNavItem = document.getElementById('liveNavItem');
-
-  const logoutBtn = document.getElementById('logoutBtn');
-  const registerBtn = document.getElementById('registerBtn');
-  const loginBtn = document.getElementById('loginBtn');
-
-  const isLoggedIn = localStorage.getItem('userToken');
-
-  if (isLoggedIn) {
-    if (profileNavItem) profileNavItem.style.display = 'inline-block';
-    if (liveNavItem) liveNavItem.style.display = 'inline-block';
-    if (logoutBtn) logoutBtn.style.display = 'inline-block';
-    if (registerBtn) registerBtn.style.display = 'none';
-    if (loginBtn) loginBtn.style.display = 'none';
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('userToken');
-      window.location.href = 'index.html';
-    });
-  }
-});
-</script>
-  <!-- Page Hero -->
-  <section class="page-hero courses-hero">
-    <div class="container">
-      <h1>برامجنا التدريبية</h1>
-    </div>
-  </section>
-
-  <!-- Featured Courses Slider -->
-  <section class="featured-courses container">
-    <h2>البرامج المميزة</h2>
-    <div class="slider" id="featuredCoursesSlider">
-      <button class="slider-btn prev-btn" aria-label="Previous Slide">&#10094;</button>
-      <div class="slides-wrapper">
-        <div class="slide">
-          <img src="images/course1.jpg" alt="دبلوم الأمن السيبراني" />
-          <h3>دبلوم الأمن السيبراني</h3>
-          <p>تعلم خطوة بخطوة أدوات وأساليب الاختراق الأخلاقي والحماية الرقمية.</p>
-          <a href="course-details.html#cybersecurity" class="btn btn-primary">اعرف المزيد</a>
-        </div>
-        <div class="slide">
-          <img src="images/course2.jpg" alt="دبلوم التحكيم التجاري والدولي" />
-          <h3>دبلوم التحكيم التجاري والدولي</h3>
-          <p>برنامج تدريبي يؤهلك لتصبح محكمًا معتمدًا في فض النزاعات التجارية محليًا ودوليًا.</p>
-          <a href="course-details.html#arbitration" class="btn btn-primary">اعرف المزيد</a>
-        </div>
-        <div class="slide">
-          <img src="images/course3.jpg" alt="برامج التطوير الإداري" />
-          <h3>برامج التطوير الإداري</h3>
-          <p>تدريب احترافي في التطوير الإداري والفني.</p>
-          <a href="course-details.html#admin" class="btn btn-primary">اعرف المزيد</a>
-        </div>
-      </div>
-      <button class="slider-btn next-btn" aria-label="Next Slide">&#10095;</button>
-    </div>
-  </section>
-
-  <!-- All Courses List -->
-  <section class="all-courses container">
-    <h2>جميع البرامج التدريبية</h2>
-    <div class="courses-grid">
-      <!-- دبلوم الأمن السيبراني -->
-      <div class="course-card animate-on-scroll">
-        <img src="images/course1.jpg" alt="دبلوم الأمن السيبراني" />
-        <h3>دبلوم الأمن السيبراني</h3>
-        <p>📌 تعلم خطوة بخطوة أدوات وأساليب الاختراق الأخلاقي والحماية الرقمية.</p>
-        <p><strong>تشمل:</strong></p>
-        <ul>
-          <li>حماية الأنظمة والشبكات من الاختراقات</li>
-          <li>تحليل الثغرات وتأمين البنية التحتية</li>
-          <li>أدوات التتبع والتحقيق الرقمي</li>
-          <li>الإعداد لاختبارات CEH وSecurity+</li>
-        </ul>
-        <p><strong>الفئة المستهدفة:</strong> موظفو تقنية المعلومات، مسؤولو الشبكات، المهتمون بمجال الأمن الرقمي</p>
-        <a href="course-details.html#cybersecurity" class="btn btn-secondary">التفاصيل</a>
-      </div>
-
-      <!-- دبلوم التحكيم التجاري والدولي -->
-      <div class="course-card animate-on-scroll">
-        <img src="images/course2.jpg" alt="دبلوم التحكيم التجاري والدولي" />
-        <h3>دبلوم التحكيم التجاري والدولي</h3>
-        <p>📌 برنامج تدريبي يؤهلك لتصبح محكمًا معتمدًا في فض النزاعات التجارية محليًا ودوليًا.</p>
-        <p><strong>يشمل:</strong></p>
-        <ul>
-          <li>فهم ماهية التحكيم التجاري ومبادئه</li>
-          <li>التعرف على مميزات التحكيم كبديل للقضاء التقليدي</li>
-          <li>آليات تعيين المحكمين وإجراءات الفصل في القضايا</li>
-        </ul>
-        <p><strong>الفئة المستهدفة:</strong> محامون، محاسبون، مستثمرون، ورواد الأعمال</p>
-        <a href="course-details.html#arbitration" class="btn btn-secondary">التفاصيل</a>
-      </div>
-
-      <!-- برامج التطوير الإداري -->
-      <div class="course-card animate-on-scroll">
-        <img src="images/course3.jpg" alt="برامج التطوير الإداري" />
-        <h3>برامج التطوير الإداري</h3>
-        <p>برامج تدريبية احترافية في التطوير الإداري والفني لتعزيز الكفاءة التنظيمية.</p>
-        <a href="course-details.html#admin" class="btn btn-secondary">التفاصيل</a>
-      </div>
-
-      <!-- الشهادات المهنية -->
-      <div class="course-card animate-on-scroll">
-        <img src="images/course4.jpg" alt="الشهادات المهنية" />
-        <h3>الشهادات المهنية</h3>
-        <p>شهادات مهنية معتمدة محليًا ودوليًا في مجالات متعددة.</p>
-        <a href="course-details.html#certifications" class="btn btn-secondary">التفاصيل</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2025 معهد الاتحاد المميز للتدريب الأهلي. جميع الحقوق محفوظة.</p>
-      <nav class="footer-nav">
-        <ul>
-          <li><a href="privacy.html">سياسة الخصوصية</a></li>
-          <li><a href="terms.html">شروط الاستخدام</a></li>
-        </ul>
-      </nav>
-    </div>
-  </footer>
-
-  <script src="js/main.js"></script>
-  <script src="js/slider.js"></script>
-  <script src="js/animations.js"></script>
-</body>
-</html>

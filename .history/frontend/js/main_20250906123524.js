@@ -79,9 +79,6 @@ function setupMobileNavigation() {
     mobileNavElements.mobileNavClose.addEventListener('click', handleMobileNavClose);
     mobileNavElements.mobileNavClose.addEventListener('touchend', handleMobileNavClose);
   }
-  
-  // Also setup close button directly
-  setupMobileNavCloseButton();
 
   // Close mobile nav when clicking on a link
   mobileNavElements.mobileNav.addEventListener('click', handleMobileNavLinkClick);
@@ -117,18 +114,6 @@ function handleMobileNavClose(e) {
   e.stopPropagation();
   console.log('❌ Mobile nav close clicked!');
   closeMobileNav();
-}
-
-// Also add a direct click handler for the close button
-function setupMobileNavCloseButton() {
-  const closeBtn = document.getElementById('mobileNavClose');
-  if (closeBtn) {
-    console.log('🔧 Setting up mobile nav close button');
-    closeBtn.addEventListener('click', handleMobileNavClose);
-    closeBtn.addEventListener('touchend', handleMobileNavClose);
-  } else {
-    console.log('❌ Mobile nav close button not found');
-  }
 }
 
 function handleMobileNavLinkClick(e) {
