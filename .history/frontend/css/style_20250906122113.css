@@ -70,11 +70,6 @@
   visibility: hidden;
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
-  /* Performance optimizations */
-  will-change: opacity, visibility;
-  transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .mobile-nav.active {
@@ -173,12 +168,6 @@
 @media (max-width: 991px) {
   .mobile-nav {
     display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 999;
   }
   
   .main-nav {
@@ -187,6 +176,16 @@
   
   .hamburger-menu {
     display: flex !important;
+  }
+  
+  /* Ensure mobile nav is properly positioned */
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
   }
 }
 

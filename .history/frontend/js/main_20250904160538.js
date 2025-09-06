@@ -1,14 +1,7 @@
 // ===== HEADER INITIALIZATION AND AUTHENTICATION HANDLING =====
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Page loaded, initializing...');
   // Initialize header functionality
   initializeHeader();
-  
-  // Additional authentication check after a short delay to ensure all elements are loaded
-  setTimeout(() => {
-    console.log('🔄 Running delayed authentication check...');
-    setupAuthentication();
-  }, 500);
 });
 
 // ===== AUTHENTICATION STATE MONITORING =====
@@ -28,128 +21,121 @@ document.addEventListener('visibilitychange', () => {
 
 // Function to initialize header functionality
 function initializeHeader() {
-  // Initialize all components immediately
-  setupMobileNavigation();
+  // Wait a bit for the header to be loaded if it's dynamic
+  setTimeout(() => {
+    setupMobileNavigation();
+    setupAuthentication();
+    setupActiveNavigation();
+    setupLanguageSwitchers();
+  }, 200); // Increased timeout to ensure header is fully loaded
+  
+  // Also run authentication check immediately for faster page loads
   setupAuthentication();
-  setupActiveNavigation();
-  setupLanguageSwitchers();
 }
 
 // ===== MOBILE NAVIGATION FUNCTIONALITY =====
-// Global variables to prevent duplicate event listeners
-let mobileNavInitialized = false;
-let mobileNavElements = {};
-
 function setupMobileNavigation() {
-  // Prevent duplicate initialization
-  if (mobileNavInitialized) return;
-  
-  mobileNavElements = {
-    hamburgerMenu: document.getElementById('hamburgerMenu'),
-    mobileNav: document.getElementById('mobileNav'),
-    mobileNavClose: document.getElementById('mobileNavClose')
-  };
+  const hamburgerMenu = document.getElementById('hamburgerMenu');
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileNavClose = document.getElementById('mobileNavClose');
 
-  console.log('🔧 Mobile nav elements found:', {
-    hamburgerMenu: !!mobileNavElements.hamburgerMenu,
-    mobileNav: !!mobileNavElements.mobileNav,
-    mobileNavClose: !!mobileNavElements.mobileNavClose
+  console.log('🔧 Setting up mobile navigation:', {
+    hamburgerMenu: !!hamburgerMenu,
+    mobileNav: !!mobileNav,
+    mobileNavClose: !!mobileNavClose
   });
 
-  // Check if elements exist
-  if (!mobileNavElements.hamburgerMenu || !mobileNavElements.mobileNav) {
-    console.log('❌ Mobile nav elements not found, skipping setup');
-    return;
+  // Hamburger menu toggle
+  if (hamburgerMenu && mobileNav) {
+    hamburgerMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('🍔 Hamburger menu clicked');
+      
+      hamburgerMenu.classList.add('active');
+      mobileNav.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Add a small delay to ensure the display property is set
+      setTimeout(() => {
+        mobileNav.style.display = 'block';
+      }, 10);
+    });
   }
 
-  // Hamburger menu toggle - support both click and touch
-  mobileNavElements.hamburgerMenu.addEventListener('click', handleHamburgerClick);
-  mobileNavElements.hamburgerMenu.addEventListener('touchend', handleHamburgerClick);
-
-  // Close mobile nav - support both click and touch
-  if (mobileNavElements.mobileNavClose) {
-    mobileNavElements.mobileNavClose.addEventListener('click', handleMobileNavClose);
-    mobileNavElements.mobileNavClose.addEventListener('touchend', handleMobileNavClose);
+  // Close mobile nav
+  if (mobileNavClose && mobileNav) {
+    mobileNavClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('❌ Mobile nav close clicked');
+      
+      hamburgerMenu.classList.remove('active');
+      mobileNav.classList.remove('active');
+      document.body.style.overflow = '';
+      
+      // Hide the mobile nav after animation
+      setTimeout(() => {
+        if (!mobileNav.classList.contains('active')) {
+          mobileNav.style.display = 'none';
+        }
+      }, 300);
+    });
   }
 
   // Close mobile nav when clicking on a link
-  mobileNavElements.mobileNav.addEventListener('click', handleMobileNavLinkClick);
+  if (mobileNav) {
+    mobileNav.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') {
+        console.log('🔗 Mobile nav link clicked:', e.target.href);
+        
+        hamburgerMenu.classList.remove('active');
+        mobileNav.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        // Hide the mobile nav after animation
+        setTimeout(() => {
+          if (!mobileNav.classList.contains('active')) {
+            mobileNav.style.display = 'none';
+          }
+        }, 300);
+      }
+    });
+  }
 
   // Close mobile nav when clicking outside
-  document.addEventListener('click', handleOutsideClick);
+  document.addEventListener('click', (e) => {
+    if (mobileNav && mobileNav.classList.contains('active') && 
+        !mobileNav.contains(e.target) && 
+        !hamburgerMenu.contains(e.target)) {
+      
+      console.log('👆 Clicked outside mobile nav');
+      
+      hamburgerMenu.classList.remove('active');
+      mobileNav.classList.remove('active');
+      document.body.style.overflow = '';
+      
+      // Hide the mobile nav after animation
+      setTimeout(() => {
+        if (!mobileNav.classList.contains('active')) {
+          mobileNav.style.display = 'none';
+        }
+      }, 300);
+    }
+  });
 
   // Handle window resize
-  window.addEventListener('resize', handleWindowResize);
-
-  mobileNavInitialized = true;
-}
-
-// Event handlers
-function handleHamburgerClick(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  console.log('🍔 Hamburger clicked!');
-  
-  const { hamburgerMenu, mobileNav } = mobileNavElements;
-  
-  hamburgerMenu.classList.add('active');
-  mobileNav.classList.add('active');
-  document.body.style.overflow = 'hidden';
-  mobileNav.style.display = 'block';
-  
-  console.log('🍔 Mobile nav should be visible now');
-}
-
-function handleMobileNavClose(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  console.log('❌ Mobile nav close clicked!');
-  closeMobileNav();
-}
-
-function handleMobileNavLinkClick(e) {
-  if (e.target.tagName === 'A') {
-    closeMobileNav();
-  }
-}
-
-function handleOutsideClick(e) {
-  const { hamburgerMenu, mobileNav } = mobileNavElements;
-  
-  if (mobileNav && mobileNav.classList.contains('active') && 
-      !mobileNav.contains(e.target) && 
-      !hamburgerMenu.contains(e.target)) {
-    closeMobileNav();
-  }
-}
-
-// Debounced resize handler
-let resizeTimeout;
-function handleWindowResize() {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
+  window.addEventListener('resize', () => {
     if (window.innerWidth > 991) {
-      closeMobileNav();
-    }
-  }, 100);
-}
-
-function closeMobileNav() {
-  console.log('🚪 Closing mobile nav...');
-  const { hamburgerMenu, mobileNav } = mobileNavElements;
-  
-  hamburgerMenu.classList.remove('active');
-  mobileNav.classList.remove('active');
-  document.body.style.overflow = '';
-  
-  // Hide the mobile nav after animation
-  setTimeout(() => {
-    if (!mobileNav.classList.contains('active')) {
+      // Desktop view - hide mobile nav
+      hamburgerMenu.classList.remove('active');
+      mobileNav.classList.remove('active');
+      document.body.style.overflow = '';
       mobileNav.style.display = 'none';
-      console.log('🚪 Mobile nav hidden');
     }
-  }, 300);
+  });
 }
 
 // ===== AUTHENTICATION HANDLING =====
@@ -244,29 +230,6 @@ function isTokenValid(token) {
   }
 }
 
-// ===== GLOBAL AUTHENTICATION UTILITIES =====
-// Make authentication functions available globally
-window.authUtils = {
-  isLoggedIn: () => {
-    const token = localStorage.getItem('userToken');
-    return token && isTokenValid(token);
-  },
-  
-  getToken: () => {
-    return localStorage.getItem('userToken');
-  },
-  
-  logout: () => {
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('adminToken');
-    window.location.reload();
-  },
-  
-  checkAuth: () => {
-    setupAuthentication();
-  }
-};
-
 // ===== ACTIVE NAVIGATION HANDLING =====
 function setupActiveNavigation() {
   // Get current page path
@@ -292,8 +255,6 @@ function setupActiveNavigation() {
 
 // ===== LANGUAGE SWITCHER SETUP =====
 function setupLanguageSwitchers() {
-  console.log('🌐 Setting up language switchers...');
-  
   // Get the current server protocol, hostname, and port
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
@@ -309,11 +270,10 @@ function setupLanguageSwitchers() {
     currentPage = 'index.html';
   }
   
-  console.log(`🌐 Setting up language switchers for page: ${currentPage} on ${baseUrl}`);
+  console.log(`Setting up language switchers for page: ${currentPage} on ${baseUrl}`);
   
   // Setup English to Arabic switcher
   const arLink = document.getElementById('arLink');
-  console.log('🌐 Arabic link found:', !!arLink);
   if (arLink) {
     // Map English pages to Arabic equivalents
     const enToArMap = {
@@ -342,7 +302,6 @@ function setupLanguageSwitchers() {
   
   // Setup Arabic to English switcher
   const enLink = document.getElementById('enLink');
-  console.log('🌐 English link found:', !!enLink);
   if (enLink) {
     // Map Arabic pages to English equivalents
     const arToEnMap = {

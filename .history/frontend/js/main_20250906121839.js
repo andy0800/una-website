@@ -1,14 +1,7 @@
 // ===== HEADER INITIALIZATION AND AUTHENTICATION HANDLING =====
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Page loaded, initializing...');
-  // Initialize header functionality
+  // Initialize header functionality once
   initializeHeader();
-  
-  // Additional authentication check after a short delay to ensure all elements are loaded
-  setTimeout(() => {
-    console.log('🔄 Running delayed authentication check...');
-    setupAuthentication();
-  }, 500);
 });
 
 // ===== AUTHENTICATION STATE MONITORING =====
@@ -50,26 +43,17 @@ function setupMobileNavigation() {
     mobileNavClose: document.getElementById('mobileNavClose')
   };
 
-  console.log('🔧 Mobile nav elements found:', {
-    hamburgerMenu: !!mobileNavElements.hamburgerMenu,
-    mobileNav: !!mobileNavElements.mobileNav,
-    mobileNavClose: !!mobileNavElements.mobileNavClose
-  });
-
   // Check if elements exist
   if (!mobileNavElements.hamburgerMenu || !mobileNavElements.mobileNav) {
-    console.log('❌ Mobile nav elements not found, skipping setup');
     return;
   }
 
-  // Hamburger menu toggle - support both click and touch
+  // Hamburger menu toggle
   mobileNavElements.hamburgerMenu.addEventListener('click', handleHamburgerClick);
-  mobileNavElements.hamburgerMenu.addEventListener('touchend', handleHamburgerClick);
 
-  // Close mobile nav - support both click and touch
+  // Close mobile nav
   if (mobileNavElements.mobileNavClose) {
     mobileNavElements.mobileNavClose.addEventListener('click', handleMobileNavClose);
-    mobileNavElements.mobileNavClose.addEventListener('touchend', handleMobileNavClose);
   }
 
   // Close mobile nav when clicking on a link
@@ -89,22 +73,17 @@ function handleHamburgerClick(e) {
   e.preventDefault();
   e.stopPropagation();
   
-  console.log('🍔 Hamburger clicked!');
-  
   const { hamburgerMenu, mobileNav } = mobileNavElements;
   
   hamburgerMenu.classList.add('active');
   mobileNav.classList.add('active');
   document.body.style.overflow = 'hidden';
   mobileNav.style.display = 'block';
-  
-  console.log('🍔 Mobile nav should be visible now');
 }
 
 function handleMobileNavClose(e) {
   e.preventDefault();
   e.stopPropagation();
-  console.log('❌ Mobile nav close clicked!');
   closeMobileNav();
 }
 
@@ -124,19 +103,13 @@ function handleOutsideClick(e) {
   }
 }
 
-// Debounced resize handler
-let resizeTimeout;
 function handleWindowResize() {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    if (window.innerWidth > 991) {
-      closeMobileNav();
-    }
-  }, 100);
+  if (window.innerWidth > 991) {
+    closeMobileNav();
+  }
 }
 
 function closeMobileNav() {
-  console.log('🚪 Closing mobile nav...');
   const { hamburgerMenu, mobileNav } = mobileNavElements;
   
   hamburgerMenu.classList.remove('active');
@@ -147,15 +120,12 @@ function closeMobileNav() {
   setTimeout(() => {
     if (!mobileNav.classList.contains('active')) {
       mobileNav.style.display = 'none';
-      console.log('🚪 Mobile nav hidden');
     }
   }, 300);
 }
 
 // ===== AUTHENTICATION HANDLING =====
 function setupAuthentication() {
-  console.log('🔐 Setting up authentication...');
-  
   const profileNavItem = document.getElementById('profileNavItem');
   const lecturesNavItem = document.getElementById('lecturesNavItem');
   const liveNavItem = document.getElementById('liveNavItem');
@@ -168,14 +138,11 @@ function setupAuthentication() {
 
   // Get token from localStorage
   const userToken = localStorage.getItem('userToken');
-  console.log('🔐 Token found:', !!userToken);
 
   // Check if token exists and is valid
   const isLoggedIn = userToken && isTokenValid(userToken);
-  console.log('🔐 User logged in:', isLoggedIn);
 
   if (isLoggedIn) {
-    console.log('✅ User is authenticated, showing authenticated UI');
     // Show authenticated elements
     if (profileNavItem) profileNavItem.style.display = 'inline-block';
     if (lecturesNavItem) lecturesNavItem.style.display = 'inline-block';
@@ -187,7 +154,6 @@ function setupAuthentication() {
     if (registerBtn) registerBtn.style.display = 'none';
     if (loginBtn) loginBtn.style.display = 'none';
   } else {
-    console.log('❌ User not authenticated, showing public UI');
     // Show public elements
     if (profileNavItem) profileNavItem.style.display = 'none';
     if (lecturesNavItem) lecturesNavItem.style.display = 'none';
@@ -201,7 +167,6 @@ function setupAuthentication() {
     
     // Clear invalid token
     if (userToken && !isTokenValid(userToken)) {
-      console.log('🗑️ Clearing invalid token');
       localStorage.removeItem('userToken');
     }
   }
@@ -209,7 +174,6 @@ function setupAuthentication() {
   // Setup logout functionality
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      console.log('🚪 User logging out');
       localStorage.removeItem('userToken');
       localStorage.removeItem('adminToken');
       // Force page reload to update UI
@@ -232,14 +196,11 @@ function isTokenValid(token) {
     
     // Check if token is expired
     if (payload.exp && payload.exp < currentTime) {
-      console.log('⏰ Token expired');
       return false;
     }
     
-    console.log('✅ Token is valid');
     return true;
   } catch (error) {
-    console.log('❌ Token validation error:', error);
     return false;
   }
 }
@@ -292,8 +253,6 @@ function setupActiveNavigation() {
 
 // ===== LANGUAGE SWITCHER SETUP =====
 function setupLanguageSwitchers() {
-  console.log('🌐 Setting up language switchers...');
-  
   // Get the current server protocol, hostname, and port
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
@@ -309,11 +268,10 @@ function setupLanguageSwitchers() {
     currentPage = 'index.html';
   }
   
-  console.log(`🌐 Setting up language switchers for page: ${currentPage} on ${baseUrl}`);
+  console.log(`Setting up language switchers for page: ${currentPage} on ${baseUrl}`);
   
   // Setup English to Arabic switcher
   const arLink = document.getElementById('arLink');
-  console.log('🌐 Arabic link found:', !!arLink);
   if (arLink) {
     // Map English pages to Arabic equivalents
     const enToArMap = {
@@ -342,7 +300,6 @@ function setupLanguageSwitchers() {
   
   // Setup Arabic to English switcher
   const enLink = document.getElementById('enLink');
-  console.log('🌐 English link found:', !!enLink);
   if (enLink) {
     // Map Arabic pages to English equivalents
     const arToEnMap = {

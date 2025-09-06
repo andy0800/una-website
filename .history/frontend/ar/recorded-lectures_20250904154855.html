@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المحاضرات المسجلة - معهد الاتحاد المميز</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/profile.css" />
+  <link rel="stylesheet" href="/css/lecture-popup.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  
+  <style>
+    /* Content Protection Notice */
+    .lecture-info-note {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      color: white;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    
+    .lecture-info-note i {
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+
+<body class="arabic">
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = '/ar/header.html'; // Path to the Arabic header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+  
+
+  
+
+  <!-- Lectures Hero Section -->
+  <section class="profile-hero">
+    <div class="container">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <i class="fas fa-video-camera"></i>
+        </div>
+        <h1 class="profile-name">المحاضرات المسجلة</h1>
+        <p class="profile-subtitle">الوصول إلى مواد التعلم الخاصة بك</p>
+        
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="totalLectures">0</span>
+            <span class="profile-stat-label">المحاضرات المتاحة</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="watchedLectures">0</span>
+            <span class="profile-stat-label">تم مشاهدتها</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-number" id="totalDuration">0س</span>
+            <span class="profile-stat-label">المدة الإجمالية</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lectures Content Section -->
+  <section class="section">
+    <div class="container">
+      <div class="lectures-grid" id="lecturesGrid">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--dark-gray);">
+          <i class="fas fa-video-camera" style="font-size: 3rem; color: var(--border-gray); margin-bottom: 1rem;"></i>
+          <p>جاري تحميل المحاضرات المتاحة...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lecture Popup Overlay -->
+  <div id="lecturePopup" class="lecture-popup-overlay">
+    <div class="lecture-popup-container">
+      <div class="lecture-popup-header">
+        <h2 class="lecture-popup-title">
+          <i class="fas fa-play-circle"></i>
+          <span id="popupLectureTitle">المحاضرة المسجلة</span>
+        </h2>
+        <button class="lecture-popup-close" id="popupCloseBtn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="lecture-popup-content">
+        <div class="lecture-video-section">
+          <video id="lectureVideoPlayer" class="lecture-video-player" controls crossorigin="anonymous" preload="metadata">
+            <source type="video/mp4">
+            <source type="video/webm">
+            متصفحك لا يدعم علامة الفيديو.
+          </video>
+          <div id="lectureVideoPlaceholder" class="lecture-video-placeholder" style="display: none;">
+            <i class="fas fa-video"></i>
+            <p>جاري تحميل الفيديو...</p>
+          </div>
+        </div>
+        
+        <div class="lecture-info-section">
+          <h3 class="lecture-info-title">معلومات المحاضرة</h3>
+          <p id="popupLectureDescription" class="lecture-info-description">
+            جاري تحميل تفاصيل المحاضرة...
+          </p>
+          
+          <div class="lecture-meta-grid">
+            <div class="lecture-meta-item">
+              <div class="lecture-meta-icon">
+                <i class="fas fa-calendar"></i>
+              </div>
+              <div class="lecture-meta-content">
+                <div class="lecture-meta-label">تاريخ البث</div>
+                <div class="lecture-meta-value" id="popupLectureDate">جاري التحميل...</div>
+              </div>
+            </div>
+            
+            <div class="lecture-meta-item">
+              <div class="lecture-meta-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="lecture-meta-content">
+                <div class="lecture-meta-label">المدة</div>
+                <div class="lecture-meta-value" id="popupLectureDuration">جاري التحميل...</div>
+              </div>
+            </div>
+            
+            <div class="lecture-meta-item">
+              <div class="lecture-meta-icon">
+                <i class="fas fa-hd-video"></i>
+              </div>
+              <div class="lecture-meta-content">
+                <div class="lecture-meta-label">الجودة</div>
+                <div class="lecture-meta-value" id="popupLectureQuality">جاري التحميل...</div>
+              </div>
+            </div>
+            
+            <div class="lecture-meta-item">
+              <div class="lecture-meta-icon">
+                <i class="fas fa-tag"></i>
+              </div>
+              <div class="lecture-meta-content">
+                <div class="lecture-meta-label">الفئة</div>
+                <div class="lecture-meta-value" id="popupLectureCategory">جاري التحميل...</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="lecture-actions">
+            <div class="lecture-info-note">
+              <i class="fas fa-shield-alt"></i>
+              <span>المحتوى محمي ولا يمكن تحميله</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>معهد الاتحاد المميز للتدريب الأهلي</h3>
+          <p>التميز في التدريب المهني مع اعتمادات رسمية وشراكات دولية.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3>روابط سريعة</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="courses.html">برامج التدريب</a></li>
+            <li><a href="news.html">الأخبار والتحديثات</a></li>
+            <li><a href="contact.html">اتصل بنا</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>الاعتمادات</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li>مرخص من الهيئة العامة</li>
+            <li>ديوان الخدمة المدنية</li>
+            <li>الجامعة الأمريكية للدراسات المهنية</li>
+            <li>معايير دولية</li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>معلومات التواصل</h3>
+          <p><i class="fas fa-map-marker-alt"></i> الكويت – شرق، قطعة 8، شارع 157، برج العدالة، الدور الأول</p>
+          <p><i class="fab fa-whatsapp"></i> +965 91108981</p>
+          <p><i class="fab fa-instagram"></i> @una_institute</p>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 معهد الاتحاد المميز للتدريب الأهلي. جميع الحقوق محفوظة.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/recordedLectures.js"></script>
+</body>
+</html>

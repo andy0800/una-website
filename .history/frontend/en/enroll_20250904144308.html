@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enroll Course</title>
+<script>
+    (function() {
+      const userLang = navigator.language || navigator.userLanguage;
+      const isEnglish = userLang.toLowerCase().startsWith('en');
+      if (isEnglish && window.location.pathname.endsWith('enroll.html')) {
+        if (!localStorage.getItem('langRedirected')) {
+          localStorage.setItem('langRedirected', 'true');
+          window.location.href = 'enroll.html';
+        }
+      } else {
+        localStorage.removeItem('langRedirected');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+      <!-- Dynamic Header -->
+  <div id="header-placeholder"></div>
+  <script>
+    // This script runs immediately after the placeholder is in the DOM
+    (function() {
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      const headerPath = '/en/header.html'; // Path to the English header file
+      
+      fetch(headerPath)
+        .then(response => response.text())
+        .then(html => {
+          headerPlaceholder.innerHTML = html;
+          // The main.js script (linked at the end of the body) will then handle
+          // the dynamic elements within this injected HTML once its DOMContentLoaded fires.
+        })
+        .catch(error => console.error('Error loading header:', error));
+    })();
+  </script>
+  
+
+  
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Enroll in a Course</h1>
+        <p class="hero-subtitle">Join our professional training programs and advance your career</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enrollment Form Section -->
+  <section class="section">
+    <div class="container">
+      <div class="enrollment-card">
+        <h2>Course Enrollment</h2>
+        <form id="enrollForm" class="enrollment-form">
+          <div class="form-group">
+            <label for="courseName">Course Name:</label>
+            <input type="text" id="courseName" name="courseName" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Enroll Now</button>
+        </form>
+        <p id="message" class="message"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Distinguished Union Institute</h3>
+          <p>Excellence in professional training with official accreditations and international partnerships.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="courses.html">Training Programs</a></li>
+            <li><a href="news.html">News & Updates</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Accreditations</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li>PAAET Licensed</li>
+            <li>Civil Service Commission</li>
+            <li>AUPS Digital University</li>
+            <li>International Standards</li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <p><i class="fas fa-map-marker-alt"></i> Kuwait – East, Block 8, Street 157, Justice Tower, First Floor</p>
+          <p><i class="fab fa-whatsapp"></i> +965 91108981</p>
+          <p><i class="fab fa-instagram"></i> @una_institute</p>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Distinguished Union Institute for Private Training. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/main.js"></script>
+  <script>
+    const token = localStorage.getItem('token');
+    const form = document.getElementById('enrollForm');
+    const messageP = document.getElementById('message');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const courseName = form.courseName.value;
+
+      try {
+        const res = await fetch(window.config.API_BASE_URL + '/enrollments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ courseName }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          messageP.textContent = 'Enrolled successfully!';
+          form.reset();
+        } else {
+          messageP.textContent = data.message || 'Enrollment failed.';
+        }
+      } catch (err) {
+        messageP.textContent = 'Error connecting to server.';
+      }
+    });
+  </script>
+</body>
+</html>

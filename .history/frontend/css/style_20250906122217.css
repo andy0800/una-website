@@ -173,12 +173,6 @@
 @media (max-width: 991px) {
   .mobile-nav {
     display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 999;
   }
   
   .main-nav {
@@ -187,6 +181,16 @@
   
   .hamburger-menu {
     display: flex !important;
+  }
+  
+  /* Ensure mobile nav is properly positioned */
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
   }
 }
 
