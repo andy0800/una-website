@@ -47,7 +47,11 @@ const server = http.createServer(app);
 // 9. Socket.IO Configuration
 const io = new Server(server, {
   cors: {
-    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+      'http://localhost:3000',
+      'https://una.institute',
+      'https://www.una.institute'
+    ],
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -65,6 +69,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS ?
   'http://localhost:4000',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:4000',
+  'https://una.institute',
+  'https://www.una.institute',
   'https://cute-churros-f9f049.netlify.app',
   'https://una-website.vercel.app'
 ];
@@ -236,9 +242,9 @@ if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
 } else {
   // Production: API Root Endpoint only
   app.get('/', (req, res) => {
-    res.json({
+  res.json({
       message: '🚀 UNA Institute Backend API - Updated',
-      version: '1.0.0',
+    version: '1.0.0',
       status: 'online',
       environment: NODE_ENV,
       worker: process.env.WORKER_ID || 'main',
@@ -247,18 +253,18 @@ if (NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'true') {
         allowedOrigins: allowedOrigins,
         currentOrigin: req.get('Origin') || 'No Origin Header'
       },
-      endpoints: {
+    endpoints: {
         health: '/health',
         healthDetailed: '/health/detailed',
-        users: '/api/users',
-        courses: '/api/courses',
-        enrollments: '/api/enrollments',
-        admin: '/api/admin',
-        lectures: '/api/lectures'
+      users: '/api/users',
+      courses: '/api/courses',
+      enrollments: '/api/enrollments',
+      admin: '/api/admin',
+      lectures: '/api/lectures'
       },
       documentation: 'Visit /health for server status and /api/* for API endpoints'
-    });
   });
+});
 
   // CORS Test Endpoint
   app.get('/cors-test', (req, res) => {
@@ -317,10 +323,10 @@ app.use((req, res) => {
     error: 'Not Found',
     message: 'The requested resource was not found',
     path: req.originalUrl,
-    timestamp: new Date().toISOString()
-  });
-});
-
+            timestamp: new Date().toISOString()
+          });
+        });
+        
 // 22. Database Connection
 const connectDB = async () => {
   try {

@@ -1,4 +1,22 @@
+# UNA Institute - Custom Domain Redirects
+# Arabic pages
 /ar/*  /ar/:splat.html  200
+
+# English pages  
 /en/*  /en/:splat.html  200
+
+# Admin pages
 /admin/*  /admin/:splat.html  200
+
+# Root redirect to Arabic homepage
 /       /ar/index.html   200
+
+# API proxy to backend (if needed)
+/api/*  https://api.una.institute/api/:splat  200
+
+# Force HTTPS
+http://una.institute/*  https://una.institute/:splat  301!
+http://www.una.institute/*  https://una.institute/:splat  301!
+
+# Remove www (optional - choose one approach)
+# www.una.institute/*  https://una.institute/:splat  301!
