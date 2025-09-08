@@ -47,11 +47,7 @@ const server = http.createServer(app);
 // 9. Socket.IO Configuration
 const io = new Server(server, {
   cors: {
-    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
-      'http://localhost:3000',
-      'https://una.institute',
-      'https://www.una.institute'
-    ],
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -69,10 +65,9 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS ?
   'http://localhost:4000',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:4000',
-  'https://una.institute',
-  'https://www.una.institute',
   'https://cute-churros-f9f049.netlify.app',
-  'https://una-website.vercel.app'
+  'https://una.institute',
+  'https://www.una.institute'
 ];
 
 console.log('🔍 DEBUG: CORS Allowed Origins:', allowedOrigins);
@@ -408,7 +403,7 @@ const startServer = async () => {
       } else {
         console.log(`📁 Static Files: Uploads only`);
         console.log(`🔧 Mode: Production (Backend API only)`);
-        console.log(`🌍 Frontend: https://cute-churros-f9f049.netlify.app`);
+        console.log(`🌍 Frontend: https://una.institute`);
       }
       
       console.log(`🗄️ Database: ${MONGO_URI.split('@')[1] || 'localhost'}`);

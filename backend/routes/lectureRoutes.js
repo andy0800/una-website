@@ -11,6 +11,32 @@ const jwt = require('jsonwebtoken'); // Added for manual token verification
 
 const router = express.Router();
 
+// CORS helper function for video streaming
+const getAllowedOrigins = () => {
+  return process.env.ALLOWED_ORIGINS ? 
+    process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim().replace(/^["']|["']$/g, '')) : [
+    'http://localhost:3000',
+    'http://localhost:4000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:4000',
+    'https://cute-churros-f9f049.netlify.app',
+    'https://una.institute',
+    'https://www.una.institute'
+  ];
+};
+
+const getCorsOrigin = (req) => {
+  const origin = req.get('Origin');
+  const allowedOrigins = getAllowedOrigins();
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    return origin;
+  }
+  
+  // Fallback to first allowed origin or wildcard for development
+  return allowedOrigins[0] || '*';
+};
+
 // Root route to prevent "Cannot GET" errors
 router.get('/', (req, res) => {
   res.json({ 
@@ -532,7 +558,7 @@ router.get('/admin/lectures/:id/stream', antiDownloadProtection, async (req, res
 // Handle preflight requests for video streaming
 router.options('/user/lectures/:id/stream', (req, res) => {
   console.log('🔍 CORS preflight request for video streaming');
-  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
+  res.header('Access-Control-Allow-Origin', getCorsOrigin(req));
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Range, Content-Range, Content-Length, Content-Type, Authorization');
@@ -665,7 +691,7 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
         'Accept-Ranges': 'bytes',
         'Content-Length': chunksize,
         'Content-Type': contentType,
-        'Access-Control-Allow-Origin': req.get('Origin') || '*',
+        'Access-Control-Allow-Origin': getCorsOrigin(req),
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Range, Content-Range, Content-Length, Content-Type',
@@ -688,7 +714,7 @@ router.get('/user/lectures/:id/stream', async (req, res) => {
       const head = {
         'Content-Length': fileSize,
         'Content-Type': contentType,
-        'Access-Control-Allow-Origin': req.get('Origin') || '*',
+        'Access-Control-Allow-Origin': getCorsOrigin(req),
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Range, Content-Range, Content-Length, Content-Type',
