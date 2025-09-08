@@ -104,6 +104,8 @@ router.post('/login', validateUserLogin, async (req, res) => {
   console.log('🔍 DEBUG: Login request received');
   console.log('🔍 DEBUG: Origin:', req.headers.origin);
   console.log('🔍 DEBUG: Headers:', req.headers);
+  console.log('🔍 DEBUG: JWT_SECRET exists:', !!process.env.JWT_SECRET);
+  console.log('🔍 DEBUG: NODE_ENV:', process.env.NODE_ENV);
   
   const { phone , password } = req.body;
 
@@ -125,9 +127,16 @@ router.post('/login', validateUserLogin, async (req, res) => {
       return res.status(400).json({ message: 'Invalid password' });
     }
 
+    console.log('🔍 DEBUG: Creating JWT token...');
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET is not defined!');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+    
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '24h'
     });
+    console.log('🔍 DEBUG: JWT token created successfully');
 
     // Set secure cookie for cross-domain support
     res.cookie('token', token, {

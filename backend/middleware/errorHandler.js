@@ -2,6 +2,26 @@
 // Global error handling middleware for consistent error responses
 
 const errorHandler = (err, req, res, next) => {
+  // Set CORS headers for error responses
+  const origin = req.get('Origin');
+  const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
+    process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim().replace(/^["']|["']$/g, '')) : [
+    'http://localhost:3000',
+    'http://localhost:4000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:4000',
+    'https://cute-churros-f9f049.netlify.app',
+    'https://una.institute',
+    'https://www.una.institute'
+  ];
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Worker-ID');
+  }
+
   // Enhanced logging for production
   const errorLog = {
     message: err.message,
