@@ -125,8 +125,10 @@
     }
 
     .nav-item i {
-      width: 20px;
+      width: 22px;
       text-align: center;
+      font-size: 1rem;
+      flex-shrink: 0;
     }
 
     /* Main Content Area */
@@ -163,19 +165,29 @@
     }
 
     .logout-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       background: #dc3545;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
-      transition: all 0.3s ease;
+      font-size: 14px;
+      transition: all 0.2s ease;
     }
 
     .logout-btn:hover {
       background: #c82333;
-      transform: translateY(-2px);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .logout-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
     }
 
     /* Content Area */
@@ -204,59 +216,77 @@
 
     .stat-card {
       background: white;
-      padding: 25px;
+      padding: 24px 26px;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .stat-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
 
     .stat-card h3 {
       color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      font-weight: 600;
     }
 
     .stat-card .number {
-      font-size: 2.5rem;
+      font-size: 2.25rem;
       font-weight: 700;
       color: #333;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
+      line-height: 1.2;
     }
 
     .stat-card .trend {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #28a745;
+      font-weight: 500;
     }
 
     /* Content Sections */
     .content-section {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.05);
+      margin-bottom: 28px;
+      overflow: hidden;
     }
 
     .section-header {
-      padding: 25px 30px;
+      padding: 20px 26px;
       border-bottom: 1px solid #eee;
-      background: #f8f9fa;
+      background: #fafbfc;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
     }
 
     .section-header h2 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 600;
       color: #333;
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-header h2 i {
+      color: #667eea;
     }
 
     .section-body {
-      padding: 30px;
+      padding: 24px 26px;
     }
 
     .chat-section {
@@ -299,25 +329,45 @@
     }
     
     .save-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       background: #28a745;
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
+      padding: 10px 20px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
-      transition: all 0.3s ease;
+      font-size: 14px;
+      transition: all 0.2s ease;
       margin-right: 10px;
       margin-bottom: 10px;
     }
     
     .save-btn:hover {
       background: #218838;
-      transform: translateY(-2px);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .save-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);
     }
     
     .gradient-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .save-btn.gradient-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .save-btn.gradient-primary:hover {
+      background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
     }
     
     .margin-left-10 {
@@ -360,10 +410,11 @@
     /* Filter Bar Styles */
     .filter-bar {
       display: flex;
-      gap: 15px;
+      gap: 12px;
       margin-bottom: 20px;
       flex-wrap: wrap;
       align-items: center;
+      padding: 12px 0;
     }
     
     .filter-bar label {
@@ -371,27 +422,70 @@
       align-items: center;
       gap: 8px;
       font-weight: 500;
+      color: #333;
     }
     
     .filter-bar input {
       padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
       font-size: 14px;
+      min-width: 140px;
+    }
+    
+    .filter-bar input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+    
+    .filter-bar #clearFiltersBtn,
+    .filter-bar button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      background: #6c757d;
+      color: white;
+      transition: all 0.2s ease;
+    }
+    
+    .filter-bar #clearFiltersBtn:hover,
+    .filter-bar button:hover {
+      background: #5a6268;
     }
     
     /* User Card Styles */
-    .user-card {
+    .user-card,
+    .card.user-card {
       background: white;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.06);
+      transition: box-shadow 0.2s ease;
     }
     
-    .user-card h3 {
-      margin-bottom: 15px;
+    .user-card:hover,
+    .card.user-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    
+    .user-card h3,
+    .user-card h4 {
+      margin-bottom: 12px;
       color: #333;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .user-card p {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #555;
     }
     
     .badge {
@@ -404,38 +498,47 @@
     }
     
     .admin-controls {
-      margin-top: 15px;
-      padding-top: 15px;
+      margin-top: 16px;
+      padding-top: 16px;
       border-top: 1px solid #eee;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 14px;
     }
     
     .admin-controls button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       background: #007bff;
       color: white;
       border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
+      padding: 8px 14px;
+      border-radius: 6px;
       cursor: pointer;
-      margin-right: 10px;
-      margin-bottom: 10px;
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
     
     .admin-controls button:hover {
       background: #0056b3;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
     }
     
-    .admin-controls input {
+    .admin-controls input[type="text"],
+    .admin-controls input[type="file"] {
       padding: 6px 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-right: 10px;
-      margin-bottom: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 13px;
     }
     
     .admin-controls label {
       font-weight: 500;
-      margin-right: 10px;
+      font-size: 13px;
+      color: #333;
     }
     
 
@@ -785,23 +888,6 @@
 
 
 
-    .save-btn {
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      margin-top: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .save-btn:hover {
-      background: linear-gradient(135deg, #218838, #1ea085);
-      transform: translateY(-2px);
-    }
-
     /* Edit Modal */
     .edit-modal {
       display: none;
@@ -816,13 +902,16 @@
     }
 
     .edit-modal-content {
-      background-color: #fefefe;
-      margin: 5% auto;
-      padding: 30px;
+      background-color: #fff;
+      margin: 4% auto;
+      padding: 28px 32px;
       border-radius: 12px;
-      width: 80%;
-      max-width: 600px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      width: 90%;
+      max-width: 560px;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      border: 1px solid rgba(0,0,0,0.06);
     }
 
     .edit-modal-header {
@@ -1453,15 +1542,19 @@
     }
 
     /* Progress Bar Styling */
+    #uploadProgress {
+      margin-top: 10px;
+    }
+
     .progress-bar {
       width: 100%;
       height: 20px;
-      background: #f0f0f0;
+      background: #e9ecef;
       border-radius: 10px;
       overflow: hidden;
-      border: 1px solid #ddd;
+      border: 1px solid #dee2e6;
     }
-    
+
     #progressFill {
       width: 0%;
       height: 100%;
@@ -1469,13 +1562,39 @@
       transition: width 0.3s ease;
       border-radius: 10px;
     }
-    
+
     #progressText {
       text-align: center;
-      margin-top: 5px;
+      margin-top: 6px;
       font-size: 12px;
-      color: #666;
+      color: #555;
       font-weight: 600;
+    }
+
+    /* Button variants (keep IDs and behaviour; style only) */
+    .save-btn.btn-warning {
+      background: #ffc107;
+      color: #000;
+    }
+    .save-btn.btn-warning:hover {
+      background: #e0a800;
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.35);
+    }
+    .save-btn.btn-info {
+      background: #17a2b8;
+      color: #fff;
+    }
+    .save-btn.btn-info:hover {
+      background: #138496;
+      box-shadow: 0 4px 12px rgba(23, 162, 184, 0.35);
+    }
+    .save-btn.test-btn {
+      background: #6c757d;
+      color: #fff;
+    }
+    .save-btn.test-btn:hover {
+      background: #5a6268;
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
     }
     
     /* Access Modal Styling */
@@ -1987,15 +2106,102 @@
     
 
     
+    /* System status (Recorded Lectures info box) */
+    .system-status {
+      padding: 10px 14px;
+      background: #f0f7ff;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+      font-size: 0.9rem;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    .system-status i {
+      margin-right: 8px;
+      color: #007bff;
+    }
+
+    /* Lecture controls toolbar */
+    .lecture-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 14px;
+    }
+
+    .lecture-count-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    /* Admin credentials note */
+    .admin-credentials-note {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #f0f4ff;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .admin-credentials-note code {
+      background: rgba(102, 126, 234, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .pagination button {
+      min-width: 36px;
+      padding: 8px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: white;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination .page-info {
+      font-size: 14px;
+      color: #666;
+      margin: 0 8px;
+    }
+
     /* Connection Status */
     .connection-status {
-      padding: 6px 12px;
-      border-radius: 15px;
+      padding: 8px 14px;
+      border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
       text-align: center;
       margin-top: 10px;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
     }
     
     .status-connected {
@@ -2327,7 +2533,7 @@
             </div>
             <div class="section-body">
               <p>Welcome to the admin dashboard. Select a tab from the sidebar to manage different aspects of the system.</p>
-              <p class="admin-credentials-note" style="margin-top:12px;padding:8px 12px;background:#f0f4ff;border-radius:6px;font-size:0.9em;color:#333;"><strong>Admin login credentials:</strong> <code>Admin</code> / <code>ROBENHOOD</code></p>
+              <p class="admin-credentials-note"><strong>Admin login credentials:</strong> <code>Admin</code> / <code>ROBENHOOD</code></p>
               <div id="adminContent">
                 <!-- Dynamic content will be loaded here -->
               </div>
@@ -2373,12 +2579,6 @@
           </div>
         </div>
 
-
-
-        </div>
-
-
-
         <!-- Statistics Tab -->
         <div id="stats" class="tab-content">
           <div class="content-section">
@@ -2413,8 +2613,8 @@
           <div class="content-section">
             <div class="section-header">
               <h2><i class="fas fa-video-camera"></i> Recorded Lectures Management</h2>
-              <div id="systemStatus" class="margin-top-10" style="padding: 10px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid #007bff;">
-                <i class="fas fa-info-circle"></i> 
+              <div id="systemStatus" class="system-status margin-top-10">
+                <i class="fas fa-info-circle"></i>
                 <span id="statusText">System ready. Click "Test API" to verify functionality.</span>
               </div>
             </div>
@@ -2427,19 +2627,19 @@
                 <button id="loadRecordedLecturesBtn" class="save-btn">
                   <i class="fas fa-list"></i> View All Lectures
                 </button>
-                <button id="exportLecturesBtn" class="save-btn" style="background: #28a745;">
+                <button id="exportLecturesBtn" class="save-btn">
                   <i class="fas fa-download"></i> Export Lectures
                 </button>
-                <button id="testRecordedLecturesAPIBtn" class="save-btn test-btn" style="background: #6c757d;">
+                <button id="testRecordedLecturesAPIBtn" class="save-btn test-btn">
                   <i class="fas fa-bug"></i> Test API
                 </button>
-                <button id="fixVideoBtn" class="save-btn" style="background: #ffc107; color: #000;">
+                <button id="fixVideoBtn" class="save-btn btn-warning">
                   <i class="fas fa-wrench"></i> Fix Video Issues
                 </button>
-                <button id="fixPublicBtn" class="save-btn" style="background: #17a2b8; color: #fff;">
+                <button id="fixPublicBtn" class="save-btn btn-info">
                   <i class="fas fa-globe"></i> Fix Public Access
                 </button>
-                <span id="lectureCount" class="margin-left-20" style="color: #666; font-size: 14px; vertical-align: middle;">
+                <span id="lectureCount" class="lecture-count-display margin-left-20">
                   <i class="fas fa-video-camera"></i> <span id="lectureCountNumber">0</span> lectures
                 </span>
               </div>

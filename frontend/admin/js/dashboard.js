@@ -566,44 +566,6 @@ function applyFilters() {
   currentPage = 1; // Reset to first page on filter
   renderUsers(filtered);
 }
-function showEditUserForm(id, name, phone, civilId, passportNumber, dateOfBirth) {
-  const container = document.getElementById('adminContent');
-  container.innerHTML = `
-    <h2>Edit User Info</h2>
-    <form id="editUserForm">
-      <input type="text" id="editName" value="${name}" placeholder="Name" required />
-      <input type="text" id="editPhone" value="${phone}" placeholder="Phone" />
-      <input type="text" id="editCivilId" value="${civilId}" placeholder="Civil ID" />
-      <input type="text" id="editPassport" value="${passportNumber}" placeholder="Passport Number" />
-      <input type="date" id="editDOB" value="${dateOfBirth ? new Date(dateOfBirth).toISOString().split('T')[0] : ''}" />
-      <button type="submit">Save Changes</button>
-    </form>
-  `;
-
-  document.getElementById('editUserForm').addEventListener('submit', e => {
-        e.preventDefault();
-    const updatedUser = {
-      name: document.getElementById('editName').value.trim(),
-      phone: document.getElementById('editPhone').value.trim(),
-      civilId: document.getElementById('editCivilId').value.trim(),
-      passportNumber: document.getElementById('editPassport').value.trim(),
-      dateOfBirth: document.getElementById('editDOB').value
-    };
-
-    fetch(`${adminApiBase}/users/${id}/info`, {
-        method: 'PUT',
-      headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedUser)
-    })
-      .then(handleResponse)
-      .then(() => {
-        alert('User info updated!');
-            loadUsers();
-      })
-      .catch(err => alert(err.message));
-  });
-}
-
 function clearFilters() {
   document.getElementById('filterCourse').value = '';
   document.getElementById('filterLevel').value = '';
@@ -2333,22 +2295,22 @@ function showEditUserForm(id, name, phone, civilId, passportNumber, dateOfBirth)
         <h2><i class="fas fa-edit"></i> Edit User</h2>
       </div>
       <div class="section-body">
-        <form id="editUserForm">
+        <form id="editUserFormInline" data-user-id="${id}">
           <div class="form-group">
             <label for="editUserName">Full Name:</label>
-            <input type="text" id="editUserName" value="${name || ''}" placeholder="Enter full name" required />
+            <input type="text" id="editUserName" value="${(name || '').replace(/"/g, '&quot;')}" placeholder="Enter full name" required />
           </div>
           <div class="form-group">
             <label for="editUserPhone">Phone Number:</label>
-            <input type="tel" id="editUserPhone" value="${phone || ''}" placeholder="Enter phone number" required />
+            <input type="tel" id="editUserPhone" value="${(phone || '').replace(/"/g, '&quot;')}" placeholder="Enter phone number" required />
           </div>
           <div class="form-group">
             <label for="editUserCivilId">Civil ID:</label>
-            <input type="text" id="editUserCivilId" value="${civilId || ''}" placeholder="Enter civil ID" />
+            <input type="text" id="editUserCivilId" value="${(civilId || '').replace(/"/g, '&quot;')}" placeholder="Enter civil ID" />
           </div>
           <div class="form-group">
             <label for="editUserPassport">Passport Number:</label>
-            <input type="text" id="editUserPassport" value="${passportNumber || ''}" placeholder="Enter passport number" />
+            <input type="text" id="editUserPassport" value="${(passportNumber || '').replace(/"/g, '&quot;')}" placeholder="Enter passport number" />
           </div>
           <div class="form-group">
             <label for="editUserDOB">Date of Birth:</label>
@@ -2659,44 +2621,46 @@ function handleCreateCourseForm() {
 }
 
 function handleEditUserForm() {
-  const form = document.getElementById('editUserForm');
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const formData = {
-        name: document.getElementById('editUserName').value.trim(),
-        phone: document.getElementById('editUserPhone').value.trim(),
-        civilId: document.getElementById('editUserCivilId').value.trim(),
-        passportNumber: document.getElementById('editUserPassport').value.trim(),
-        dateOfBirth: document.getElementById('editUserDOB').value
-      };
-      
-      if (!formData.name || !formData.phone) {
-        alert('Name and phone are required fields');
-        return;
-      }
-      
-      // Get user ID from the form or context
-      const userId = form.getAttribute('data-user-id');
-      if (!userId) {
-        alert('User ID not found');
-        return;
-      }
-      
-      fetch(`${adminApiBase}/users/${userId}/info`, {
-        method: 'PUT',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (form.id !== 'editUserForm' && form.id !== 'editUserFormInline') return;
+    e.preventDefault();
+
+    const formData = {
+      name: form.querySelector('#editUserName')?.value?.trim() ?? '',
+      phone: form.querySelector('#editUserPhone')?.value?.trim() ?? '',
+      civilId: form.querySelector('#editUserCivilId')?.value?.trim() ?? '',
+      passportNumber: form.querySelector('#editUserPassport')?.value?.trim() ?? '',
+      dateOfBirth: form.querySelector('#editUserDOB')?.value ?? ''
+    };
+
+    if (!formData.name || !formData.phone) {
+      alert('Name and phone are required fields');
+      return;
+    }
+
+    const userId = form.getAttribute('data-user-id');
+    if (!userId) {
+      alert('User ID not found');
+      return;
+    }
+
+    fetch(`${adminApiBase}/users/${userId}/info`, {
+      method: 'PUT',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    })
+      .then(handleResponse)
+      .then(() => {
+        alert('User updated successfully!');
+        loadUsers();
+        if (form.id === 'editUserFormInline') {
+          const tab = document.querySelector('[data-tab="users"]');
+          if (tab) tab.click();
+        }
       })
-        .then(handleResponse)
-        .then(() => {
-          alert('User updated successfully!');
-          loadUsers();
-        })
-        .catch(err => alert(err.message));
-    });
-  }
+      .catch(err => alert(err.message));
+  });
 }
 
 // Initialize form handlers when DOM is loaded
