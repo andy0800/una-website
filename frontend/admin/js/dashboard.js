@@ -842,6 +842,24 @@ function filterUsers() {
 
   renderUsers(filtered);
 }
+// Page titles for each tab (top bar updates when tab changes)
+const TAB_PAGE_TITLES = {
+  'dashboard': 'Dashboard Overview',
+  'users': 'Users Management',
+  'courses': 'Courses Management',
+  'stats': 'Statistics',
+  'forms': 'Submitted Forms',
+  'recorded-lectures': 'Recorded Lectures Management',
+  'analytics': 'Analytics Dashboard'
+};
+
+function setPageTitleForTab(tabId) {
+  const titleEl = document.querySelector('.page-title');
+  if (titleEl && TAB_PAGE_TITLES[tabId]) {
+    titleEl.textContent = TAB_PAGE_TITLES[tabId];
+  }
+}
+
 // Tab switching system
 function initializeTabSystem() {
   const navItems = document.querySelectorAll('.nav-item');
@@ -851,6 +869,12 @@ function initializeTabSystem() {
   console.log('Found nav items:', navItems.length);
   console.log('Found tab contents:', tabContents.length);
   
+  // Set initial page title from active tab
+  const activeNav = document.querySelector('.nav-item.active');
+  if (activeNav) {
+    setPageTitleForTab(activeNav.getAttribute('data-tab'));
+  }
+
   navItems.forEach((item, index) => {
     const targetTab = item.getAttribute('data-tab');
     console.log(`Nav item ${index}: ${targetTab}`);
@@ -870,6 +894,7 @@ function initializeTabSystem() {
       const targetTabContent = document.getElementById(targetTab);
       if (targetTabContent) {
         targetTabContent.classList.add('active');
+        setPageTitleForTab(targetTab);
         console.log(`Tab content activated: ${targetTab}`);
             } else {
         console.warn(`Tab content not found: ${targetTab}`);
