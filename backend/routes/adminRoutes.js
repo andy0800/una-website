@@ -115,6 +115,53 @@ router.post('/refresh-token', verifyAdminToken, async (req, res) => {
   }
 });
 
+/* ========== Unprotected Admin Account Management (standalone page) ========== */
+/* WARNING: No auth - for initial setup / recovery only. Restrict or remove in production. */
+
+router.get('/manage/admins', async (req, res) => {
+  try {
+    const admins = await Admin.find({}).select('_id username createdAt').lean();
+    res.json(admins);
+  } catch (err) {
+    console.error('❌ List admins error:', err.message);
+    res.status(500).json({ message: 'Failed to list admins' });
+  }
+});
+
+router.post('/manage/admins', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password required' });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' });
+    }
+    const exists = await Admin.findOne({ username });
+    if (exists) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+    const admin = new Admin({ username, password });
+    await admin.save();
+    res.status(201).json({ message: 'Admin created', id: admin._id, username: admin.username });
+  } catch (err) {
+    console.error('❌ Create admin error:', err.message);
+    res.status(500).json({ message: 'Failed to create admin' });
+  }
+});
+
+router.delete('/manage/admins/:id', async (req, res) => {
+  try {
+    const admin = await Admin.findByIdAndDelete(req.params.id);
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+    res.json({ message: 'Admin deleted', username: admin.username });
+  } catch (err) {
+    console.error('❌ Delete admin error:', err.message);
+    res.status(500).json({ message: 'Failed to delete admin' });
+  }
+});
 
 /* ========== User Management ========== */
 router.post('/users', verifyAdminToken, async (req, res) => {

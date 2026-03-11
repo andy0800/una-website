@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Admin Users</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 24px; background: #1a1d29; color: #e4e6eb; min-height: 100vh; }
+    .container { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; color: #fff; }
+    .sub { color: #8b8f99; font-size: 0.9rem; margin-bottom: 24px; }
+    .card { background: #252836; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 16px; }
+    .form-row label { display: block; font-size: 0.85rem; color: #8b8f99; margin-bottom: 4px; }
+    input[type="text"], input[type="password"] { padding: 10px 12px; border: 1px solid #3d4152; border-radius: 8px; background: #1a1d29; color: #e4e6eb; font-size: 1rem; min-width: 160px; }
+    input:focus { outline: none; border-color: #6366f1; }
+    button { padding: 10px 18px; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 500; }
+    .btn-primary { background: #6366f1; color: #fff; }
+    .btn-primary:hover { background: #4f46e5; }
+    .btn-danger { background: #dc2626; color: #fff; padding: 6px 12px; font-size: 0.85rem; }
+    .btn-danger:hover { background: #b91c1c; }
+    .msg { padding: 10px 12px; border-radius: 8px; margin-top: 12px; font-size: 0.9rem; }
+    .msg.success { background: #065f46; color: #6ee7b7; }
+    .msg.error { background: #7f1d1d; color: #fca5a5; }
+    .list { margin: 0; padding: 0; list-style: none; }
+    .list li { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #3d4152; gap: 12px; }
+    .list li:last-child { border-bottom: none; }
+    .list-username { font-weight: 500; }
+    .list-date { font-size: 0.85rem; color: #8b8f99; }
+    .link { color: #818cf8; text-decoration: none; font-size: 0.9rem; }
+    .link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Manage Admin Users</h1>
+    <p class="sub">Create and delete admin dashboard accounts. This page is unprotected; restrict access in production.</p>
+    <p class="sub" id="openHint" style="display:none; background:#2d2f3d; padding:8px 12px; border-radius:8px; margin-bottom:16px;">You opened this from your computer. For it to work, open it via a server instead: <strong>http://localhost:3000/admin/manage-admins.html</strong> or your deployed site.</p>
+
+    <div class="card">
+      <h2 style="font-size:1.1rem; margin-top:0;">Create admin</h2>
+      <form id="createForm">
+        <div class="form-row">
+          <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Username" required minlength="1" />
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Password (min 8 chars)" required minlength="8" />
+          </div>
+          <div style="align-self: flex-end;">
+            <button type="submit" class="btn-primary" id="createBtn">Create</button>
+          </div>
+        </div>
+      </form>
+      <div id="createMessage" class="msg" style="display:none;"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.1rem; margin-top:0;">Admin accounts</h2>
+      <p class="sub" style="margin-bottom:12px;">Delete an account to remove dashboard access.</p>
+      <ul class="list" id="adminList"></ul>
+      <div id="listMessage" class="msg" style="display:none;"></div>
+    </div>
+
+    <a href="/admin" class="link">← Back to admin login</a>
+  </div>
+
+  <script>
+    (function () {
+      // No external config: works when opened as file:// or served from any host
+      var base;
+      if (typeof window.config !== 'undefined' && window.config.API_BASE_URL) {
+        base = window.config.API_BASE_URL;
+      } else if (window.location.protocol === 'file:' || window.location.origin === 'null' || !window.location.origin) {
+        base = 'https://una-backend-c207.onrender.com/api';
+      } else {
+        base = window.location.origin + '/api';
+      }
+      var prefix = base.replace(/\/$/, '') + '/admin/manage/admins';
+      if (window.location.protocol === 'file:') {
+        var h = document.getElementById('openHint');
+        if (h) h.style.display = 'block';
+      }
+
+      function show(el, text, isError) {
+        if (!el) return;
+        el.style.display = 'block';
+        el.textContent = text || '';
+        el.className = 'msg ' + (isError ? 'error' : 'success');
+      }
+      function hide(el) { if (el) el.style.display = 'none'; }
+
+      function listAdmins() {
+        var list = document.getElementById('adminList');
+        var msg = document.getElementById('listMessage');
+        list.innerHTML = '';
+        hide(msg);
+        fetch(prefix, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (!Array.isArray(data)) { show(msg, data.message || 'Failed to load', true); return; }
+            if (data.length === 0) { list.innerHTML = '<li style="color:#8b8f99;">No admin accounts yet.</li>'; return; }
+            data.forEach(function (a) {
+              var li = document.createElement('li');
+              var left = document.createElement('span');
+              left.innerHTML = '<span class="list-username">' + escapeHtml(a.username) + '</span> <span class="list-date">' + (a.createdAt ? new Date(a.createdAt).toLocaleString() : '') + '</span>';
+              var btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'btn-danger';
+              btn.textContent = 'Delete';
+              btn.onclick = function () { deleteAdmin(a._id, a.username); };
+              li.appendChild(left);
+              li.appendChild(btn);
+              list.appendChild(li);
+            });
+          })
+          .catch(function (err) { show(msg, 'Network error: ' + (err.message || 'Could not load list'), true); });
+      }
+
+      function deleteAdmin(id, username) {
+        if (!id || !confirm('Delete admin “‘ + username + ’”? This cannot be undone.')) return;
+        var msg = document.getElementById('listMessage');
+        hide(msg);
+        fetch(prefix + '/' + id, { method: 'DELETE' })
+          .then(function (r) { return r.json().catch(function () { return {}; }); })
+          .then(function (data) {
+            show(msg, data.message || 'Deleted.', false);
+            listAdmins();
+          })
+          .catch(function (err) { show(msg, 'Error: ' + (err.message || 'Delete failed'), true); });
+      }
+
+      function escapeHtml(s) {
+        if (s == null) return '';
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      document.getElementById('createForm').onsubmit = function (e) {
+        e.preventDefault();
+        var username = document.getElementById('username').value.trim();
+        var password = document.getElementById('password').value;
+        var btn = document.getElementById('createBtn');
+        var msg = document.getElementById('createMessage');
+        hide(msg);
+        btn.disabled = true;
+        fetch(prefix, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username, password: password })
+        })
+          .then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); })
+          .then(function (o) {
+            if (o.status === 201) {
+              show(msg, 'Admin “‘ + escapeHtml(username) + ’” created.', false);
+              document.getElementById('username').value = '';
+              document.getElementById('password').value = '';
+              listAdmins();
+            } else {
+              show(msg, (o.data && o.data.message) || 'Create failed', true);
+            }
+          })
+          .catch(function (err) { show(msg, 'Error: ' + (err.message || 'Request failed'), true); })
+          .then(function () { btn.disabled = false; });
+      };
+
+      listAdmins();
+    })();
+  </script>
+</body>
+</html>

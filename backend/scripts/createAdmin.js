@@ -4,11 +4,14 @@ const bcrypt = require('bcryptjs');
 const Admin = require('../models/Admin');
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/una_institute', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/una_institute';
+mongoose.connect(uri)
+.then(() => {
+  const dbName = mongoose.connection.db.databaseName;
+  const host = mongoose.connection.host || 'localhost';
+  console.log('✅ Connected to MongoDB');
+  console.log(`   Database: ${dbName}  |  Host: ${host}  |  Collection: admins`);
 })
-.then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => {
   console.error('❌ MongoDB connection error:', err.message);
   process.exit(1);
