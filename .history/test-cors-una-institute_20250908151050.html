@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test for una.institute</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🌐 CORS Test for una.institute</h1>
+    
+    <div class="test-section info">
+        <h3>Test Information</h3>
+        <p><strong>Current Origin:</strong> <span id="currentOrigin"></span></p>
+        <p><strong>Target API:</strong> https://una-backend-c207.onrender.com/api/users/login</p>
+        <p><strong>Test Time:</strong> <span id="testTime"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 1: Health Check</h3>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="healthResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: CORS Test Endpoint</h3>
+        <button onclick="testCors()">Test CORS Configuration</button>
+        <div id="corsResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Login Endpoint (Expected to fail with 400, not CORS)</h3>
+        <button onclick="testLogin()">Test Login Endpoint</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 4: Users API Root</h3>
+        <button onclick="testUsersApi()">Test Users API Root</button>
+        <div id="usersResult"></div>
+    </div>
+
+    <script>
+        // Set current origin and time
+        document.getElementById('currentOrigin').textContent = window.location.origin;
+        document.getElementById('testTime').textContent = new Date().toLocaleString();
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    credentials: 'include',
+                    ...options
+                });
+                
+                const data = await response.text();
+                return {
+                    success: true,
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries()),
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message,
+                    type: error.name
+                };
+            }
+        }
+
+        function displayResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.className = result.success ? 'success' : 'error';
+            
+            let html = '<h4>Result:</h4>';
+            if (result.success) {
+                html += `<p><strong>Status:</strong> ${result.status} ${result.statusText}</p>`;
+                html += `<p><strong>CORS Headers:</strong></p>`;
+                html += '<pre>';
+                Object.entries(result.headers).forEach(([key, value]) => {
+                    if (key.toLowerCase().includes('access-control') || key.toLowerCase().includes('cors')) {
+                        html += `${key}: ${value}\n`;
+                    }
+                });
+                html += '</pre>';
+                html += `<p><strong>Response:</strong></p><pre>${result.data}</pre>`;
+            } else {
+                html += `<p><strong>Error:</strong> ${result.error}</p>`;
+                html += `<p><strong>Type:</strong> ${result.type}</p>`;
+                if (result.type === 'TypeError' && result.error.includes('CORS')) {
+                    html += '<p><strong>⚠️ CORS Error Detected!</strong></p>';
+                }
+            }
+            element.innerHTML = html;
+        }
+
+        async function testHealth() {
+            const result = await makeRequest('https://una-backend-c207.onrender.com/health', { method: 'GET' });
+            displayResult('healthResult', result);
+        }
+
+        async function testCors() {
+            const result = await makeRequest('https://una-backend-c207.onrender.com/cors-test', { method: 'GET' });
+            displayResult('corsResult', result);
+        }
+
+        async function testLogin() {
+            const result = await makeRequest('https://una-backend-c207.onrender.com/api/users/login', {
+                body: JSON.stringify({ phone: 'test', password: 'test' })
+            });
+            displayResult('loginResult', result);
+        }
+
+        async function testUsersApi() {
+            const result = await makeRequest('https://una-backend-c207.onrender.com/api/users', { method: 'GET' });
+            displayResult('usersResult', result);
+        }
+
+        // Auto-run health check on load
+        window.addEventListener('load', () => {
+            testHealth();
+        });
+    </script>
+</body>
+</html>

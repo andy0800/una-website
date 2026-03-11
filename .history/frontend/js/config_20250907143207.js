@@ -5,17 +5,17 @@ const config = {
   ENV: window.location.hostname === 'localhost' ? 'development' : 'production',
   
   // API endpoints - dynamic based on environment
-  API_BASE_URL: window.location.hostname === 'localhost' ? 'http://localhost:4000/api' : 'https://una-backend-c207.onrender.com/api',
-  SOCKET_URL: window.location.hostname === 'localhost' ? 'http://localhost:4000' : 'https://una-backend-c207.onrender.com',
-  UPLOAD_URL: window.location.hostname === 'localhost' ? 'http://localhost:4000/uploads' : 'https://una-backend-c207.onrender.com/uploads',
+  API_BASE_URL: window.location.hostname === 'localhost' ? 'http://localhost:4000/api' : 'https://api.una.institute/api',
+  SOCKET_URL: window.location.hostname === 'localhost' ? 'http://localhost:4000' : 'https://api.una.institute',
+  UPLOAD_URL: window.location.hostname === 'localhost' ? 'http://localhost:4000/uploads' : 'https://api.una.institute/uploads',
   
   // Specific API endpoints
   USER_API: {
-    LOGIN: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/login' : 'https://una-backend-c207.onrender.com/api/users/login',
-    REGISTER: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/register' : 'https://una-backend-c207.onrender.com/api/users/register',
-    PROFILE: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/me' : 'https://una-backend-c207.onrender.com/api/users/me',
-    COURSES: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/courses' : 'https://una-backend-c207.onrender.com/api/courses',
-    ENROLL: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/enroll' : 'https://una-backend-c207.onrender.com/api/users/enroll'
+    LOGIN: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/login' : 'https://api.una.institute/api/users/login',
+    REGISTER: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/register' : 'https://api.una.institute/api/users/register',
+    PROFILE: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/me' : 'https://api.una.institute/api/users/me',
+    COURSES: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/courses' : 'https://api.una.institute/api/courses',
+    ENROLL: window.location.hostname === 'localhost' ? 'http://localhost:4000/api/users/enroll' : 'https://api.una.institute/api/users/enroll'
   },
   
   ADMIN_API: {
