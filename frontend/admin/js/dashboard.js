@@ -3,6 +3,8 @@ const apiBase = window.config.API_BASE_URL;
 const adminApiBase = window.config.API_BASE_URL + '/admin';
 const lectureApiBase = window.config.API_BASE_URL + '/lectures';
 let allUsers = []; // global to store users
+let currentPopupLectureId = null; // lecture id when popup is open (for Edit button)
+let analyticsUpdateIntervalId = null; // single interval for analytics refresh
 
 const headers = {
   Authorization: `Bearer ${token}`
@@ -55,6 +57,19 @@ document.addEventListener('DOMContentLoaded', function() {
   const fixVideoBtn = document.getElementById('fixVideoBtn');
   if (fixVideoBtn) {
     fixVideoBtn.addEventListener('click', fixVideoIssues);
+  }
+
+  const fixPublicBtn = document.getElementById('fixPublicBtn');
+  if (fixPublicBtn) {
+    fixPublicBtn.addEventListener('click', fixPublicAccess);
+  }
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('adminToken');
+      window.location.href = 'login.html';
+    });
   }
 });
 
@@ -173,7 +188,14 @@ function initializeEventListeners() {
 
   const editLectureBtn = document.getElementById('editLectureBtn');
   if (editLectureBtn) {
-    editLectureBtn.addEventListener('click', editLecture);
+    editLectureBtn.addEventListener('click', () => {
+      if (currentPopupLectureId) {
+        closeLecturePopup();
+        editLecture(currentPopupLectureId);
+      } else {
+        alert('No lecture selected');
+      }
+    });
   }
 
   // Search input
@@ -254,17 +276,76 @@ function closeEditModal(modalId) {
 }
 
 function saveUserEdit() {
-  // Implementation for saving user edits
-  // This function should be implemented based on your form structure
-  console.log('Saving user edit...');
-  // Add your save logic here
+  const form = document.getElementById('editUserForm');
+  if (!form) return;
+  const userId = form.getAttribute('data-user-id');
+  if (!userId) {
+    alert('User ID not found. Please open the user from the list first.');
+    return;
+  }
+  const nameEl = document.getElementById('editUserName');
+  const phoneEl = document.getElementById('editUserPhone');
+  const civilIdEl = document.getElementById('editUserCivilId');
+  const coursesEl = document.getElementById('editUserCourses');
+  const name = nameEl ? nameEl.value.trim() : '';
+  const phone = phoneEl ? phoneEl.value.trim() : '';
+  if (!name || !phone) {
+    alert('Name and phone are required.');
+    return;
+  }
+  const civilId = civilIdEl ? civilIdEl.value.trim() : '';
+  const passportNumber = document.getElementById('editUserPassport') ? document.getElementById('editUserPassport').value.trim() : '';
+  const dateOfBirthEl = document.getElementById('editUserDOB');
+  const dateOfBirth = dateOfBirthEl && dateOfBirthEl.value ? dateOfBirthEl.value : null;
+  let courses = [];
+  if (coursesEl) {
+    courses = Array.from(coursesEl.selectedOptions).map(o => o.value).filter(Boolean);
+  }
+  const body = { name, phone, civilId, passportNumber, dateOfBirth, courses };
+  fetch(`${adminApiBase}/users/${userId}/info`, {
+    method: 'PUT',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+    .then(handleResponse)
+    .then(() => {
+      alert('User updated successfully!');
+      closeEditModal('editUserModal');
+      loadUsers();
+    })
+    .catch(err => alert(err.message || 'Failed to update user'));
 }
 
 function saveCourseEdit() {
-  // Implementation for saving course edits
-  // This function should be implemented based on your form structure
-  console.log('Saving course edit...');
-  // Add your save logic here
+  const form = document.getElementById('editCourseForm');
+  if (!form) return;
+  const courseId = form.getAttribute('data-course-id');
+  if (!courseId) {
+    alert('Course ID not found. Please open the course from the list first.');
+    return;
+  }
+  const nameEl = document.getElementById('editCourseName');
+  const descEl = document.getElementById('editCourseDescription');
+  const durationEl = document.getElementById('editCourseDuration');
+  const name = nameEl ? nameEl.value.trim() : '';
+  const description = descEl ? descEl.value.trim() : '';
+  const duration = durationEl ? durationEl.value.trim() : '';
+  if (!name) {
+    alert('Course name is required.');
+    return;
+  }
+  fetch(`${adminApiBase}/courses/${courseId}`, {
+    method: 'PUT',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description, duration })
+  })
+    .then(handleResponse)
+    .then(() => {
+      alert('Course updated successfully!');
+      closeEditModal('editCourseModal');
+      loadCourses();
+    })
+    .catch(err => alert(err.message || 'Failed to update course'));
 }
 
 function createLecture() {
@@ -314,14 +395,20 @@ function addEventDelegation() {
 
   // Lecture management buttons
   document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('edit-lecture-btn')) {
-      const lectureId = e.target.dataset.lectureId;
-      editLecture(lectureId);
+    const watchBtn = e.target.closest('.watch-lecture-btn');
+    if (watchBtn) {
+      const lectureId = watchBtn.dataset.lectureId;
+      if (lectureId) openLecturePopup(lectureId);
+      return;
     }
-    
-    if (e.target.classList.contains('delete-lecture-btn')) {
-      const lectureId = e.target.dataset.lectureId;
-      deleteLecture(lectureId);
+    const editBtn = e.target.closest('.edit-lecture-btn');
+    if (editBtn && editBtn.dataset.lectureId) {
+      editLecture(editBtn.dataset.lectureId);
+      return;
+    }
+    const delBtn = e.target.closest('.delete-lecture-btn');
+    if (delBtn && delBtn.dataset.lectureId) {
+      deleteLecture(delBtn.dataset.lectureId);
     }
   });
 
@@ -352,11 +439,6 @@ function addEventDelegation() {
     }
   });
 }
-
-document.getElementById('logoutBtn').addEventListener('click', () => {
-                localStorage.removeItem('adminToken');
-  window.location.href = 'login.html';
-});
 
 function handleResponse(res) {
   return res.json().then(data => {
@@ -760,6 +842,15 @@ function loadStats() {
           <div class="stat-card">🎓 Certificates: <strong>${stats.certificates}</strong></div>
         `;
       }
+      // Update dashboard overview stat cards
+      const totalUsersEl = document.getElementById('totalUsers');
+      const activeCoursesEl = document.getElementById('activeCourses');
+      const totalFormsEl = document.getElementById('totalForms');
+      const liveViewersEl = document.getElementById('liveViewers');
+      if (totalUsersEl) totalUsersEl.textContent = stats.users;
+      if (activeCoursesEl) activeCoursesEl.textContent = stats.courses;
+      if (totalFormsEl) totalFormsEl.textContent = stats.forms;
+      if (liveViewersEl) liveViewersEl.textContent = stats.liveViewers != null ? stats.liveViewers : '0';
       // Update connection status on successful API call
       updateConnectionStatus('connected');
     })
@@ -804,7 +895,10 @@ function initializeTabSystem() {
     
     item.addEventListener('click', () => {
       console.log(`Tab clicked: ${targetTab}`);
-      
+      if (targetTab !== 'analytics' && analyticsUpdateIntervalId) {
+        clearInterval(analyticsUpdateIntervalId);
+        analyticsUpdateIntervalId = null;
+      }
       // Remove active class from all nav items and tab contents
       navItems.forEach(nav => nav.classList.remove('active'));
       tabContents.forEach(tab => tab.classList.remove('active'));
@@ -1543,12 +1637,15 @@ function displayLecturesList(lectures) {
               <span class="lecture-quality">${lecture.quality || '1080p'}</span>
             </div>
             <div class="lecture-actions">
-                              <button class="btn-edit edit-lecture-btn" data-lecture-id="${lecture._id}">
-                  <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn-delete delete-lecture-btn" data-lecture-id="${lecture._id}">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
+              <button class="btn-watch watch-lecture-btn" data-lecture-id="${lecture._id}" title="Watch">
+                <i class="fas fa-play"></i> Watch
+              </button>
+              <button class="btn-edit edit-lecture-btn" data-lecture-id="${lecture._id}">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn-delete delete-lecture-btn" data-lecture-id="${lecture._id}">
+                <i class="fas fa-trash"></i> Delete
+              </button>
             </div>
           </div>
         </div>
@@ -1578,6 +1675,45 @@ function closeLecturePopup() {
   const popup = document.getElementById('lecturePopup');
   if (popup) {
     popup.style.display = 'none';
+  }
+  currentPopupLectureId = null;
+}
+
+async function openLecturePopup(lectureId) {
+  const popup = document.getElementById('lecturePopup');
+  if (!popup) return;
+  try {
+    const response = await fetch(`${lectureApiBase}/admin/lectures/${lectureId}`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+    });
+    if (!response.ok) throw new Error('Failed to load lecture');
+    const lecture = await response.json();
+    currentPopupLectureId = lectureId;
+    const streamUrl = `${lectureApiBase}/admin/lectures/${lectureId}/stream?token=${encodeURIComponent(localStorage.getItem('adminToken') || '')}`;
+    const titleEl = document.getElementById('popupLectureTitle');
+    const descEl = document.getElementById('popupLectureDescription');
+    const dateEl = document.getElementById('popupLectureDate');
+    const durationEl = document.getElementById('popupLectureDuration');
+    const qualityEl = document.getElementById('popupLectureQuality');
+    const categoryEl = document.getElementById('popupLectureCategory');
+    const videoEl = document.getElementById('lectureVideoPlayer');
+    if (titleEl) titleEl.textContent = lecture.title || 'Lecture';
+    if (descEl) descEl.textContent = lecture.description || 'No description.';
+    if (dateEl) dateEl.textContent = lecture.streamDate ? new Date(lecture.streamDate).toLocaleDateString() : '—';
+    if (durationEl) durationEl.textContent = lecture.duration || '—';
+    if (qualityEl) qualityEl.textContent = lecture.quality || '—';
+    if (categoryEl) categoryEl.textContent = lecture.category || '—';
+    if (videoEl) {
+      videoEl.querySelectorAll('source').forEach(s => s.removeAttribute('src'));
+      const src = videoEl.querySelector('source[type="video/mp4"]') || videoEl.appendChild(document.createElement('source'));
+      src.setAttribute('type', 'video/mp4');
+      src.setAttribute('src', streamUrl);
+      videoEl.load();
+    }
+    popup.style.display = 'block';
+  } catch (err) {
+    console.error('Error opening lecture popup:', err);
+    alert('Could not load lecture: ' + (err.message || 'Unknown error'));
   }
 }
 
@@ -2009,23 +2145,21 @@ function displayAnalyticsError(message) {
 }
 
 function startAnalyticsUpdates() {
-  // Update analytics every 30 seconds
-  const updateInterval = setInterval(async () => {
+  if (analyticsUpdateIntervalId) {
+    clearInterval(analyticsUpdateIntervalId);
+    analyticsUpdateIntervalId = null;
+  }
+  analyticsUpdateIntervalId = setInterval(async () => {
     const currentTab = document.querySelector('.nav-item.active')?.getAttribute('data-tab');
     if (currentTab === 'analytics') {
       await loadAnalytics();
     } else {
-      clearInterval(updateInterval);
+      if (analyticsUpdateIntervalId) {
+        clearInterval(analyticsUpdateIntervalId);
+        analyticsUpdateIntervalId = null;
+      }
     }
   }, 30000);
-  
-  // Clean up interval when tab changes
-  const navItems = document.querySelectorAll('.nav-item');
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      clearInterval(updateInterval);
-    });
-  });
 }
 
 // Enhanced Forms Function
